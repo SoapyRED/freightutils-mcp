@@ -1,0 +1,53 @@
+{
+  "name": "freightutils-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for FreightUtils — 11 freight calculation and reference tools for AI agents",
+  "author": "FreightUtils <contact@freightutils.com>",
+  "license": "MIT",
+  "homepage": "https://www.freightutils.com/api-docs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SoapyRED/freightutils-mcp"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "freight",
+    "logistics",
+    "shipping",
+    "cbm",
+    "ldm",
+    "adr",
+    "dangerous-goods",
+    "hs-codes",
+    "incoterms",
+    "air-freight",
+    "sea-freight"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "freightutils-mcp": "dist/bin/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/bin/cli.js",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "@types/node": "^22"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
