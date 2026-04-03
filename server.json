@@ -1,0 +1,27 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.SoapyRED/freightutils",
+  "title": "FreightUtils MCP Server",
+  "description": "11 freight tools for AI agents: ADR, HS codes, airlines, LDM, CBM, pallets, containers",
+  "repository": {
+    "url": "https://github.com/SoapyRED/freightutils-mcp",
+    "source": "github"
+  },
+  "version": "1.0.1",
+  "remotes": [
+    {
+      "type": "sse",
+      "url": "https://freightutils.com/api/mcp/mcp"
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "freightutils-mcp",
+      "version": "1.0.1",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

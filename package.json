@@ -1,6 +1,7 @@
 {
   "name": "freightutils-mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "mcpName": "io.github.SoapyRED/freightutils",
   "description": "MCP server for FreightUtils — 11 freight calculation and reference tools for AI agents",
   "author": "FreightUtils <contact@freightutils.com>",
   "license": "MIT",
