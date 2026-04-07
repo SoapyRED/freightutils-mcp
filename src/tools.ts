@@ -361,6 +361,194 @@ Note: Short tons (US) = 2,000 lbs. Long tons (UK) = 2,240 lbs. Metric tonnes = 2
 };
 
 // ─────────────────────────────────────────────────────────────
+//  12. Consignment Calculator
+// ─────────────────────────────────────────────────────────────
+
+const consignmentCalculator: ToolDef = {
+  name: 'consignment_calculator',
+  description: `Calculate total CBM, weight, loading metres, and chargeable weight for multi-item consignments.
+
+Combines multiple different items into a single consignment calculation. Supports road, air, and sea freight modes with mode-specific chargeable weight calculations.
+
+Use this tool when you need to:
+- Quote a mixed consignment with different item types
+- Calculate total CBM and weight across all items
+- Get mode-specific chargeable weight (road: LDM-based, air: volumetric, sea: W/M)
+
+Provide an array of items, each with length, width, height (cm) and optional weight, quantity, and pallet type.`,
+
+  schema: z.object({
+    mode: z.enum(['road', 'air', 'sea']).optional().describe('Transport mode (default: road)'),
+    items: z.array(z.object({
+      length: z.number().positive().describe('Length in cm'),
+      width: z.number().positive().describe('Width in cm'),
+      height: z.number().positive().describe('Height in cm'),
+      quantity: z.number().int().positive().optional().describe('Number of items (default: 1)'),
+      grossWeight: z.number().optional().describe('Gross weight per item in kg'),
+      stackable: z.boolean().optional().describe('Can items be stacked?'),
+      palletType: z.enum(['euro', 'uk', 'us', 'custom', 'none']).optional().describe('Pallet type'),
+      description: z.string().optional().describe('Item description'),
+    })).describe('Array of consignment items'),
+  }),
+
+  handler: async (args) =>
+    apiPost('consignment', { mode: args.mode ?? 'road', items: args.items }),
+};
+
+// ─────────────────────────────────────────────────────────────
+//  13. UN/LOCODE Lookup
+// ─────────────────────────────────────────────────────────────
+
+const unlocodeLookup: ToolDef = {
+  name: 'unlocode_lookup',
+  description: `Search 116,129 UN/LOCODE transport locations worldwide.
+
+UN/LOCODE identifies ports, airports, rail terminals, inland depots, and border crossings. Each code is 5 characters: 2-letter country code + 3-character location (e.g., GBLHR = London Heathrow, NLRTM = Rotterdam).
+
+Use this tool when you need to:
+- Find a port, airport, or terminal by name
+- Look up a specific UN/LOCODE
+- Filter locations by country or function type (port, airport, rail, road, icd, border)`,
+
+  schema: z.object({
+    query: z.string().optional().describe('Search by location name (e.g., "rotterdam", "heathrow")'),
+    code: z.string().optional().describe('Exact UN/LOCODE lookup (e.g., "GBLHR", "NLRTM")'),
+    country: z.string().optional().describe('Filter by country code (e.g., "GB", "NL")'),
+    function: z.string().optional().describe('Filter by function: port, airport, rail, road, icd, border'),
+    limit: z.number().int().positive().optional().describe('Max results (default: 20, max: 100)'),
+  }),
+
+  handler: async (args) =>
+    apiGet('unlocode', {
+      q: args.query, code: args.code, country: args.country,
+      function: args.function, limit: args.limit,
+    }),
+};
+
+// ─────────────────────────────────────────────────────────────
+//  14. UK Import Duty & VAT Calculator
+// ─────────────────────────────────────────────────────────────
+
+const ukDutyCalculator: ToolDef = {
+  name: 'uk_duty_calculator',
+  description: `Estimate UK import duty and VAT for any commodity code.
+
+Uses live GOV.UK Trade Tariff data. Calculates CIF value from goods value + freight + insurance, applies the appropriate duty rate, then calculates VAT (standard 20%) on the duty-inclusive value.
+
+Use this tool when you need to:
+- Estimate import costs for UK-bound shipments
+- Check duty rates for specific HS/commodity codes
+- Compare landed costs for different origin countries
+- Determine if preferential rates apply`,
+
+  schema: z.object({
+    commodityCode: z.string().describe('HS/tariff code (min 6 digits, e.g., "847989")'),
+    originCountry: z.string().describe('ISO 2-letter origin country code (e.g., "CN", "DE")'),
+    customsValue: z.number().positive().describe('Goods value in GBP'),
+    freightCost: z.number().optional().describe('Freight cost in GBP (added to CIF value)'),
+    insuranceCost: z.number().optional().describe('Insurance cost in GBP (added to CIF value)'),
+    incoterm: z.string().optional().describe('Incoterm (e.g., "FOB", "CIF", "EXW")'),
+  }),
+
+  handler: async (args) =>
+    apiPost('duty', {
+      commodityCode: args.commodityCode, originCountry: args.originCountry,
+      customsValue: args.customsValue, freightCost: args.freightCost,
+      insuranceCost: args.insuranceCost, incoterm: args.incoterm,
+    }),
+};
+
+// ─────────────────────────────────────────────────────────────
+//  15. Shipment Summary (Composite)
+// ─────────────────────────────────────────────────────────────
+
+const shipmentSummary: ToolDef = {
+  name: 'shipment_summary',
+  description: `Composite endpoint — chains CBM, weight, LDM/volumetric/W&M, ADR compliance, and UK duty estimation into one response.
+
+The flagship composite tool. Accepts multiple items with a transport mode and returns comprehensive calculations. Road mode includes LDM, pallet spaces, and vehicle suggestion. Air mode includes volumetric weight. Sea mode includes revenue tonnes and container suggestion. All modes include ADR compliance checks and UK duty estimates when HS codes and customs values are provided.
+
+Use this tool when you need a complete shipment analysis in one call.`,
+
+  schema: z.object({
+    mode: z.enum(['road', 'air', 'sea', 'multimodal']).describe('Transport mode'),
+    items: z.array(z.object({
+      description: z.string().optional(),
+      length: z.number().positive().describe('Length in cm'),
+      width: z.number().positive().describe('Width in cm'),
+      height: z.number().positive().describe('Height in cm'),
+      weight: z.number().describe('Gross weight per item in kg'),
+      quantity: z.number().int().positive().describe('Number of items'),
+      stackable: z.boolean().optional(),
+      palletType: z.enum(['euro', 'uk', 'us', 'custom', 'none']).optional(),
+      hsCode: z.string().optional().describe('HS code for customs'),
+      unNumber: z.string().optional().describe('UN number for dangerous goods'),
+      customsValue: z.number().optional().describe('Customs value per item in GBP'),
+    })).describe('Shipment items'),
+    origin: z.object({ country: z.string(), locode: z.string().optional() }).optional(),
+    destination: z.object({ country: z.string(), locode: z.string().optional() }).optional(),
+    incoterm: z.string().optional(),
+    freightCost: z.number().optional(),
+    insuranceCost: z.number().optional(),
+  }),
+
+  handler: async (args) =>
+    apiPost('shipment/summary', args),
+};
+
+// ─────────────────────────────────────────────────────────────
+//  16. ULD Lookup
+// ─────────────────────────────────────────────────────────────
+
+const uldLookup: ToolDef = {
+  name: 'uld_lookup',
+  description: `Look up air freight ULD (Unit Load Device) specifications.
+
+15 types including AKE (LD3), PMC main deck pallet, temperature-controlled containers, and more. Returns dimensions, weights, usable volume, compatible aircraft, and deck position.
+
+Use this tool when you need to:
+- Find ULD specs by IATA code (e.g., "AKE", "PMC")
+- Compare container vs pallet ULD types
+- Check which ULDs fit on lower deck vs main deck
+- Find aircraft-compatible ULDs`,
+
+  schema: z.object({
+    type: z.string().optional().describe('ULD code (e.g., "AKE", "PMC"). Omit to list all.'),
+    category: z.enum(['container', 'pallet', 'special']).optional().describe('Filter by category'),
+    deck: z.enum(['lower', 'main']).optional().describe('Filter by deck position'),
+  }),
+
+  handler: async (args) =>
+    apiGet('uld', { type: args.type, category: args.category, deck: args.deck }),
+};
+
+// ─────────────────────────────────────────────────────────────
+//  17. Vehicle & Trailer Lookup
+// ─────────────────────────────────────────────────────────────
+
+const vehicleLookup: ToolDef = {
+  name: 'vehicle_lookup',
+  description: `Look up road freight vehicle and trailer specifications.
+
+17 types covering articulated trailers (curtainsider, mega, box, reefer, double-deck, flatbed, low-loader, US 53ft/48ft), rigid trucks (7.5T to 26T), and vans (Luton, Transit, Sprinter). Returns internal dimensions, payload limits, pallet capacity, and features.
+
+Use this tool when you need to:
+- Find vehicle specs by type (e.g., "standard-curtainsider")
+- Compare EU vs US trailer dimensions
+- Determine pallet capacity for vehicle selection
+- Check payload limits for heavy shipments`,
+
+  schema: z.object({
+    slug: z.string().optional().describe('Vehicle slug (e.g., "standard-curtainsider"). Omit to list all.'),
+    category: z.enum(['articulated', 'rigid', 'van']).optional().describe('Filter by category'),
+    region: z.enum(['EU', 'US']).optional().describe('Filter by region'),
+  }),
+
+  handler: async (args) =>
+    apiGet('vehicles', { slug: args.slug, category: args.category, region: args.region }),
+};
+
+// ─────────────────────────────────────────────────────────────
 //  Export all tools
 // ─────────────────────────────────────────────────────────────
 
@@ -376,4 +564,10 @@ export const ALL_TOOLS: ToolDef[] = [
   incotermsLookup,
   palletFittingCalculator,
   unitConverter,
+  consignmentCalculator,
+  unlocodeLookup,
+  ukDutyCalculator,
+  shipmentSummary,
+  uldLookup,
+  vehicleLookup,
 ];
