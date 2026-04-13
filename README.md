@@ -68,7 +68,14 @@ Once connected, your AI agent can:
 
 ## API
 
-All tools call the free [FreightUtils API](https://www.freightutils.com/api-docs). No API key required. Courtesy rate limit: 100 requests/day per IP.
+All tools call the free [FreightUtils API](https://www.freightutils.com/api-docs).
+
+Rate limits:
+- **Anonymous:** 25 requests/day (no key needed)
+- **Free API key:** 100 requests/day
+- **Pro:** 50,000 requests/month
+
+Get a free API key at [freightutils.com/api-docs#signup](https://www.freightutils.com/api-docs#signup).
 
 ## License
 
