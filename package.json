@@ -1,14 +1,17 @@
 {
   "name": "freightutils-mcp",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "mcpName": "io.github.SoapyRED/freightutils",
-  "description": "MCP server for FreightUtils — 17 freight calculation and reference tools for AI agents",
+  "description": "17 freight calculation and reference tools for AI agents — ADR 2025 dangerous goods (2,939 entries), HS 2022 codes (6,940), airlines (6,352), UN/LOCODE (116,129 locations), LDM/CBM/chargeable weight calculators, UK duty estimator, and more.",
   "author": "FreightUtils <contact@freightutils.com>",
   "license": "MIT",
   "homepage": "https://www.freightutils.com/api-docs",
   "repository": {
     "type": "git",
-    "url": "https://github.com/SoapyRED/freightutils-mcp"
+    "url": "git+https://github.com/SoapyRED/freightutils-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SoapyRED/freightutils-mcp/issues"
   },
   "keywords": [
     "mcp",
@@ -16,14 +19,20 @@
     "freight",
     "logistics",
     "shipping",
-    "cbm",
-    "ldm",
+    "transportation",
     "adr",
     "dangerous-goods",
     "hs-codes",
-    "incoterms",
     "air-freight",
-    "sea-freight"
+    "sea-freight",
+    "road-freight",
+    "customs",
+    "calculator",
+    "iata",
+    "unlocode",
+    "cbm",
+    "ldm",
+    "incoterms"
   ],
   "type": "module",
   "main": "dist/index.js",
@@ -32,7 +41,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc",

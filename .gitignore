@@ -1,2 +1,6 @@
 node_modules/
 dist/
+.mcpregistry_*_token
+.env
+.env.*
+*.tgz

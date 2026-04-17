@@ -1,32 +1,63 @@
 # FreightUtils MCP Server
 
-A [Model Context Protocol](https://modelcontextprotocol.io) server that gives AI agents access to 17 freight calculation and reference tools.
+[![npm version](https://img.shields.io/npm/v/freightutils-mcp.svg)](https://www.npmjs.com/package/freightutils-mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![FreightUtils MCP server](https://glama.ai/mcp/servers/SoapyRED/freightutils-mcp/badges/score.svg)](https://glama.ai/mcp/servers/SoapyRED/freightutils-mcp)
 
-## Tools
+A [Model Context Protocol](https://modelcontextprotocol.io/) server that gives AI agents access to 17 freight calculation and reference tools, covering road, air, and sea freight.
 
+Built by an ADR-certified freight transport planner for AI agents, developers, and freight professionals.
+
+**Website:** https://www.freightutils.com
+**API Docs:** https://www.freightutils.com/api-docs
+
+---
+
+## Tools (17)
+
+### Calculators
 | Tool | Description |
 |------|-------------|
-| `cbm_calculator` | Calculate cubic metres (CBM) for sea freight |
+| `ldm_calculator` | Loading metres for European and US road trailers |
+| `cbm_calculator` | Cubic metres for sea freight |
 | `chargeable_weight_calculator` | Air freight chargeable weight (volumetric vs actual) |
-| `ldm_calculator` | Loading metres for European road freight |
-| `consignment_calculator` | Multi-item consignment calculator (combined LDM/CBM/chargeable weight) |
-| `pallet_fitting_calculator` | Box-on-pallet fitting with layers and rotation |
-| `container_lookup` | ISO container specs and loading calculation |
-| `unit_converter` | Convert between freight units (weight, volume, length) |
-| `adr_lookup` | Dangerous goods lookup (ADR 2025, 2,939 entries) |
-| `adr_exemption_calculator` | ADR 1.1.3.6 small load exemption calculator |
-| `hs_code_lookup` | Harmonized System tariff codes (6,940 codes) |
-| `incoterms_lookup` | Incoterms 2020 trade rules |
-| `uk_duty_calculator` | UK import duty & VAT estimator (live GOV.UK data) |
-| `airline_lookup` | Search 6,352 airlines by name, IATA/ICAO code, AWB prefix |
-| `unlocode_lookup` | UN/LOCODE location codes (116,129 locations) |
-| `uld_lookup` | Air cargo ULD types (15 Unit Load Devices) |
-| `vehicle_lookup` | Road freight vehicle & trailer types (17 EU/US vehicles) |
-| `shipment_summary` | Composite shipment analysis — chains multiple tools in one call |
+| `pallet_fitting_calculator` | Box-on-pallet optimisation with rotation |
+| `container_lookup` | ISO container specs (10 types) and loading calculation |
+| `unit_converter` | Weight, volume, length, and freight-specific conversions |
+| `consignment_calculator` | Multi-item CBM, weight, LDM, chargeable weight |
 
-## Quick Start
+### Dangerous Goods (ADR)
+| Tool | Description |
+|------|-------------|
+| `adr_lookup` | 2,939 UNECE ADR 2025 entries |
+| `adr_exemption_calculator` | ADR 1.1.3.6 small load exemption check |
+| `adr_lq_eq_check` | Limited and Excepted Quantity eligibility |
 
-### Claude Desktop / Claude Code
+### Customs & Tariff
+| Tool | Description |
+|------|-------------|
+| `hs_code_lookup` | 6,940 Harmonized System tariff codes (HS 2022) |
+| `uk_duty_calculator` | UK import duty and VAT (live GOV.UK Trade Tariff data) |
+| `incoterms_lookup` | Incoterms 2020 — all 11 rules with risk/cost transfer points |
+
+### Reference Data
+| Tool | Description |
+|------|-------------|
+| `airline_lookup` | 6,352 airlines with IATA/ICAO codes and AWB prefixes |
+| `unlocode_lookup` | 116,129+ UN/LOCODE transport locations |
+| `uld_lookup` | 15 air cargo ULD types (LD3, PMC, etc.) |
+| `vehicle_lookup` | 17 road freight vehicles and trailers |
+
+### Composite
+| Tool | Description |
+|------|-------------|
+| `shipment_summary` | Chains CBM + weight + LDM + ADR + duty in one call |
+
+---
+
+## Installation
+
+### Claude Desktop / Claude Code (stdio)
 
 Add to your MCP config (`claude_desktop_config.json` or `.claude/settings.json`):
 
@@ -41,42 +72,66 @@ Add to your MCP config (`claude_desktop_config.json` or `.claude/settings.json`)
 }
 ```
 
-### Remote HTTP (URL-based)
+### Remote HTTP / SSE
 
 If your MCP client supports remote servers:
 
 ```
-https://www.freightutils.com/api/mcp/mcp
+https://www.freightutils.com/api/mcp
 ```
 
-## Examples
+No authentication required for basic usage.
+
+---
+
+## Rate Limits
+
+All tools call the free FreightUtils API:
+
+- **Anonymous:** 25 requests/day per IP
+- **Free API key:** 100 requests/day (register at https://www.freightutils.com)
+- **Pro:** 50,000 requests/month at £19/month
+
+---
+
+## Example Prompts
 
 Once connected, your AI agent can:
 
-- *"Calculate CBM for a box 120cm x 80cm x 100cm, 24 pieces"*
-- *"Look up UN 1203 in the ADR database"*
-- *"Check if 200L of petrol qualifies for ADR 1.1.3.6 exemption"*
-- *"Find the HS code for lithium batteries"*
-- *"What does FOB mean in shipping?"*
-- *"How many boxes 40x30x25cm fit on a euro pallet?"*
-- *"Calculate loading metres for 26 euro pallets on an artic trailer"*
-- *"What are the specs of an AKE (LD3) ULD container?"*
-- *"What's the payload of a standard 13.6m curtainsider?"*
-- *"Estimate UK import duty on HS 847989 from China, value £10,000"*
-- *"Find the UN/LOCODE for Rotterdam"*
-- *"Get a full shipment summary for 6 pallets going road from Hamburg to Felixstowe"*
+- "Calculate CBM for a box 120cm × 80cm × 100cm, 24 pieces"
+- "Look up UN 1203 in the ADR database"
+- "Check if 200L of petrol qualifies for ADR 1.1.3.6 exemption"
+- "Find the HS code for lithium batteries"
+- "What does FOB mean in shipping?"
+- "How many boxes of 40×30×25cm fit on a euro pallet?"
+- "Calculate loading metres for 26 euro pallets on an artic trailer"
+- "What's the UK import duty on laptops from China?"
 
-## API
+---
 
-All tools call the free [FreightUtils API](https://www.freightutils.com/api-docs).
+## Data Sources
 
-Rate limits:
-- **Anonymous:** 25 requests/day (no key needed)
-- **Free API key:** 100 requests/day
-- **Pro:** 50,000 requests/month
+- **ADR 2025** — UNECE (licensed from Labeline.com)
+- **HS 2022** — UN Comtrade (PDDL)
+- **Airlines** — public IATA/ICAO data, cross-referenced
+- **UN/LOCODE** — UNECE
+- **UK Duty** — live GOV.UK Trade Tariff API
+- **Containers/ULD/Vehicles** — ISO, IATA, and industry-standard specifications
 
-Get a free API key at [freightutils.com/api-docs#signup](https://www.freightutils.com/api-docs#signup).
+---
+
+## Links
+
+- **Main site:** https://www.freightutils.com
+- **API documentation:** https://www.freightutils.com/api-docs
+- **GitHub (this repo):** https://github.com/SoapyRED/freightutils-mcp
+- **npm:** https://www.npmjs.com/package/freightutils-mcp
+- **Issues:** https://github.com/SoapyRED/freightutils-mcp/issues
+
+---
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
+
+Built by [Marius Cristoiu](https://www.linkedin.com/in/marius-cristoiu-a853812a2/), ADR-certified freight transport planner.

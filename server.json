@@ -7,7 +7,7 @@
     "url": "https://github.com/SoapyRED/freightutils-mcp",
     "source": "github"
   },
-  "version": "1.0.2",
+  "version": "1.0.4",
   "remotes": [
     {
       "type": "sse",
@@ -18,7 +18,7 @@
     {
       "registryType": "npm",
       "identifier": "freightutils-mcp",
-      "version": "1.0.2",
+      "version": "1.0.4",
       "transport": {
         "type": "stdio"
       }
