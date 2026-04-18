@@ -549,6 +549,38 @@ Use this tool when you need to:
 };
 
 // ─────────────────────────────────────────────────────────────
+//  18. ADR Limited/Excepted Quantity Check
+// ─────────────────────────────────────────────────────────────
+
+const adrLqEqCheck: ToolDef = {
+  name: 'adr_lq_eq_check',
+  description: `Check if dangerous goods qualify for ADR Limited Quantity (LQ) or Excepted Quantity (EQ) exemptions.
+
+ADR 3.4 (Limited Quantities) allows reduced requirements for small quantities packed in inner packagings below a per-substance maximum. ADR 3.5 (Excepted Quantities, codes E1–E5) applies to very small quantities with even stricter per-inner limits.
+
+Use this tool when you need to:
+- Check whether one or more items qualify for LQ transport (ADR 3.4)
+- Check whether one or more items qualify for EQ transport (ADR 3.5)
+- Work out the per-item LQ maximum or EQ code/limit for a UN number
+- Batch-check up to 20 items in a single call
+
+Provide the mode ('lq' or 'eq') and an array of items with un_number, quantity, and unit. For EQ mode, optionally include inner_packaging_qty to validate the packaging arrangement.`,
+
+  schema: z.object({
+    mode: z.enum(['lq', 'eq']).describe("Check mode: 'lq' (Limited Quantity, ADR 3.4) or 'eq' (Excepted Quantity, ADR 3.5)"),
+    items: z.array(z.object({
+      un_number: z.string().describe('UN number (1–4 digits, e.g. "1203")'),
+      quantity: z.number().positive().describe('Quantity of substance per inner packaging'),
+      unit: z.enum(['ml', 'L', 'g', 'kg']).describe('Unit of measurement'),
+      inner_packaging_qty: z.number().int().positive().optional().describe('Number of inner packagings (EQ mode only)'),
+    })).min(1).max(20).describe('Items to check (max 20 per call)'),
+  }),
+
+  handler: async (args) =>
+    apiPost('adr/lq-check', { mode: args.mode, items: args.items }),
+};
+
+// ─────────────────────────────────────────────────────────────
 //  Export all tools
 // ─────────────────────────────────────────────────────────────
 
@@ -558,6 +590,7 @@ export const ALL_TOOLS: ToolDef[] = [
   ldmCalculator,
   adrLookup,
   adrExemptionCalculator,
+  adrLqEqCheck,
   airlineLookup,
   containerLookup,
   hsCodeLookup,

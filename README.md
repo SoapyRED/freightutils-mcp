@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![FreightUtils MCP server](https://glama.ai/mcp/servers/SoapyRED/freightutils-mcp/badges/score.svg)](https://glama.ai/mcp/servers/SoapyRED/freightutils-mcp)
 
-A [Model Context Protocol](https://modelcontextprotocol.io/) server that gives AI agents access to 17 freight calculation and reference tools, covering road, air, and sea freight.
+A [Model Context Protocol](https://modelcontextprotocol.io/) server that gives AI agents access to 18 freight calculation and reference tools, covering road, air, and sea freight.
 
 Built by an ADR-certified freight transport planner for AI agents, developers, and freight professionals.
 
@@ -13,7 +13,7 @@ Built by an ADR-certified freight transport planner for AI agents, developers, a
 
 ---
 
-## Tools (17)
+## Tools (18)
 
 ### Calculators
 | Tool | Description |
@@ -74,11 +74,13 @@ Add to your MCP config (`claude_desktop_config.json` or `.claude/settings.json`)
 
 ### Remote HTTP / SSE
 
-If your MCP client supports remote servers:
+If your MCP client supports remote servers, use the canonical URL:
 
 ```
 https://www.freightutils.com/api/mcp
 ```
+
+> The older URL `https://www.freightutils.com/api/mcp/mcp` still works for backwards compatibility with existing clients.
 
 No authentication required for basic usage.
 

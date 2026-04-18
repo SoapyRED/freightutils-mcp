@@ -2,23 +2,23 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.SoapyRED/freightutils",
   "title": "FreightUtils MCP Server",
-  "description": "17 freight tools: calculators, ADR, HS codes, airlines, ULDs, vehicles, duty & more",
+  "description": "18 freight tools: calculators, ADR, HS codes, airlines, ULDs, vehicles, duty & more",
   "repository": {
     "url": "https://github.com/SoapyRED/freightutils-mcp",
     "source": "github"
   },
-  "version": "1.0.4",
+  "version": "1.0.5",
   "remotes": [
     {
       "type": "sse",
-      "url": "https://freightutils.com/api/mcp/mcp"
+      "url": "https://www.freightutils.com/api/mcp"
     }
   ],
   "packages": [
     {
       "registryType": "npm",
       "identifier": "freightutils-mcp",
-      "version": "1.0.4",
+      "version": "1.0.5",
       "transport": {
         "type": "stdio"
       }
