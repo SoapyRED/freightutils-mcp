@@ -122,6 +122,14 @@ Once connected, your AI agent can:
 
 ---
 
+## Changelog
+
+### 1.0.6 — 2026-04-22
+- Security: bump `@modelcontextprotocol/sdk` to `1.26.0` to patch **CVE-2026-25536** (cross-client data leak via shared transport/server instance reuse). See [GHSA-345p-7cg4-v4c7](https://github.com/advisories/GHSA-345p-7cg4-v4c7).
+- No user-facing API changes. Same 18 tools.
+
+---
+
 ## Links
 
 - **Main site:** https://www.freightutils.com
