@@ -1,0 +1,103 @@
+name: Publish to MCP Registry
+
+# Run on two triggers:
+#   1. When a GitHub Release is published (recommended path for releases)
+#   2. Manual dispatch with a version input (for backfills or retries)
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Package version to publish to registry (must match an existing npm version)'
+        required: true
+        type: string
+
+permissions:
+  contents: write      # to commit the updated server.json back to main
+  id-token: write      # required for GitHub OIDC authentication to the MCP Registry
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve target version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            # Extract version from release tag, stripping leading "v" if present
+            VERSION="${GITHUB_REF_NAME#v}"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Target version: $VERSION"
+
+      - name: Sanity-check that npm has this version
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          NPM_VERSIONS=$(npm view freightutils-mcp versions --json)
+          if ! echo "$NPM_VERSIONS" | jq -e --arg v "$VERSION" 'index($v)' > /dev/null; then
+            echo "::error::Version $VERSION is not published to npm yet. Publish to npm first, then run this workflow."
+            exit 1
+          fi
+          echo "Confirmed: freightutils-mcp@$VERSION exists on npm."
+
+      - name: Update server.json version fields
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          # Update top-level version
+          jq --arg v "$VERSION" '.version = $v' server.json > server.json.tmp
+          # Update packages[0].version too
+          jq --arg v "$VERSION" '.packages[0].version = $v' server.json.tmp > server.json
+          rm server.json.tmp
+          echo "Updated server.json:"
+          cat server.json
+
+      - name: Install mcp-publisher
+        run: |
+          VERSION="1.6.0"
+          curl -L -o mcp-publisher.tar.gz \
+            "https://github.com/modelcontextprotocol/registry/releases/download/v${VERSION}/mcp-publisher_linux_amd64.tar.gz"
+          tar -xzf mcp-publisher.tar.gz
+          chmod +x mcp-publisher
+          ./mcp-publisher --version
+
+      - name: Validate server.json
+        run: ./mcp-publisher validate ./server.json
+
+      - name: Authenticate via GitHub OIDC
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish to MCP Registry
+        run: ./mcp-publisher publish
+
+      - name: Commit updated server.json back to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet server.json; then
+            echo "server.json unchanged, nothing to commit."
+          else
+            git add server.json
+            git commit -m "chore(registry): sync server.json to v${{ steps.version.outputs.version }} [skip ci]"
+            git push origin main
+          fi
+
+      - name: Verify registry entry
+        run: |
+          sleep 5
+          RESULT=$(curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=freightutils")
+          LATEST_VERSION=$(echo "$RESULT" | jq -r '.servers[] | select(._meta["io.modelcontextprotocol.registry/official"].isLatest == true) | .server.version')
+          EXPECTED="${{ steps.version.outputs.version }}"
+          if [ "$LATEST_VERSION" = "$EXPECTED" ]; then
+            echo "✅ Registry confirms isLatest=$EXPECTED"
+          else
+            echo "::warning::Registry shows isLatest=$LATEST_VERSION but expected $EXPECTED. May be a replication delay."
+          fi
