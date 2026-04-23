@@ -124,6 +124,11 @@ Once connected, your AI agent can:
 
 ## Changelog
 
+### 1.0.8 — 2026-04-23 (hotfix)
+- **Critical fix:** revert `list_prompts` / `list_resources` stub handlers introduced in 1.0.7. The raw SDK asserts the corresponding capability must be declared before `setRequestHandler` is called — 1.0.7 threw `Server does not support prompts` at startup, crashing the MCP server on every run. 1.0.8 removes the stubs and restores boot.
+- Server identity bumped: `version: '1.0.7'` → `'1.0.8'`.
+- No other changes. 18 tools, annotations, `shipment_summary` descriptions, and `smithery.yaml` from 1.0.7 are preserved.
+
 ### 1.0.7 — 2026-04-22
 - Add `smithery.yaml` with empty configSchema (Smithery Quality Score: config UX +25).
 - Add read-only `annotations` to all 18 tools (`readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`, `openWorldHint: false`) with human-readable `title` (+7).

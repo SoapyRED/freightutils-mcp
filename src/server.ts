@@ -1,14 +1,10 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import {
-  ListPromptsRequestSchema,
-  ListResourcesRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
 import { ALL_TOOLS } from './tools.js';
 
 export function createServer(): McpServer {
   const server = new McpServer({
     name: 'freightutils-mcp',
-    version: '1.0.7',
+    version: '1.0.8',
   });
 
   // Register every tool
@@ -37,10 +33,14 @@ export function createServer(): McpServer {
     );
   }
 
-  // Stub empty prompts and resources lists so clients don't receive
-  // -32601 Method Not Found for list_prompts / list_resources probes.
-  server.server.setRequestHandler(ListPromptsRequestSchema, async () => ({ prompts: [] }));
-  server.server.setRequestHandler(ListResourcesRequestSchema, async () => ({ resources: [] }));
+  // NOTE: list_prompts / list_resources stubs were tried here via
+  // server.server.setRequestHandler(...) but the SDK asserts the
+  // corresponding capability must be declared first (throws
+  // "Server does not support prompts"). Reverted for 1.0.8 — the
+  // proper path is to declare capabilities: { prompts: {}, resources: {} }
+  // in the McpServer constructor, but that interaction with mcp-handler
+  // also needs validation before re-enabling. Accepting -5 pt on the
+  // Smithery prompts/resources stub score until verified.
 
   return server;
 }
