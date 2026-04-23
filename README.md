@@ -124,6 +124,14 @@ Once connected, your AI agent can:
 
 ## Changelog
 
+### 1.0.7 — 2026-04-22
+- Add `smithery.yaml` with empty configSchema (Smithery Quality Score: config UX +25).
+- Add read-only `annotations` to all 18 tools (`readOnlyHint: true`, `destructiveHint: false`, `idempotentHint: true`, `openWorldHint: false`) with human-readable `title` (+7).
+- Add missing parameter `.describe(...)` text to `shipment_summary` (+1).
+- Add stub `list_prompts` / `list_resources` handlers so probes return `{ prompts: [] }` / `{ resources: [] }` instead of `-32601 Method not found` (+5).
+- Fix server identity: `name: 'FreightUtils'` → `'freightutils-mcp'`, `version: '1.0.0'` → `'1.0.7'`.
+- No breaking changes. Same 18 tools, same names, same behaviour.
+
 ### 1.0.6 — 2026-04-22
 - Security: bump `@modelcontextprotocol/sdk` to `1.26.0` to patch **CVE-2026-25536** (cross-client data leak via shared transport/server instance reuse). See [GHSA-345p-7cg4-v4c7](https://github.com/advisories/GHSA-345p-7cg4-v4c7).
 - No user-facing API changes. Same 18 tools.

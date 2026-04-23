@@ -5,12 +5,31 @@ import { apiGet, apiPost } from './api.js';
 //  Tool type
 // ─────────────────────────────────────────────────────────────
 
+export interface ToolAnnotationShape {
+  title: string;
+  readOnlyHint: true;
+  destructiveHint: false;
+  idempotentHint: true;
+  openWorldHint: false;
+}
+
 export interface ToolDef {
   name: string;
   description: string;
   schema: z.ZodObject<z.ZodRawShape>;
+  annotations: ToolAnnotationShape;
   handler: (args: Record<string, unknown>) => Promise<unknown>;
 }
+
+// Every FreightUtils tool is a pure, read-only lookup or deterministic
+// calculation. This helper keeps the annotations consistent.
+const readOnlyAnnotations = (title: string): ToolAnnotationShape => ({
+  title,
+  readOnlyHint: true,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+});
 
 
 // ─────────────────────────────────────────────────────────────
@@ -36,6 +55,8 @@ Input dimensions in centimetres. Specify pieces to get total volume for multiple
     height_cm: z.number().positive().describe('Height in centimetres'),
     pieces: z.number().int().positive().optional().describe('Number of identical pieces (default: 1)'),
   }),
+
+  annotations: readOnlyAnnotations('CBM Calculator'),
 
   handler: async (args) =>
     apiGet('cbm', { l: args.length_cm, w: args.width_cm, h: args.height_cm, pcs: args.pieces }),
@@ -66,6 +87,8 @@ A ratio > 1.0 means the shipment is "volumetric" (light for its size). A ratio <
     pieces: z.number().int().positive().optional().describe('Number of identical pieces (default: 1)'),
     factor: z.number().int().positive().optional().describe('Volumetric divisor (default: 6000 IATA standard, DHL uses 5000)'),
   }),
+
+  annotations: readOnlyAnnotations('Chargeable Weight Calculator'),
 
   handler: async (args) =>
     apiGet('chargeable-weight', {
@@ -106,6 +129,8 @@ Supports pallet presets (euro, uk, half, quarter) or custom dimensions. Supports
       .describe('Custom vehicle length in metres (required if vehicle=custom)'),
   }),
 
+  annotations: readOnlyAnnotations('LDM Calculator'),
+
   handler: async (args) =>
     apiGet('ldm', {
       pallet: args.pallet, length: args.length_mm, width: args.width_mm,
@@ -138,6 +163,8 @@ Provide a UN number for exact lookup, or a search term for name-based search.`,
     hazard_class: z.string().optional().describe('Filter by hazard class (e.g., "3" for flammable liquids)'),
   }),
 
+  annotations: readOnlyAnnotations('ADR Dangerous Goods Lookup'),
+
   handler: async (args) =>
     apiGet('adr', { un: args.un_number, q: args.search, class: args.hazard_class }),
 };
@@ -167,6 +194,8 @@ For single substances, provide un_number + quantity. For mixed loads, use the it
       quantity: z.number().positive().describe('Quantity in kg or litres'),
     })).optional().describe('Array of items for mixed-load calculation (use instead of single un_number/quantity)'),
   }),
+
+  annotations: readOnlyAnnotations('ADR 1.1.3.6 Exemption Calculator'),
 
   handler: async (args) => {
     if (args.items) {
@@ -198,6 +227,8 @@ AWB prefixes are 3-digit codes used on air waybills to identify the issuing carr
     prefix: z.string().optional().describe('AWB prefix (3 digits, e.g., "176")'),
     country: z.string().optional().describe('Filter by country name (min 2 chars)'),
   }),
+
+  annotations: readOnlyAnnotations('Airline / AWB Prefix Lookup'),
 
   handler: async (args) =>
     apiGet('airlines', {
@@ -233,6 +264,8 @@ Provide a container type for specs. Add item dimensions (l, w, h in cm) to calcu
     item_quantity: z.number().int().positive().optional().describe('Number of items'),
   }),
 
+  annotations: readOnlyAnnotations('Container Lookup'),
+
   handler: async (args) =>
     apiGet('containers', {
       type: args.type, l: args.item_length_cm, w: args.item_width_cm,
@@ -263,6 +296,8 @@ Provide a search term for description-based search, or an exact HS code for deta
     section: z.string().optional().describe('Browse by section (Roman numeral, e.g., "II")'),
   }),
 
+  annotations: readOnlyAnnotations('HS Code Lookup'),
+
   handler: async (args) =>
     apiGet('hs', { q: args.query, code: args.code, section: args.section }),
 };
@@ -287,6 +322,8 @@ Use this tool when you need to:
     code: z.string().optional().describe('Incoterm code (e.g., "FOB", "CIF", "EXW")'),
     category: z.enum(['any_mode', 'sea_only']).optional().describe('Filter by transport mode category'),
   }),
+
+  annotations: readOnlyAnnotations('Incoterms 2020 Lookup'),
 
   handler: async (args) =>
     apiGet('incoterms', { code: args.code, category: args.category }),
@@ -324,6 +361,8 @@ Use this tool when you need to:
     allow_rotation: z.boolean().optional().describe('Allow 90-degree box rotation (default: true)'),
   }),
 
+  annotations: readOnlyAnnotations('Pallet Fitting Calculator'),
+
   handler: async (args) =>
     apiGet('pallet', {
       pl: args.pallet_length_cm, pw: args.pallet_width_cm, pmh: args.pallet_max_height_cm,
@@ -355,6 +394,8 @@ Note: Short tons (US) = 2,000 lbs. Long tons (UK) = 2,240 lbs. Metric tonnes = 2
     from: z.string().describe('Source unit code (e.g., "kg", "cbm", "cm")'),
     to: z.string().describe('Target unit code (e.g., "lbs", "cuft", "inches")'),
   }),
+
+  annotations: readOnlyAnnotations('Unit Converter'),
 
   handler: async (args) =>
     apiGet('convert', { value: args.value, from: args.from, to: args.to }),
@@ -391,6 +432,8 @@ Provide an array of items, each with length, width, height (cm) and optional wei
     })).describe('Array of consignment items'),
   }),
 
+  annotations: readOnlyAnnotations('Consignment Calculator'),
+
   handler: async (args) =>
     apiPost('consignment', { mode: args.mode ?? 'road', items: args.items }),
 };
@@ -417,6 +460,8 @@ Use this tool when you need to:
     function: z.string().optional().describe('Filter by function: port, airport, rail, road, icd, border'),
     limit: z.number().int().positive().optional().describe('Max results (default: 20, max: 100)'),
   }),
+
+  annotations: readOnlyAnnotations('UN/LOCODE Lookup'),
 
   handler: async (args) =>
     apiGet('unlocode', {
@@ -450,6 +495,8 @@ Use this tool when you need to:
     incoterm: z.string().optional().describe('Incoterm (e.g., "FOB", "CIF", "EXW")'),
   }),
 
+  annotations: readOnlyAnnotations('UK Duty & VAT Calculator'),
+
   handler: async (args) =>
     apiPost('duty', {
       commodityCode: args.commodityCode, originCountry: args.originCountry,
@@ -479,18 +526,20 @@ Use this tool when you need a complete shipment analysis in one call.`,
       height: z.number().positive().describe('Height in cm'),
       weight: z.number().describe('Gross weight per item in kg'),
       quantity: z.number().int().positive().describe('Number of items'),
-      stackable: z.boolean().optional(),
-      palletType: z.enum(['euro', 'uk', 'us', 'custom', 'none']).optional(),
+      stackable: z.boolean().optional().describe('Whether this item can be stacked (affects pallet fitting calc)'),
+      palletType: z.enum(['euro', 'uk', 'us', 'custom', 'none']).optional().describe('Pallet standard the item sits on, if any'),
       hsCode: z.string().optional().describe('HS code for customs'),
       unNumber: z.string().optional().describe('UN number for dangerous goods'),
       customsValue: z.number().optional().describe('Customs value per item in GBP'),
-    })).describe('Shipment items'),
-    origin: z.object({ country: z.string(), locode: z.string().optional() }).optional(),
-    destination: z.object({ country: z.string(), locode: z.string().optional() }).optional(),
-    incoterm: z.string().optional(),
-    freightCost: z.number().optional(),
-    insuranceCost: z.number().optional(),
+    })).describe('Array of shipment items with dimensions, weight, and optional HS/UN codes'),
+    origin: z.object({ country: z.string(), locode: z.string().optional() }).optional().describe('Origin location — ISO country code and optional UN/LOCODE'),
+    destination: z.object({ country: z.string(), locode: z.string().optional() }).optional().describe('Destination location — ISO country code and optional UN/LOCODE'),
+    incoterm: z.string().optional().describe("Incoterms 2020 three-letter code (e.g. 'DAP', 'EXW', 'FOB')"),
+    freightCost: z.number().optional().describe('Optional freight cost in GBP for duty calculation'),
+    insuranceCost: z.number().optional().describe('Optional insurance cost in GBP for duty calculation'),
   }),
+
+  annotations: readOnlyAnnotations('Shipment Summary'),
 
   handler: async (args) =>
     apiPost('shipment/summary', args),
@@ -518,6 +567,8 @@ Use this tool when you need to:
     deck: z.enum(['lower', 'main']).optional().describe('Filter by deck position'),
   }),
 
+  annotations: readOnlyAnnotations('Air Cargo ULD Lookup'),
+
   handler: async (args) =>
     apiGet('uld', { type: args.type, category: args.category, deck: args.deck }),
 };
@@ -543,6 +594,8 @@ Use this tool when you need to:
     category: z.enum(['articulated', 'rigid', 'van']).optional().describe('Filter by category'),
     region: z.enum(['EU', 'US']).optional().describe('Filter by region'),
   }),
+
+  annotations: readOnlyAnnotations('Vehicle Lookup'),
 
   handler: async (args) =>
     apiGet('vehicles', { slug: args.slug, category: args.category, region: args.region }),
@@ -575,6 +628,8 @@ Provide the mode ('lq' or 'eq') and an array of items with un_number, quantity, 
       inner_packaging_qty: z.number().int().positive().optional().describe('Number of inner packagings (EQ mode only)'),
     })).min(1).max(20).describe('Items to check (max 20 per call)'),
   }),
+
+  annotations: readOnlyAnnotations('ADR LQ / EQ Exemption Check'),
 
   handler: async (args) =>
     apiPost('adr/lq-check', { mode: args.mode, items: args.items }),
