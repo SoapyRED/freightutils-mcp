@@ -1,7 +1,9 @@
 # FreightUtils MCP Server
 
-[![npm version](https://img.shields.io/npm/v/freightutils-mcp.svg)](https://www.npmjs.com/package/freightutils-mcp)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![npm version](https://img.shields.io/npm/v/freightutils-mcp)](https://www.npmjs.com/package/freightutils-mcp)
+[![npm downloads (total)](https://img.shields.io/npm/dt/freightutils-mcp)](https://www.npmjs.com/package/freightutils-mcp)
+[![npm downloads (month)](https://img.shields.io/npm/dm/freightutils-mcp)](https://www.npmjs.com/package/freightutils-mcp)
+[![License: MIT](https://img.shields.io/npm/l/freightutils-mcp)](https://opensource.org/licenses/MIT)
 [![FreightUtils MCP server](https://glama.ai/mcp/servers/SoapyRED/freightutils-mcp/badges/score.svg)](https://glama.ai/mcp/servers/SoapyRED/freightutils-mcp)
 
 A [Model Context Protocol](https://modelcontextprotocol.io/) server that gives AI agents access to 18 freight calculation and reference tools, covering road, air, and sea freight.
