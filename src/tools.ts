@@ -425,17 +425,32 @@ Provide an array of items, each with length, width, height (cm) and optional wei
       width: z.number().positive().describe('Width in cm'),
       height: z.number().positive().describe('Height in cm'),
       quantity: z.number().int().positive().optional().describe('Number of items (default: 1)'),
-      grossWeight: z.number().optional().describe('Gross weight per item in kg'),
+      gross_weight: z.number().optional().describe('Gross weight per item in kg'),
       stackable: z.boolean().optional().describe('Can items be stacked?'),
-      palletType: z.enum(['euro', 'uk', 'us', 'custom', 'none']).optional().describe('Pallet type'),
+      pallet_type: z.enum(['euro', 'uk', 'us', 'custom', 'none']).optional().describe('Pallet type'),
       description: z.string().optional().describe('Item description'),
     })).describe('Array of consignment items'),
   }),
 
   annotations: readOnlyAnnotations('Consignment Calculator'),
 
+  // The /api/consignment input parser only recognises camelCase aliases on
+  // item fields (grossWeight, palletType). Map snake_case → camelCase on
+  // the wire until the website's input parser adds snake_case aliases.
   handler: async (args) =>
-    apiPost('consignment', { mode: args.mode ?? 'road', items: args.items }),
+    apiPost('consignment', {
+      mode: args.mode ?? 'road',
+      items: (args.items as Array<Record<string, unknown>>).map((i) => ({
+        description: i.description,
+        length: i.length,
+        width: i.width,
+        height: i.height,
+        quantity: i.quantity,
+        grossWeight: i.gross_weight,
+        stackable: i.stackable,
+        palletType: i.pallet_type,
+      })),
+    }),
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -487,22 +502,19 @@ Use this tool when you need to:
 - Determine if preferential rates apply`,
 
   schema: z.object({
-    commodityCode: z.string().describe('HS/tariff code (min 6 digits, e.g., "847989")'),
-    originCountry: z.string().describe('ISO 2-letter origin country code (e.g., "CN", "DE")'),
-    customsValue: z.number().positive().describe('Goods value in GBP'),
-    freightCost: z.number().optional().describe('Freight cost in GBP (added to CIF value)'),
-    insuranceCost: z.number().optional().describe('Insurance cost in GBP (added to CIF value)'),
+    commodity_code: z.string().describe('HS/tariff code (min 6 digits, e.g., "847989")'),
+    origin_country: z.string().describe('ISO 2-letter origin country code (e.g., "CN", "DE")'),
+    customs_value: z.number().positive().describe('Goods value in GBP'),
+    freight_cost: z.number().optional().describe('Freight cost in GBP (added to CIF value)'),
+    insurance_cost: z.number().optional().describe('Insurance cost in GBP (added to CIF value)'),
     incoterm: z.string().optional().describe('Incoterm (e.g., "FOB", "CIF", "EXW")'),
   }),
 
   annotations: readOnlyAnnotations('UK Duty & VAT Calculator'),
 
-  handler: async (args) =>
-    apiPost('duty', {
-      commodityCode: args.commodityCode, originCountry: args.originCountry,
-      customsValue: args.customsValue, freightCost: args.freightCost,
-      insuranceCost: args.insuranceCost, incoterm: args.incoterm,
-    }),
+  // /api/duty accepts both casings on the request body — send the canonical
+  // snake_case form, which now matches the schema.
+  handler: async (args) => apiPost('duty', args),
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -527,22 +539,46 @@ Use this tool when you need a complete shipment analysis in one call.`,
       weight: z.number().describe('Gross weight per item in kg'),
       quantity: z.number().int().positive().describe('Number of items'),
       stackable: z.boolean().optional().describe('Whether this item can be stacked (affects pallet fitting calc)'),
-      palletType: z.enum(['euro', 'uk', 'us', 'custom', 'none']).optional().describe('Pallet standard the item sits on, if any'),
-      hsCode: z.string().optional().describe('HS code for customs'),
-      unNumber: z.string().optional().describe('UN number for dangerous goods'),
-      customsValue: z.number().optional().describe('Customs value per item in GBP'),
+      pallet_type: z.enum(['euro', 'uk', 'us', 'custom', 'none']).optional().describe('Pallet standard the item sits on, if any'),
+      hs_code: z.string().optional().describe('HS code for customs'),
+      un_number: z.string().optional().describe('UN number for dangerous goods'),
+      customs_value: z.number().optional().describe('Customs value per item in GBP'),
     })).describe('Array of shipment items with dimensions, weight, and optional HS/UN codes'),
     origin: z.object({ country: z.string(), locode: z.string().optional() }).optional().describe('Origin location — ISO country code and optional UN/LOCODE'),
     destination: z.object({ country: z.string(), locode: z.string().optional() }).optional().describe('Destination location — ISO country code and optional UN/LOCODE'),
     incoterm: z.string().optional().describe("Incoterms 2020 three-letter code (e.g. 'DAP', 'EXW', 'FOB')"),
-    freightCost: z.number().optional().describe('Optional freight cost in GBP for duty calculation'),
-    insuranceCost: z.number().optional().describe('Optional insurance cost in GBP for duty calculation'),
+    freight_cost: z.number().optional().describe('Optional freight cost in GBP for duty calculation'),
+    insurance_cost: z.number().optional().describe('Optional insurance cost in GBP for duty calculation'),
   }),
 
   annotations: readOnlyAnnotations('Shipment Summary'),
 
+  // The /api/shipment/summary input parser only recognises camelCase aliases
+  // on freightCost / insuranceCost / items[].palletType / items[].hsCode /
+  // items[].unNumber / items[].customsValue. Map snake_case → camelCase on
+  // the wire until the website's input parser adds snake_case aliases.
   handler: async (args) =>
-    apiPost('shipment/summary', args),
+    apiPost('shipment/summary', {
+      mode: args.mode,
+      items: (args.items as Array<Record<string, unknown>>).map((i) => ({
+        description: i.description,
+        length: i.length,
+        width: i.width,
+        height: i.height,
+        weight: i.weight,
+        quantity: i.quantity,
+        stackable: i.stackable,
+        palletType: i.pallet_type,
+        hsCode: i.hs_code,
+        unNumber: i.un_number,
+        customsValue: i.customs_value,
+      })),
+      origin: args.origin,
+      destination: args.destination,
+      incoterm: args.incoterm,
+      freightCost: args.freight_cost,
+      insuranceCost: args.insurance_cost,
+    }),
 };
 
 // ─────────────────────────────────────────────────────────────
