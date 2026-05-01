@@ -62,7 +62,7 @@ jobs:
 
       - name: Install mcp-publisher
         run: |
-          VERSION="1.6.0"
+          VERSION="1.7.6"
           curl -L -o mcp-publisher.tar.gz \
             "https://github.com/modelcontextprotocol/registry/releases/download/v${VERSION}/mcp-publisher_linux_amd64.tar.gz"
           tar -xzf mcp-publisher.tar.gz
