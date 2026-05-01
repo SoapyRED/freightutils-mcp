@@ -1,5 +1,28 @@
 # Changelog
 
+## 2.1.0 — 2026-05-01
+
+### Added
+
+- New tool: `get_subscribe_link`. Returns the FreightUtils `/pricing`
+  URL plus tier / monthly limit / monthly price metadata. Use it when
+  the user asks how to upgrade, hits a rate limit, or asks about
+  pricing. Static response — no upstream API call. Tool description
+  explicitly tells agents NOT to attempt checkout themselves; they
+  should hand the URL to the user.
+
+Tool count: **18 → 19**.
+
+### Notes
+
+Pairs with the website-side fix that wires `/api/mcp/*` through the
+existing API rate-limit middleware so Pro keys get attributed against
+the 50,000/month bucket on MCP traffic (previously: zero rate limiting
+on the MCP surface, regardless of key). With v2.1.0 + the website fix,
+agents using the npm-shipped MCP server with a Pro `Authorization:
+Bearer fu_live_*` header will see `X-RateLimit-Limit: 50000` on
+upstream API responses.
+
 ## 2.0.0 — 2026-04-25 (later — input-side casing)
 
 ### BREAKING

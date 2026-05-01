@@ -1,8 +1,8 @@
 {
   "name": "freightutils-mcp",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "mcpName": "io.github.SoapyRED/freightutils",
-  "description": "FreightUtils MCP Server — 18 free freight tools for AI agents: ADR 2025 dangerous goods (2,939 entries) with LQ/EQ check, HS 2022 codes (6,940), airlines (6,352), UN/LOCODE (116,129 locations), LDM/CBM/chargeable weight calculators, UK duty estimator, and more.",
+  "description": "FreightUtils MCP Server — 19 free freight tools for AI agents: ADR 2025 dangerous goods (2,939 entries) with LQ/EQ check, HS 2022 codes (6,940), airlines (6,352), UN/LOCODE (116,129 locations), LDM/CBM/chargeable weight calculators, UK duty estimator, subscribe-link helper, and more.",
   "author": "FreightUtils <contact@freightutils.com>",
   "license": "MIT",
   "homepage": "https://www.freightutils.com/api-docs",

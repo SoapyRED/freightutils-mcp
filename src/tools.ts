@@ -672,6 +672,39 @@ Provide the mode ('lq' or 'eq') and an array of items with un_number, quantity, 
 };
 
 // ─────────────────────────────────────────────────────────────
+//  19. Get Subscribe Link
+// ─────────────────────────────────────────────────────────────
+
+const getSubscribeLink: ToolDef = {
+  name: 'get_subscribe_link',
+  description: `Get the URL where the user can subscribe to FreightUtils Pro for higher API limits.
+
+Use this tool when:
+- The user asks how to upgrade or subscribe
+- The user hits a rate limit and asks how to get more requests
+- The user asks about pricing
+
+Returns the subscription URL plus the tier/limit/price metadata. Agents must hand this URL to the user — DO NOT attempt to complete the subscription on the user's behalf.`,
+
+  schema: z.object({
+    tier: z.enum(['pro']).optional().describe('Tier to surface (only "pro" supported today)'),
+  }),
+
+  annotations: readOnlyAnnotations('FreightUtils Subscribe Link'),
+
+  // Pure static response — no upstream API call. The pricing page is the
+  // canonical surface for subscription; this tool just hands the URL back.
+  handler: async () => ({
+    url: 'https://www.freightutils.com/pricing',
+    tier: 'pro',
+    monthly_limit: 50000,
+    monthly_price: '£19',
+    currency: 'GBP',
+    note: 'Open the URL in a browser to subscribe. Agents must not attempt to complete checkout themselves.',
+  }),
+};
+
+// ─────────────────────────────────────────────────────────────
 //  Export all tools
 // ─────────────────────────────────────────────────────────────
 
@@ -694,4 +727,5 @@ export const ALL_TOOLS: ToolDef[] = [
   shipmentSummary,
   uldLookup,
   vehicleLookup,
+  getSubscribeLink,
 ];
