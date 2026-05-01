@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/npm/l/freightutils-mcp)](https://opensource.org/licenses/MIT)
 [![FreightUtils MCP server](https://glama.ai/mcp/servers/SoapyRED/freightutils-mcp/badges/score.svg)](https://glama.ai/mcp/servers/SoapyRED/freightutils-mcp)
 
-A [Model Context Protocol](https://modelcontextprotocol.io/) server that gives AI agents access to 18 freight calculation and reference tools, covering road, air, and sea freight.
+A [Model Context Protocol](https://modelcontextprotocol.io/) server that gives AI agents access to 19 freight calculation and reference tools, covering road, air, and sea freight.
 
 Built by an ADR-certified freight transport planner for AI agents, developers, and freight professionals.
 
@@ -15,7 +15,7 @@ Built by an ADR-certified freight transport planner for AI agents, developers, a
 
 ---
 
-## Tools (18)
+## Tools (19)
 
 ### Calculators
 | Tool | Description |
@@ -54,6 +54,11 @@ Built by an ADR-certified freight transport planner for AI agents, developers, a
 | Tool | Description |
 |------|-------------|
 | `shipment_summary` | Chains CBM + weight + LDM + ADR + duty in one call |
+
+### Subscription
+| Tool | Description |
+|------|-------------|
+| `get_subscribe_link` | URL to upgrade to FreightUtils Pro (50,000/month at £19/mo) |
 
 ---
 
