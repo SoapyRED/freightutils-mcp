@@ -150,13 +150,16 @@ Once connected, your AI agent can:
 
 ---
 
-## Links
+## Other ways to use FreightUtils
 
-- **Main site:** https://www.freightutils.com
-- **API documentation:** https://www.freightutils.com/api-docs
-- **GitHub (this repo):** https://github.com/SoapyRED/freightutils-mcp
-- **npm:** https://www.npmjs.com/package/freightutils-mcp
-- **Issues:** https://github.com/SoapyRED/freightutils-mcp/issues
+FreightUtils ships across multiple distribution surfaces. Pick the one that fits how you work:
+
+- **Website** — interactive tools at [freightutils.com](https://www.freightutils.com)
+- **REST API** — 19 endpoints, free tier (100/day) and Pro tier (50K/month, £19/mo). [API docs](https://www.freightutils.com/api-docs)
+- **MCP server** — for LLM agents and AI tooling. [npm: freightutils-mcp](https://www.npmjs.com/package/freightutils-mcp) · [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=freightutils)
+- **n8n custom node** — for workflow automation. [npm: n8n-nodes-freightutils](https://www.npmjs.com/package/n8n-nodes-freightutils)
+
+Same data, same compliance reference set (ADR 2025, HS 2022, IATA-regulated airline prefixes), every surface kept in sync.
 
 ---
 
