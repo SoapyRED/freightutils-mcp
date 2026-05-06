@@ -11,7 +11,7 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://www.freightutils.com/api/mcp/mcp"
+      "url": "https://www.freightutils.com/api/mcp"
     }
   ],
   "packages": [
