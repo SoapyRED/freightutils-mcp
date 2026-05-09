@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.1.1 — 2026-05-09
+
+### Fixed
+
+- **`serverInfo.version` was stuck at `1.0.8`** in `src/server.ts` even after 1.1.0 / 2.0.0 / 2.1.0 published. Smithery's admin probe reads `result.serverInfo.version` from the `initialize` response; the wire-level identity has been silently lying about the package version since the 1.0.7 fix. Replaced the hard-coded literal with a runtime `createRequire('../package.json')` read so the wire version always matches the npm-published release. Now reports `2.1.1`.
+- **`server.json` description undercounted tools** (`"18 freight tools …"`). Updated to `"19 freight tools …, get_subscribe_link"` to match the 19-tool surface shipped in 2.1.0.
+
+### Improved
+
+- **Tighter Zod input constraints** for better agent-side errors:
+  - `airline_lookup`: `iata.length(2)`, `icao.length(3)`, `prefix.regex(/^\d{3}$/)`, `query`/`country` min 2 chars.
+  - `adr_lookup`, `adr_exemption_calculator`, `adr_lq_eq_check`: `un_number.regex(/^(UN)?\d{4}$/i)` (top-level and inside `items[]`).
+  - `unlocode_lookup`: `code.length(5).regex(/^[A-Z0-9]{5}$/i)`, `country.length(2).regex(/^[A-Z]{2}$/i)`, `limit.min(1).max(100)`.
+  - `uk_duty_calculator`: `commodity_code.regex(/^\d{6,10}$/)`, `origin_country.length(2).regex(/^[A-Z]{2}$/i)`.
+- **`.strict()` declared on every top-level tool schema** — applied across all 19 tools at the source level. NOTE: this is a no-op at the wire today because the deprecated `server.tool()` overload passes only `schema.shape` to the SDK, which rebuilds the object in default `strip` mode (verified in `@modelcontextprotocol/sdk@1.26` `mcp.js#getZodSchemaObject → objectFromShape`). `.strict()` will become wire-effective once the planned migration to `server.registerTool()` ships (audit finding #4, slated for 2.2.0). Field-level constraints above (regex/length/min/max) DO take effect at the wire — verified by smoke test.
+
+### Notes
+
+No tool-call wire breakage. All previously-valid inputs remain valid; the new field-level constraints only reject inputs that were already malformed (e.g., a 4-letter IATA code, a country name in an ISO-2 slot). Tool surface, names, descriptions, and annotations are unchanged.
+
 ## 2.1.0 — 2026-05-01
 
 ### Added

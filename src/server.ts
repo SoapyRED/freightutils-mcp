@@ -1,10 +1,18 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { createRequire } from 'node:module';
 import { ALL_TOOLS } from './tools.js';
+
+// Read the version directly from package.json at runtime so the wire-level
+// serverInfo.version stays in sync with the npm-published release. Using
+// createRequire (rather than `import ... with { type: 'json' }`) keeps the
+// JSON file outside the tsconfig rootDir without tripping TS6059.
+const require = createRequire(import.meta.url);
+const pkg = require('../package.json') as { version: string };
 
 export function createServer(): McpServer {
   const server = new McpServer({
     name: 'freightutils-mcp',
-    version: '1.0.8',
+    version: pkg.version,
   });
 
   // Register every tool
@@ -14,9 +22,9 @@ export function createServer(): McpServer {
       tool.description,
       tool.schema.shape,
       tool.annotations,
-      async (args) => {
+      async (args: Record<string, unknown>) => {
         try {
-          const result = await tool.handler(args as Record<string, unknown>);
+          const result = await tool.handler(args);
           return {
             content: [
               { type: 'text' as const, text: JSON.stringify(result, null, 2) },
