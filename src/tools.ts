@@ -16,7 +16,9 @@ export interface ToolAnnotationShape {
 export interface ToolDef {
   name: string;
   description: string;
-  schema: z.ZodObject<z.ZodRawShape>;
+  // Allow any ZodObject (including .strict() variants) so individual tools
+  // can opt into strict-key enforcement without breaking the shared type.
+  schema: z.AnyZodObject;
   annotations: ToolAnnotationShape;
   handler: (args: Record<string, unknown>) => Promise<unknown>;
 }
@@ -54,7 +56,7 @@ Input dimensions in centimetres. Specify pieces to get total volume for multiple
     width_cm: z.number().positive().describe('Width in centimetres'),
     height_cm: z.number().positive().describe('Height in centimetres'),
     pieces: z.number().int().positive().optional().describe('Number of identical pieces (default: 1)'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('CBM Calculator'),
 
@@ -86,7 +88,7 @@ A ratio > 1.0 means the shipment is "volumetric" (light for its size). A ratio <
     gross_weight_kg: z.number().positive().describe('Actual gross weight in kilograms'),
     pieces: z.number().int().positive().optional().describe('Number of identical pieces (default: 1)'),
     factor: z.number().int().positive().optional().describe('Volumetric divisor (default: 6000 IATA standard, DHL uses 5000)'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('Chargeable Weight Calculator'),
 
@@ -127,7 +129,7 @@ Supports pallet presets (euro, uk, half, quarter) or custom dimensions. Supports
       .describe('Vehicle type (default: artic 13.6m)'),
     vehicle_length_m: z.number().positive().optional()
       .describe('Custom vehicle length in metres (required if vehicle=custom)'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('LDM Calculator'),
 
@@ -158,10 +160,10 @@ Use this tool when you need to:
 Provide a UN number for exact lookup, or a search term for name-based search.`,
 
   schema: z.object({
-    un_number: z.string().optional().describe('UN number (e.g., "1203", "UN1203")'),
-    search: z.string().optional().describe('Search by substance name (min 2 characters)'),
+    un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN" (e.g., "1203" or "UN1203")').optional().describe('UN number (e.g., "1203", "UN1203")'),
+    search: z.string().min(2, 'Search term must be at least 2 characters').optional().describe('Search by substance name (min 2 characters)'),
     hazard_class: z.string().optional().describe('Filter by hazard class (e.g., "3" for flammable liquids)'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('ADR Dangerous Goods Lookup'),
 
@@ -187,13 +189,13 @@ Use this tool when you need to:
 For single substances, provide un_number + quantity. For mixed loads, use the items array.`,
 
   schema: z.object({
-    un_number: z.string().optional().describe('UN number for single-substance check'),
+    un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN"').optional().describe('UN number for single-substance check'),
     quantity: z.number().positive().optional().describe('Quantity in kg or litres for single-substance check'),
     items: z.array(z.object({
-      un_number: z.string().describe('UN number'),
+      un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN"').describe('UN number'),
       quantity: z.number().positive().describe('Quantity in kg or litres'),
     })).optional().describe('Array of items for mixed-load calculation (use instead of single un_number/quantity)'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('ADR 1.1.3.6 Exemption Calculator'),
 
@@ -221,12 +223,12 @@ Use this tool when you need to:
 AWB prefixes are 3-digit codes used on air waybills to identify the issuing carrier (e.g., 176 = Emirates).`,
 
   schema: z.object({
-    query: z.string().optional().describe('General search (name, code, prefix, or country — min 2 chars)'),
-    iata: z.string().optional().describe('Exact IATA code (2 chars, e.g., "EK")'),
-    icao: z.string().optional().describe('Exact ICAO code (3 chars, e.g., "UAE")'),
-    prefix: z.string().optional().describe('AWB prefix (3 digits, e.g., "176")'),
-    country: z.string().optional().describe('Filter by country name (min 2 chars)'),
-  }),
+    query: z.string().min(2, 'Query must be at least 2 characters').optional().describe('General search (name, code, prefix, or country — min 2 chars)'),
+    iata: z.string().length(2, 'IATA code must be exactly 2 characters').optional().describe('Exact IATA code (2 chars, e.g., "EK")'),
+    icao: z.string().length(3, 'ICAO code must be exactly 3 characters').optional().describe('Exact ICAO code (3 chars, e.g., "UAE")'),
+    prefix: z.string().regex(/^\d{3}$/, 'AWB prefix must be exactly 3 digits').optional().describe('AWB prefix (3 digits, e.g., "176")'),
+    country: z.string().min(2, 'Country must be at least 2 characters').optional().describe('Filter by country name (min 2 chars)'),
+  }).strict(),
 
   annotations: readOnlyAnnotations('Airline / AWB Prefix Lookup'),
 
@@ -262,7 +264,7 @@ Provide a container type for specs. Add item dimensions (l, w, h in cm) to calcu
     item_height_cm: z.number().positive().optional().describe('Item height in cm'),
     item_weight_kg: z.number().positive().optional().describe('Item weight in kg'),
     item_quantity: z.number().int().positive().optional().describe('Number of items'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('Container Lookup'),
 
@@ -294,7 +296,7 @@ Provide a search term for description-based search, or an exact HS code for deta
     query: z.string().optional().describe('Search by product description (min 2 chars)'),
     code: z.string().optional().describe('Exact HS code lookup (2-6 digits)'),
     section: z.string().optional().describe('Browse by section (Roman numeral, e.g., "II")'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('HS Code Lookup'),
 
@@ -321,7 +323,7 @@ Use this tool when you need to:
   schema: z.object({
     code: z.string().optional().describe('Incoterm code (e.g., "FOB", "CIF", "EXW")'),
     category: z.enum(['any_mode', 'sea_only']).optional().describe('Filter by transport mode category'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('Incoterms 2020 Lookup'),
 
@@ -359,7 +361,7 @@ Use this tool when you need to:
     box_weight_kg: z.number().positive().optional().describe('Box weight in kg'),
     max_payload_kg: z.number().positive().optional().describe('Maximum pallet payload weight in kg'),
     allow_rotation: z.boolean().optional().describe('Allow 90-degree box rotation (default: true)'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('Pallet Fitting Calculator'),
 
@@ -393,7 +395,7 @@ Note: Short tons (US) = 2,000 lbs. Long tons (UK) = 2,240 lbs. Metric tonnes = 2
     value: z.number().describe('The value to convert'),
     from: z.string().describe('Source unit code (e.g., "kg", "cbm", "cm")'),
     to: z.string().describe('Target unit code (e.g., "lbs", "cuft", "inches")'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('Unit Converter'),
 
@@ -430,7 +432,7 @@ Provide an array of items, each with length, width, height (cm) and optional wei
       pallet_type: z.enum(['euro', 'uk', 'us', 'custom', 'none']).optional().describe('Pallet type'),
       description: z.string().optional().describe('Item description'),
     })).describe('Array of consignment items'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('Consignment Calculator'),
 
@@ -469,12 +471,12 @@ Use this tool when you need to:
 - Filter locations by country or function type (port, airport, rail, road, icd, border)`,
 
   schema: z.object({
-    query: z.string().optional().describe('Search by location name (e.g., "rotterdam", "heathrow")'),
-    code: z.string().optional().describe('Exact UN/LOCODE lookup (e.g., "GBLHR", "NLRTM")'),
-    country: z.string().optional().describe('Filter by country code (e.g., "GB", "NL")'),
+    query: z.string().min(2, 'Query must be at least 2 characters').optional().describe('Search by location name (e.g., "rotterdam", "heathrow")'),
+    code: z.string().length(5, 'UN/LOCODE must be exactly 5 characters (2-letter country + 3-char location)').regex(/^[A-Z0-9]{5}$/i, 'UN/LOCODE must be alphanumeric').optional().describe('Exact UN/LOCODE lookup (e.g., "GBLHR", "NLRTM")'),
+    country: z.string().length(2, 'Country must be a 2-letter ISO code').regex(/^[A-Z]{2}$/i, 'Country must be a 2-letter ISO code (e.g., "GB", "NL")').optional().describe('Filter by country code (e.g., "GB", "NL")'),
     function: z.string().optional().describe('Filter by function: port, airport, rail, road, icd, border'),
-    limit: z.number().int().positive().optional().describe('Max results (default: 20, max: 100)'),
-  }),
+    limit: z.number().int().min(1).max(100).optional().describe('Max results (default: 20, max: 100)'),
+  }).strict(),
 
   annotations: readOnlyAnnotations('UN/LOCODE Lookup'),
 
@@ -502,13 +504,13 @@ Use this tool when you need to:
 - Determine if preferential rates apply`,
 
   schema: z.object({
-    commodity_code: z.string().describe('HS/tariff code (min 6 digits, e.g., "847989")'),
-    origin_country: z.string().describe('ISO 2-letter origin country code (e.g., "CN", "DE")'),
+    commodity_code: z.string().regex(/^\d{6,10}$/, 'Commodity code must be 6–10 digits').describe('HS/tariff code (6–10 digits, e.g., "847989")'),
+    origin_country: z.string().length(2, 'Origin country must be a 2-letter ISO code').regex(/^[A-Z]{2}$/i, 'Origin country must be a 2-letter ISO code (e.g., "CN", "DE")').describe('ISO 2-letter origin country code (e.g., "CN", "DE")'),
     customs_value: z.number().positive().describe('Goods value in GBP'),
     freight_cost: z.number().optional().describe('Freight cost in GBP (added to CIF value)'),
     insurance_cost: z.number().optional().describe('Insurance cost in GBP (added to CIF value)'),
     incoterm: z.string().optional().describe('Incoterm (e.g., "FOB", "CIF", "EXW")'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('UK Duty & VAT Calculator'),
 
@@ -549,7 +551,7 @@ Use this tool when you need a complete shipment analysis in one call.`,
     incoterm: z.string().optional().describe("Incoterms 2020 three-letter code (e.g. 'DAP', 'EXW', 'FOB')"),
     freight_cost: z.number().optional().describe('Optional freight cost in GBP for duty calculation'),
     insurance_cost: z.number().optional().describe('Optional insurance cost in GBP for duty calculation'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('Shipment Summary'),
 
@@ -601,7 +603,7 @@ Use this tool when you need to:
     type: z.string().optional().describe('ULD code (e.g., "AKE", "PMC"). Omit to list all.'),
     category: z.enum(['container', 'pallet', 'special']).optional().describe('Filter by category'),
     deck: z.enum(['lower', 'main']).optional().describe('Filter by deck position'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('Air Cargo ULD Lookup'),
 
@@ -629,7 +631,7 @@ Use this tool when you need to:
     slug: z.string().optional().describe('Vehicle slug (e.g., "standard-curtainsider"). Omit to list all.'),
     category: z.enum(['articulated', 'rigid', 'van']).optional().describe('Filter by category'),
     region: z.enum(['EU', 'US']).optional().describe('Filter by region'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('Vehicle Lookup'),
 
@@ -658,12 +660,12 @@ Provide the mode ('lq' or 'eq') and an array of items with un_number, quantity, 
   schema: z.object({
     mode: z.enum(['lq', 'eq']).describe("Check mode: 'lq' (Limited Quantity, ADR 3.4) or 'eq' (Excepted Quantity, ADR 3.5)"),
     items: z.array(z.object({
-      un_number: z.string().describe('UN number (1–4 digits, e.g. "1203")'),
+      un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN"').describe('UN number (1–4 digits, e.g. "1203")'),
       quantity: z.number().positive().describe('Quantity of substance per inner packaging'),
       unit: z.enum(['ml', 'L', 'g', 'kg']).describe('Unit of measurement'),
       inner_packaging_qty: z.number().int().positive().optional().describe('Number of inner packagings (EQ mode only)'),
     })).min(1).max(20).describe('Items to check (max 20 per call)'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('ADR LQ / EQ Exemption Check'),
 
@@ -688,7 +690,7 @@ Returns the subscription URL plus the tier/limit/price metadata. Agents must han
 
   schema: z.object({
     tier: z.enum(['pro']).optional().describe('Tier to surface (only "pro" supported today)'),
-  }),
+  }).strict(),
 
   annotations: readOnlyAnnotations('FreightUtils Subscribe Link'),
 
