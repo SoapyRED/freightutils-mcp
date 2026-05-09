@@ -2,12 +2,12 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.SoapyRED/freightutils",
   "title": "FreightUtils MCP Server",
-  "description": "18 freight tools for AI agents: ADR 2025 + LQ/EQ, HS, airlines, UN/LOCODE, ULDs, duty, CBM/LDM",
+  "description": "19 freight tools for AI agents: ADR 2025 + LQ/EQ, HS, airlines, UN/LOCODE, ULDs, duty, CBM/LDM, get_subscribe_link",
   "repository": {
     "url": "https://github.com/SoapyRED/freightutils-mcp",
     "source": "github"
   },
-  "version": "2.1.0",
+  "version": "2.1.1",
   "remotes": [
     {
       "type": "streamable-http",
@@ -18,7 +18,7 @@
     {
       "registryType": "npm",
       "identifier": "freightutils-mcp",
-      "version": "2.1.0",
+      "version": "2.1.1",
       "transport": {
         "type": "stdio"
       }
