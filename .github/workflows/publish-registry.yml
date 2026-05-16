@@ -1,16 +1,27 @@
 name: Publish to MCP Registry
 
-# Run on two triggers:
-#   1. When a GitHub Release is published (recommended path for releases)
-#   2. Manual dispatch with a version input (for backfills or retries)
+# Run on three triggers, in order of preference for routine releases:
+#   1. Tag push matching v* — fires when `git push --follow-tags` lands a
+#      version tag. This is the canonical release event in this org; pairs
+#      with `npm version <bump> && npm publish && git push --follow-tags`.
+#   2. GitHub Release published — kept for any UI-driven release path.
+#   3. Manual workflow_dispatch with optional version input. Catch-up
+#      path when neither (1) nor (2) fired. Default version is read from
+#      package.json on main, so the dispatch needs no input for the
+#      common "publish whatever main says" case.
+#
+# The diagnosis at docs/audit/distribution-cascade-2026-05-16.md in the
+# main freighttools repo documents why this trigger set exists.
 on:
+  push:
+    tags: ['v*']
   release:
     types: [published]
   workflow_dispatch:
     inputs:
       version:
-        description: 'Package version to publish to registry (must match an existing npm version)'
-        required: true
+        description: 'Package version to publish (optional — defaults to package.json on main)'
+        required: false
         type: string
 
 permissions:
@@ -29,15 +40,26 @@ jobs:
 
       - name: Resolve target version
         id: version
+        env:
+          INPUT_VERSION: ${{ github.event.inputs.version }}
+          REF_TYPE: ${{ github.ref_type }}
         run: |
-          if [ -n "${{ github.event.inputs.version }}" ]; then
-            VERSION="${{ github.event.inputs.version }}"
-          else
-            # Extract version from release tag, stripping leading "v" if present
+          # Resolution order:
+          #   1. Manual dispatch input (highest priority — explicit override)
+          #   2. Tag ref (push:tags or release:published both set ref_type=tag)
+          #   3. package.json on main (catch-up dispatch with no input)
+          if [ -n "$INPUT_VERSION" ]; then
+            VERSION="$INPUT_VERSION"
+            SOURCE="workflow_dispatch input"
+          elif [ "$REF_TYPE" = "tag" ]; then
             VERSION="${GITHUB_REF_NAME#v}"
+            SOURCE="tag $GITHUB_REF_NAME"
+          else
+            VERSION=$(jq -r '.version' package.json)
+            SOURCE="package.json"
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Target version: $VERSION"
+          echo "Target version: $VERSION (from $SOURCE)"
 
       - name: Sanity-check that npm has this version
         run: |
