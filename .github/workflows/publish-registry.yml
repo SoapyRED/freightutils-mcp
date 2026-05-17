@@ -10,8 +10,17 @@ name: Publish to MCP Registry
 #      package.json on main, so the dispatch needs no input for the
 #      common "publish whatever main says" case.
 #
+# Both the MCP Registry publish and the GitHub Release creation steps are
+# idempotent — re-running the workflow on a tag whose version is already
+# isLatest on the Registry, or for which a Release already exists, is a
+# no-op for that surface. This lets backfills (and the dual-trigger case
+# where one tag push fires both push:tags and release:published) succeed
+# without duplicate-publish errors.
+#
 # The diagnosis at docs/audit/distribution-cascade-2026-05-16.md in the
-# main freighttools repo documents why this trigger set exists.
+# main freighttools repo documents why this trigger set exists, and the
+# 2026-05-17 amendment in the same doc covers the Release-gap discovery
+# that drove this version of the workflow.
 on:
   push:
     tags: ['v*']
@@ -94,13 +103,36 @@ jobs:
       - name: Validate server.json
         run: ./mcp-publisher validate ./server.json
 
+      - name: Check if version is already on MCP Registry
+        id: registry_check
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          RESULT=$(curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=freightutils")
+          # Skip publish if this version appears in the Registry history,
+          # in any status. mcp-publisher errors on duplicate-version
+          # publish, so this guard makes the workflow safe to re-run on
+          # backfill tag pushes (v2.0.0, v1.1.0, v1.0.5, v1.0.4) where
+          # the version was published long ago via a manual path.
+          ALREADY=$(echo "$RESULT" | jq -r --arg v "$VERSION" '.servers[] | select(.server.version == $v) | .server.version' | head -1)
+          LATEST=$(echo "$RESULT" | jq -r '.servers[] | select(._meta["io.modelcontextprotocol.registry/official"].isLatest == true) | .server.version')
+          if [ -n "$ALREADY" ]; then
+            echo "Registry already has version $VERSION (current isLatest=$LATEST) — skipping publish step."
+            echo "already_published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Registry does not have $VERSION (current isLatest=$LATEST) — publish step will run."
+            echo "already_published=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Authenticate via GitHub OIDC
+        if: steps.registry_check.outputs.already_published != 'true'
         run: ./mcp-publisher login github-oidc
 
       - name: Publish to MCP Registry
+        if: steps.registry_check.outputs.already_published != 'true'
         run: ./mcp-publisher publish
 
       - name: Commit updated server.json back to main
+        if: steps.registry_check.outputs.already_published != 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -123,3 +155,52 @@ jobs:
           else
             echo "::warning::Registry shows isLatest=$LATEST_VERSION but expected $EXPECTED. May be a replication delay."
           fi
+
+      - name: Cut GitHub Release if missing
+        # Glama reads the GitHub Releases API, not git tags or the MCP
+        # Registry. Without a Release per version, Glama's "Latest
+        # release" / tool-count cache / maintenance grade all stay
+        # stale. This step creates the Release if one does not already
+        # exist for the current tag. Notes are pulled from CHANGELOG.md
+        # (entry between `## X.Y.Z` and the next `## ` heading); if no
+        # entry exists, falls back to a pointer line. Idempotent —
+        # safe to re-run on existing-Release tags.
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          TAG="v$VERSION"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            echo "GitHub Release $TAG already exists — skipping."
+            exit 0
+          fi
+          # Extract CHANGELOG entry for this version. The CHANGELOG.md
+          # heading format is `## X.Y.Z — YYYY-MM-DD` (em-dash, em-dash
+          # then date may be present). Match `## VERSION` at start of
+          # line, capture lines until the next `## ` heading.
+          NOTES_FILE=$(mktemp)
+          awk -v v="$VERSION" '
+            $0 ~ "^## "v"([^0-9]|$)" { capturing=1; next }
+            /^## [0-9]/ && capturing { exit }
+            capturing { print }
+          ' CHANGELOG.md > "$NOTES_FILE"
+          # Trim leading/trailing blank lines.
+          sed -i -e '/./,$!d' -e ':a' -e '/^\n*$/{$d;N;ba' -e '}' "$NOTES_FILE"
+          if [ ! -s "$NOTES_FILE" ]; then
+            echo "No CHANGELOG.md entry found for $VERSION — using pointer note." >&2
+            echo "See [CHANGELOG.md](./CHANGELOG.md) for details and the [npm package page](https://www.npmjs.com/package/freightutils-mcp/v/$VERSION) for the release artefact." > "$NOTES_FILE"
+          fi
+          # If this tag is the current MCP Registry isLatest, mark as
+          # the GitHub latest too. Otherwise create as a historical
+          # Release (--latest=false).
+          LATEST_FLAG="--latest=false"
+          REGISTRY_LATEST=$(curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=freightutils" | jq -r '.servers[] | select(._meta["io.modelcontextprotocol.registry/official"].isLatest == true) | .server.version')
+          if [ "$REGISTRY_LATEST" = "$VERSION" ]; then
+            LATEST_FLAG="--latest=true"
+          fi
+          gh release create "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "$TAG" \
+            --notes-file "$NOTES_FILE" \
+            $LATEST_FLAG
+          echo "Created GitHub Release $TAG ($LATEST_FLAG)"
