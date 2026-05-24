@@ -47,7 +47,7 @@ Built by an ADR-certified freight transport planner for AI agents, developers, a
 |------|-------------|
 | `airline_lookup` | 6,352 airlines with IATA/ICAO codes and AWB prefixes |
 | `unlocode_lookup` | 116,129+ UN/LOCODE transport locations |
-| `uld_lookup` | 15 air cargo ULD types (LD3, PMC, etc.) |
+| `uld_lookup` | 16 air cargo ULD types (LD3, PMC, etc.) |
 | `vehicle_lookup` | 17 road freight vehicles and trailers |
 
 ### Composite
@@ -130,6 +130,26 @@ Once connected, your AI agent can:
 ---
 
 ## Changelog
+
+Full release notes also on [GitHub Releases](https://github.com/SoapyRED/freightutils-mcp/releases).
+
+### 2.1.1 — 2026-05-09
+- **Fix:** `serverInfo.version` was stuck at `1.0.8` even after 1.1.0 / 2.0.0 / 2.1.0 published. The wire-level identity has been silently lying about the package version since the 1.0.7 fix. Now reads from `package.json` at runtime via `createRequire`, so the wire version always matches the npm-published release.
+- **Fix:** `server.json` description undercounted tools (`"18 freight tools …"` → `"19 freight tools …, get_subscribe_link"`).
+- **Tightened Zod input constraints** across `airline_lookup`, `adr_lookup`, `adr_exemption_calculator`, `adr_lq_eq_check`, `unlocode_lookup`, and `uk_duty_calculator` (regex / length / min-max on UN numbers, IATA / ICAO / AWB prefixes, ISO country codes, UN/LOCODE format). Field-level constraints take effect at the wire; `.strict()` on top-level schemas becomes wire-effective once the `server.registerTool()` migration ships in 2.2.0.
+
+### 2.1.0 — 2026-05-01
+- **New tool: `get_subscribe_link`.** Returns the FreightUtils `/pricing` URL plus tier / monthly limit / monthly price metadata. Tool description tells agents NOT to attempt checkout themselves — they hand the URL to the user. **Tool count: 18 → 19.**
+- Pairs with the website-side fix wiring `/api/mcp/*` through the existing API rate-limit middleware so Pro keys are attributed against the 50,000/month bucket on MCP traffic.
+
+### 2.0.0 — 2026-04-25 (BREAKING — input-side casing)
+- **Tool input schemas migrated `camelCase` → `snake_case`** to match the response convention shipped in 1.1.0. 13 input keys renamed across `uk_duty_calculator`, `consignment_calculator`, and `shipment_summary` (e.g. `commodityCode` → `commodity_code`, `originCountry` → `origin_country`, `items[].grossWeight` → `items[].gross_weight`). Agents calling these tools with prior camelCase keys now get a Zod validation error instead of a 200. **Re-prompt or update tool-call code.**
+- All other tools (`cbm_calculator`, `chargeable_weight_calculator`, `ldm_calculator`, `pallet_fitting_calculator`, `unit_converter`, ADR family, `airline_lookup`, `container_lookup`, `hs_code_lookup`, `incoterms_lookup`, `unlocode_lookup`, `uld_lookup`, `vehicle_lookup`) already used snake_case (or single-word) input keys and are unchanged.
+
+### 1.1.0 — 2026-04-25 (BREAKING — response-side casing)
+- **API responses migrated `camelCase` → `snake_case` site-wide** across `/api/unlocode`, `/api/uld`, `/api/containers`, `/api/vehicles`, `/api/consignment`, `/api/duty`. All MCP tools in this package are passthroughs, so AI agents see snake_case keys (e.g. `commodity_code`, `location_code`, `internal_length_cm`) instead of the prior camelCase forms. **Re-prompt or update parsing logic.**
+- No code changes to MCP tool implementations — every tool was already a passthrough wrapper around `apiGet` / `apiPost`. Input schemas continue to declare camelCase here; 2.0.0 deliberately closes that asymmetry.
+- README badges: added monthly + total npm downloads alongside the existing version + license + Glama score badges.
 
 ### 1.0.8 — 2026-04-23 (hotfix)
 - **Critical fix:** revert `list_prompts` / `list_resources` stub handlers introduced in 1.0.7. The raw SDK asserts the corresponding capability must be declared before `setRequestHandler` is called — 1.0.7 threw `Server does not support prompts` at startup, crashing the MCP server on every run. 1.0.8 removes the stubs and restores boot.
