@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.2.0 — 2026-05-28
+
+### Added
+
+- **`npx freightutils-mcp ping` install diagnostic.** Single command that tells the user whether their install is working, in plain English. Three checks: (1) `GET /api/mcp/health` against the backend (proves the website is up; reports `mcp_version` and `tools_registered`); (2) in-process MCP handshake (`Client` ↔ `Server` via the SDK's `InMemoryTransport.createLinkedPair()` — proves the package loads and registers all `ALL_TOOLS.length` tools); (3) end-to-end `cbm_calculator` call with `l=120 w=80 h=100` and golden-value assert (`total_cbm/totalCbm ≈ 0.96 m³` — proves the network proxy works through to the website API). Exit code 0 on all-pass, 1 on any failure. Each ✗ prints a specific remediation message (network errors → check status page / `HTTPS_PROXY`; tools-count mismatch → reinstall; 429 → API key signup + note that the npm package does not yet pass keys through; `isError` → tool error body + issue link). `--help` and `--version` subcommands added alongside `ping`. ANSI colour disabled when stdout is not a TTY or `NO_COLOR=1` is set. The diagnostic is dynamic-imported in [`src/bin/cli.ts`](src/bin/cli.ts) so the cold-start cost of the diagnostic only hits the diagnostic path — the default stdio-server boot for MCP clients pays no extra import.
+
+### Improved
+
+- **README "Verify your setup" + "Troubleshooting" sections.** Two new top-level sections in [README.md](README.md): an install-verification block with the `ping` invocation and an example all-pass output, and a 6-row troubleshooting table mirroring the website's [/api-docs#mcp-setup](https://www.freightutils.com/api-docs#mcp-setup). The troubleshooting table documents the known anonymous-cap limitation (this package does not yet pass an API key through to proxied calls) so users hitting 429 see the workaround inline.
+
+### Notes
+
+- No tool surface changes — still 19 tools, same names, same behaviour. `serverInfo.version` continues to read dynamically from `package.json` via the `createRequire` pattern introduced in 2.1.1; verified intact post-bump.
+
 ## 2.1.1 — 2026-05-09
 
 ### Fixed
