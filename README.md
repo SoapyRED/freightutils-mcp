@@ -93,6 +93,55 @@ No authentication required for basic usage.
 
 ---
 
+## Verify your setup
+
+After adding FreightUtils to your MCP client config, **fully quit and relaunch the client** (Claude Desktop, Cursor, Cline). MCP servers are only loaded at client startup; editing the config in a running session does nothing until restart.
+
+Then run the install diagnostic from a terminal:
+
+```sh
+npx freightutils-mcp ping
+```
+
+You should see three ticks and `All checks passed`:
+
+```
+FreightUtils MCP Diagnostic
+───────────────────────────
+package: freightutils-mcp@2.2.0
+health:  https://www.freightutils.com/api/mcp/health
+
+[1/3] Backend health (https://www.freightutils.com/api/mcp/health)
+      ✓ status=ok mcp_version=2.2.0 tools_registered=19 (143ms)
+
+[2/3] MCP handshake (in-process via InMemoryTransport)
+      ✓ server freightutils-mcp@2.2.0 initialized; tools/list returned 19 tools
+
+[3/3] End-to-end tool call (cbm_calculator l=120 w=80 h=100)
+      ✓ cbm_calculator → total=0.96 m³ (expected 0.96) (218ms)
+
+All checks passed. Your FreightUtils MCP install is working.
+```
+
+If any check shows ✗, see [Troubleshooting](#troubleshooting) below. Exit code is 0 on all-pass and 1 on any failure, so the command works in CI / health-check scripts too.
+
+---
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---------|--------------|-----|
+| Tools not appearing in the MCP client after editing the config | Client wasn't fully restarted | Quit and relaunch (Cmd+Q on macOS / right-click → Quit on Windows tray). Closing the window is not enough. |
+| `npx freightutils-mcp ping` check 1 fails with a network error | DNS, proxy, or the website is unreachable from your network | Check the status page at https://www.freightutils.com/status. If you're behind a corporate proxy, set `HTTPS_PROXY`. Override the host for `ping` with `FREIGHTUTILS_API_URL=<base-url>`. |
+| `npx freightutils-mcp ping` check 2 fails | Broken local install (npx cache or stale Node version) | Re-install: `rm -rf ~/.npm/_npx && npm install -g freightutils-mcp` and rerun. Requires Node 18 or newer. |
+| Tool calls return HTTP 429 / `"rate_limited"` | Anonymous IP cap of 25 requests/day exceeded | Get a free API key at https://www.freightutils.com/api-docs (100/day) or upgrade to Pro (50,000/month). **Known limitation:** this npm package does not yet pass the API key through. Until that lands, configure your MCP client to use the remote URL directly (`https://www.freightutils.com/api/mcp`) and set the `Authorization` header in the client config if your client supports it. |
+| `"Server failed to start"` / spawn error in client logs | `npx` not on PATH, or Node older than 18 | Install Node 18+. On macOS, an absolute path in the config (`"command": "/opt/homebrew/bin/npx"`) avoids PATH issues for GUI-launched clients. |
+| Specific tool returns `isError: true` | Bad input shape, or an unknown lookup key (UN number / HS code / AWB prefix not in the dataset) | The tool's error body names the offending field. Verify against the schema at https://www.freightutils.com/api-docs or call the corresponding [playground](https://www.freightutils.com/playground) endpoint to confirm the input shape. |
+
+The full diagnostic flow lives at the [/api-docs#mcp-setup](https://www.freightutils.com/api-docs#mcp-setup) section on the website. The live backend status is callable from inside any MCP client at [GET /api/mcp/health](https://www.freightutils.com/api/mcp/health) — useful when you don't have shell access during a conversation.
+
+---
+
 ## Rate Limits
 
 All tools call the free FreightUtils API:
