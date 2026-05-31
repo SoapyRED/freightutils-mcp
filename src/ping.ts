@@ -28,8 +28,9 @@ import { ALL_TOOLS } from './tools.js';
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json') as { version: string };
 
-const HEALTH_URL =
-  (process.env.FREIGHTUTILS_API_URL ?? 'https://www.freightutils.com/api') + '/mcp/health';
+const BASE_URL = process.env.FREIGHTUTILS_API_URL ?? 'https://www.freightutils.com/api';
+const HEALTH_URL = BASE_URL + '/mcp/health';
+const WHOAMI_URL = BASE_URL + '/auth/whoami';
 
 // ─── tiny output helpers ─────────────────────────────────────────
 
@@ -37,10 +38,12 @@ const COLOUR = process.stdout.isTTY && !process.env.NO_COLOR;
 const c = (code: string, s: string) => (COLOUR ? `\x1b[${code}m${s}\x1b[0m` : s);
 const green = (s: string) => c('32', s);
 const red = (s: string) => c('31', s);
+const yellow = (s: string) => c('33', s);
 const dim = (s: string) => c('2', s);
 const bold = (s: string) => c('1', s);
 
 const TICK = green('✓');
+const WARN = yellow('⚠');
 const CROSS = red('✗');
 
 interface CheckResult {
@@ -213,11 +216,10 @@ async function checkToolCall(client: Client): Promise<CheckResult> {
           'website. Get a free API key at https://www.freightutils.com/api-docs\n' +
           'for 100/day or upgrade to Pro for 50,000/month.\n' +
           '\n' +
-          'Known limitation: this npm package does not yet pass an API key\n' +
-          'through to its proxied calls. Until that ships, configure your MCP\n' +
-          'client to use the remote URL directly:\n' +
-          '  https://www.freightutils.com/api/mcp\n' +
-          'and set the Authorization header in the client config if supported.';
+          'Then set FREIGHTUTILS_API_KEY in the environment that runs this\n' +
+          'MCP server (your MCP client config or shell). v2.3.0+ forwards\n' +
+          'the key on every outbound call so the same key honored by the\n' +
+          'remote /api/mcp transport now flows through the stdio path too.';
       } else if (text.includes('ENOTFOUND') || text.toLowerCase().includes('network')) {
         remediation =
           'A network error prevented the tool from reaching the backend.\n' +
@@ -312,6 +314,70 @@ async function checkToolCall(client: Client): Promise<CheckResult> {
   }
 }
 
+// ─── auth tier reporting ─────────────────────────────────────────
+//
+// New in v2.3.0: report the observed tier this install is running as. When
+// FREIGHTUTILS_API_KEY is set we verify it against /api/auth/whoami and
+// surface "Authenticated as <tier>". When unset we surface the anonymous
+// cap so the user knows they're on the free path.
+//
+// This is an additional reported line, not a 4th check — failure to verify
+// an API key does not flip the overall ping exit code, because the three
+// existing checks already prove the install is functionally working. The
+// auth line is informational with its own success indicator.
+
+interface AuthLine {
+  text: string;
+  symbol: string;
+}
+
+async function reportAuthStatus(): Promise<AuthLine> {
+  const key = process.env.FREIGHTUTILS_API_KEY;
+  if (!key) {
+    return {
+      symbol: WARN,
+      text: 'Anonymous (25/day cap) — set FREIGHTUTILS_API_KEY in your environment to lift the cap. See https://www.freightutils.com/pricing.',
+    };
+  }
+
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10_000);
+    const res = await fetch(WHOAMI_URL, {
+      headers: { 'Accept': 'application/json', 'Authorization': 'Bearer ' + key },
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+
+    if (!res.ok) {
+      return {
+        symbol: WARN,
+        text: `API key set but verification failed (HTTP ${res.status} from ${WHOAMI_URL}). Check the key at https://www.freightutils.com/pricing.`,
+      };
+    }
+
+    const body = (await res.json()) as { authenticated?: boolean; tier?: string };
+    if (!body.authenticated || !body.tier) {
+      return {
+        symbol: WARN,
+        text: 'API key set but server reports unauthenticated. Verify the key at https://www.freightutils.com/pricing.',
+      };
+    }
+
+    const tierLabel = body.tier.charAt(0).toUpperCase() + body.tier.slice(1);
+    return {
+      symbol: TICK,
+      text: `Authenticated as ${tierLabel}`,
+    };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return {
+      symbol: WARN,
+      text: `API key set but verification call failed — ${msg}. Tools will still attempt the call with the key.`,
+    };
+  }
+}
+
 // ─── runPing ─────────────────────────────────────────────────────
 
 export async function runPing(): Promise<number> {
@@ -319,6 +385,8 @@ export async function runPing(): Promise<number> {
   console.log(dim('───────────────────────────'));
   console.log(dim(`package: freightutils-mcp@${pkg.version}`));
   console.log(dim(`health:  ${HEALTH_URL}`));
+  const auth = await reportAuthStatus();
+  console.log(`auth:    ${auth.symbol} ${auth.text}`);
   console.log();
 
   let failures = 0;
