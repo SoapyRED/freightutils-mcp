@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.3.0 — 2026-05-31
+
+### Added
+
+- **`FREIGHTUTILS_API_KEY` env var support.** [`apiGet`](src/api.ts) / [`apiPost`](src/api.ts) now build an `Authorization: Bearer` header from the env var on every outbound call when set. Backwards compatible — unset env var preserves the existing anonymous behaviour, so users running freely continue to work without code changes.
+
+### Fixed
+
+- **Sytze pattern.** Pro customers using the stdio transport were silently being rate-limited at the anonymous 25/day cap because the package was not forwarding the API key from the environment to the underlying `/api/*` HTTP calls. v2.3.0 closes this end-to-end — the same key honored by the remote `/api/mcp` transport now flows through the stdio path too.
+
+### Updated
+
+- **`npx freightutils-mcp ping` diagnostic** now reports observed tier. With `FREIGHTUTILS_API_KEY` set, the header now reads `auth: ✓ Authenticated as Pro` (or `Free`) after a successful `/api/auth/whoami` call; with the env var unset it reads `auth: ⚠ Anonymous (25/day cap)`. Adds a fourth informational line at the diagnostic header without changing the existing 3-check exit semantics.
+- **README** — removed the "Known limitation: this npm package does not yet pass the API key through" wording from the Troubleshooting table; replaced with `FREIGHTUTILS_API_KEY` setup instructions. Added an "Authenticating with a Pro key" section under Installation with a stdio config example that wires `FREIGHTUTILS_API_KEY` into the `env` block of an MCP server entry.
+
 ## 2.2.0 — 2026-05-28
 
 ### Added

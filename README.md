@@ -91,6 +91,28 @@ https://www.freightutils.com/api/mcp
 
 No authentication required for basic usage.
 
+### Authenticating with a Pro key
+
+Anonymous usage caps at 25 requests/day per IP. If you have a free or Pro API key, set `FREIGHTUTILS_API_KEY` in the environment that runs the MCP server. The package reads it from `process.env` and attaches `Authorization: Bearer <key>` to every outbound `/api/*` call — same key the remote `https://www.freightutils.com/api/mcp` transport already honors.
+
+stdio config example with the env var wired through:
+
+```json
+{
+  "mcpServers": {
+    "freightutils": {
+      "command": "npx",
+      "args": ["freightutils-mcp"],
+      "env": {
+        "FREIGHTUTILS_API_KEY": "fu_pk_xxx"
+      }
+    }
+  }
+}
+```
+
+Get a key at [freightutils.com/api-docs](https://www.freightutils.com/api-docs) (free, 100/day) or [freightutils.com/pricing](https://www.freightutils.com/pricing) (Pro, 50,000/month). Backwards compatible — unset env var preserves the existing anonymous behaviour.
+
 ---
 
 ## Verify your setup
@@ -134,7 +156,7 @@ If any check shows ✗, see [Troubleshooting](#troubleshooting) below. Exit code
 | Tools not appearing in the MCP client after editing the config | Client wasn't fully restarted | Quit and relaunch (Cmd+Q on macOS / right-click → Quit on Windows tray). Closing the window is not enough. |
 | `npx freightutils-mcp ping` check 1 fails with a network error | DNS, proxy, or the website is unreachable from your network | Check the status page at https://www.freightutils.com/status. If you're behind a corporate proxy, set `HTTPS_PROXY`. Override the host for `ping` with `FREIGHTUTILS_API_URL=<base-url>`. |
 | `npx freightutils-mcp ping` check 2 fails | Broken local install (npx cache or stale Node version) | Re-install: `rm -rf ~/.npm/_npx && npm install -g freightutils-mcp` and rerun. Requires Node 18 or newer. |
-| Tool calls return HTTP 429 / `"rate_limited"` | Anonymous IP cap of 25 requests/day exceeded | Get a free API key at https://www.freightutils.com/api-docs (100/day) or upgrade to Pro (50,000/month). **Known limitation:** this npm package does not yet pass the API key through. Until that lands, configure your MCP client to use the remote URL directly (`https://www.freightutils.com/api/mcp`) and set the `Authorization` header in the client config if your client supports it. |
+| Tool calls return HTTP 429 / `"rate_limited"` | Anonymous IP cap of 25 requests/day exceeded | If you have a FreightUtils Pro API key, set `FREIGHTUTILS_API_KEY` in your environment before invoking the MCP. The package passes it through automatically on every outbound call. See https://www.freightutils.com/pricing if you need a key. |
 | `"Server failed to start"` / spawn error in client logs | `npx` not on PATH, or Node older than 18 | Install Node 18+. On macOS, an absolute path in the config (`"command": "/opt/homebrew/bin/npx"`) avoids PATH issues for GUI-launched clients. |
 | Specific tool returns `isError: true` | Bad input shape, or an unknown lookup key (UN number / HS code / AWB prefix not in the dataset) | The tool's error body names the offending field. Verify against the schema at https://www.freightutils.com/api-docs or call the corresponding [playground](https://www.freightutils.com/playground) endpoint to confirm the input shape. |
 
