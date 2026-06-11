@@ -8,9 +8,9 @@
  *
  * Why centralised in buildHeaders(): callers should never have to remember
  * to forward the key. apiGet / apiPost are the only two outbound surfaces
- * in this package, and both now route through this helper — the "Sytze
- * pattern" bug (Pro customers silently rate-limited because the stdio
- * surface wasn't forwarding the env-var key) is closed end-to-end.
+ * in this package, and both now route through this helper — the stdio
+ * key-passthrough bug (Pro customers silently rate-limited because the
+ * stdio surface wasn't forwarding the env-var key) is closed end-to-end.
  */
 
 const BASE_URL = process.env.FREIGHTUTILS_API_URL ?? 'https://www.freightutils.com/api';
