@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.4.0 — 2026-06-16
+
+### Changed
+
+- **`consignment_calculator` upgraded to the canonical consignment v1 contract.** The tool now exposes a transport `mode` (sea | air | road) and a canonical `lines[]` shape — each line with `quantity`, `dims { l, w, h, unit }` (mm/cm/m/in) and `weight { value, unit }` (kg/g/t/lb), plus optional `description` / `hs_code` / `un_number` / `stackable` — alongside an `options` object (`air_volumetric_divisor` default 6000, `container_number`, `awb_number`). The legacy flat `items[]` array (cm/kg) is still accepted unchanged for backward compatibility. Output now includes per-line and grand totals (CBM, loading metres, volumetric and mode-specific chargeable weight), a `schema_version`, and objective advisory-only flags — implausible density, mode/option mismatch, dangerous-goods presence by UN number against the ADR 2025 reference (presence only, never a compliance verdict), and ISO 6346 container / IATA AWB check-digit validity — plus a best-effort disclaimer. The package proxies to the website `/api/consignment`, which is the single authoritative compute pipeline; the previous snake_case→camelCase item remap is removed (the endpoint now accepts both shapes). Canonical JSON Schema: <https://www.freightutils.com/schema/consignment.v1.json>.
+
+### Notes
+
+- No tool-count change — still 19 tools, same names. `serverInfo.version` reads dynamically from `package.json`, now `2.4.0`. Mirrors the website MCP + REST surface (FAULT 13 fix-once-mirror-everywhere).
+
 ## 2.3.0 — 2026-05-31
 
 ### Added

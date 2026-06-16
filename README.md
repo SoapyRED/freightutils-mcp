@@ -26,7 +26,7 @@ Built by an ADR-certified freight transport planner for AI agents, developers, a
 | `pallet_fitting_calculator` | Box-on-pallet optimisation with rotation |
 | `container_lookup` | ISO container specs (10 types) and loading calculation |
 | `unit_converter` | Weight, volume, length, and freight-specific conversions |
-| `consignment_calculator` | Multi-item CBM, weight, LDM, chargeable weight |
+| `consignment_calculator` | Multi-item CBM, LDM, volumetric & mode-specific chargeable weight (sea/air/road) + advisory flags |
 
 ### Dangerous Goods (ADR)
 | Tool | Description |
@@ -203,6 +203,9 @@ Once connected, your AI agent can:
 ## Changelog
 
 Full release notes also on [GitHub Releases](https://github.com/SoapyRED/freightutils-mcp/releases).
+
+### 2.4.0 — 2026-06-16
+- **`consignment_calculator` → canonical consignment v1.** New transport `mode` (sea | air | road) and a canonical `lines[]` shape (each line: `quantity`, `dims {l,w,h,unit}` mm/cm/m/in, `weight {value,unit}` kg/g/t/lb, optional `description`/`hs_code`/`un_number`/`stackable`), plus an `options` object (`air_volumetric_divisor` default 6000, `container_number`, `awb_number`). The legacy flat `items[]` array (cm/kg) still works unchanged. Output gains per-line + grand totals, a `schema_version`, and advisory-only flags (implausible density, mode/option mismatch, dangerous-goods presence by UN number vs the ADR 2025 reference, ISO 6346 / IATA AWB check-digit) plus a best-effort disclaimer. Canonical schema: <https://www.freightutils.com/schema/consignment.v1.json>. **No tool-count change (19).**
 
 ### 2.1.1 — 2026-05-09
 - **Fix:** `serverInfo.version` was stuck at `1.0.8` even after 1.1.0 / 2.0.0 / 2.1.0 published. The wire-level identity has been silently lying about the package version since the 1.0.7 fix. Now reads from `package.json` at runtime via `createRequire`, so the wire version always matches the npm-published release.

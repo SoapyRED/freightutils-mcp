@@ -409,50 +409,54 @@ Note: Short tons (US) = 2,000 lbs. Long tons (UK) = 2,240 lbs. Metric tonnes = 2
 
 const consignmentCalculator: ToolDef = {
   name: 'consignment_calculator',
-  description: `Calculate total CBM, weight, loading metres, and chargeable weight for multi-item consignments.
+  description: `Calculate total CBM, loading metres (LDM), volumetric and mode-specific chargeable weight for a multi-item mixed consignment — per-line and grand totals, plus objective advisory flags.
 
-Combines multiple different items into a single consignment calculation. Supports road, air, and sea freight modes with mode-specific chargeable weight calculations.
+Provide a transport mode (sea | air | road) and either "lines" (canonical: each line has quantity, dims {l,w,h,unit}, weight {value,unit}, and optional description / hs_code / un_number / stackable) or the legacy flat "items" array (dimensions in cm, weight in kg). Air uses an IATA volumetric divisor (default 6000, settable via options.air_volumetric_divisor). Optionally pass options.container_number / options.awb_number for a check-digit sanity flag.
 
-Use this tool when you need to:
-- Quote a mixed consignment with different item types
-- Calculate total CBM and weight across all items
-- Get mode-specific chargeable weight (road: LDM-based, air: volumetric, sea: W/M)
-
-Provide an array of items, each with length, width, height (cm) and optional weight, quantity, and pallet type.`,
+Flags are advisory only — implausible density, mode/option mismatch, dangerous-goods presence by UN number against the ADR 2025 reference, and container/AWB check-digit validity. They never state that a shipment is permitted or compliant. Best-effort deterministic calculation and reference data only; not regulatory, customs, or dangerous-goods compliance advice — you remain responsible for classification, documentation and carrier acceptance. Canonical schema: https://www.freightutils.com/schema/consignment.v1.json`,
 
   schema: z.object({
-    mode: z.enum(['road', 'air', 'sea']).optional().describe('Transport mode (default: road)'),
+    mode: z.enum(['sea', 'air', 'road']).optional().describe('Transport mode: sea | air | road (default road)'),
+    lines: z.array(z.object({
+      description: z.string().optional().describe('Optional item label'),
+      quantity: z.number().int().positive().describe('Number of identical pieces'),
+      dims: z.object({
+        l: z.number().positive().describe('Length in the given unit'),
+        w: z.number().positive().describe('Width in the given unit'),
+        h: z.number().positive().describe('Height in the given unit'),
+        unit: z.enum(['mm', 'cm', 'm', 'in']).describe('Dimension unit'),
+      }).describe('Dimensions with unit'),
+      weight: z.object({
+        value: z.number().positive().describe('Gross weight per piece'),
+        unit: z.enum(['kg', 'g', 't', 'lb']).describe('Weight unit'),
+      }).describe('Weight with unit'),
+      hs_code: z.string().optional().describe('Optional HS commodity code (6–10 digits)'),
+      un_number: z.string().optional().describe('Optional UN number for dangerous-goods reference'),
+      stackable: z.boolean().optional().describe('Stack two-high (halves loading-metre footprint)'),
+    })).min(1).max(50).optional().describe('Canonical consignment lines (preferred). Provide lines OR items.'),
     items: z.array(z.object({
+      description: z.string().optional().describe('Item description'),
       length: z.number().positive().describe('Length in cm'),
       width: z.number().positive().describe('Width in cm'),
       height: z.number().positive().describe('Height in cm'),
-      quantity: z.number().int().positive().optional().describe('Number of items (default: 1)'),
-      gross_weight: z.number().optional().describe('Gross weight per item in kg'),
-      stackable: z.boolean().optional().describe('Can items be stacked?'),
-      pallet_type: z.enum(['euro', 'uk', 'us', 'custom', 'none']).optional().describe('Pallet type'),
-      description: z.string().optional().describe('Item description'),
-    })).describe('Array of consignment items'),
+      quantity: z.number().int().positive().optional().describe('Number of pieces (default 1)'),
+      gross_weight: z.number().positive().describe('Gross weight per piece in kg'),
+      stackable: z.boolean().optional().describe('Can the item be stacked?'),
+      pallet_type: z.enum(['none', 'euro', 'uk', 'us', 'custom']).optional().describe('Pallet type (informational)'),
+    })).min(1).max(50).optional().describe('Deprecated flat alias — dimensions in cm, weight in kg. Prefer lines.'),
+    options: z.object({
+      air_volumetric_divisor: z.number().positive().optional().describe('IATA volumetric divisor in cm³/kg (default 6000). Air only.'),
+      container_number: z.string().optional().describe('ISO 6346 container number, check-digit validated'),
+      awb_number: z.string().optional().describe('IATA 11-digit air waybill number, check-digit validated'),
+    }).optional().describe('Optional settings'),
   }).strict(),
 
   annotations: readOnlyAnnotations('Consignment Calculator'),
 
-  // The /api/consignment input parser only recognises camelCase aliases on
-  // item fields (grossWeight, palletType). Map snake_case → camelCase on
-  // the wire until the website's input parser adds snake_case aliases.
-  handler: async (args) =>
-    apiPost('consignment', {
-      mode: args.mode ?? 'road',
-      items: (args.items as Array<Record<string, unknown>>).map((i) => ({
-        description: i.description,
-        length: i.length,
-        width: i.width,
-        height: i.height,
-        quantity: i.quantity,
-        grossWeight: i.gross_weight,
-        stackable: i.stackable,
-        palletType: i.pallet_type,
-      })),
-    }),
+  // Proxies straight to the website /api/consignment, which is the single
+  // authoritative validate → compute → flag pipeline and now accepts BOTH the
+  // canonical { mode, lines, options } and the legacy { items } shapes.
+  handler: async (args) => apiPost('consignment', args),
 };
 
 // ─────────────────────────────────────────────────────────────
