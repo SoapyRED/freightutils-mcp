@@ -18,7 +18,7 @@
 
 ### Fixed
 
-- **Sytze pattern.** Pro customers using the stdio transport were silently being rate-limited at the anonymous 25/day cap because the package was not forwarding the API key from the environment to the underlying `/api/*` HTTP calls. v2.3.0 closes this end-to-end — the same key honored by the remote `/api/mcp` transport now flows through the stdio path too.
+- **Stdio key passthrough.** Pro customers using the stdio transport were silently being rate-limited at the anonymous 25/day cap because the package was not forwarding the API key from the environment to the underlying `/api/*` HTTP calls. v2.3.0 closes this end-to-end — the same key honored by the remote `/api/mcp` transport now flows through the stdio path too.
 
 ### Updated
 
