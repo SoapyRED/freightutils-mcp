@@ -1,4 +1,9 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import {
+  ListPromptsRequestSchema,
+  ListResourcesRequestSchema,
+  ListResourceTemplatesRequestSchema,
+} from '@modelcontextprotocol/sdk/types.js';
 import { createRequire } from 'node:module';
 import { ALL_TOOLS } from './tools.js';
 
@@ -10,10 +15,14 @@ const require = createRequire(import.meta.url);
 const pkg = require('../package.json') as { version: string };
 
 export function createServer(): McpServer {
-  const server = new McpServer({
-    name: 'freightutils-mcp',
-    version: pkg.version,
-  });
+  const server = new McpServer(
+    { name: 'freightutils-mcp', version: pkg.version },
+    // Declare prompts + resources capabilities up front so the low-level
+    // setRequestHandler calls below are accepted (the SDK asserts a capability
+    // is declared before its handler can be registered — see the historical
+    // note that follows the tool loop).
+    { capabilities: { prompts: {}, resources: {} } },
+  );
 
   // Register every tool
   for (const tool of ALL_TOOLS) {
@@ -41,14 +50,16 @@ export function createServer(): McpServer {
     );
   }
 
-  // NOTE: list_prompts / list_resources stubs were tried here via
-  // server.server.setRequestHandler(...) but the SDK asserts the
-  // corresponding capability must be declared first (throws
-  // "Server does not support prompts"). Reverted for 1.0.8 — the
-  // proper path is to declare capabilities: { prompts: {}, resources: {} }
-  // in the McpServer constructor, but that interaction with mcp-handler
-  // also needs validation before re-enabling. Accepting -5 pt on the
-  // Smithery prompts/resources stub score until verified.
+  // This server exposes tools only — no prompts, no resources. But keyless MCP
+  // introspectors expect these list methods to exist: Glama builds each server
+  // in a sandbox and runs initialize + tools/list + resources/list +
+  // prompts/list with NO credentials. Without handlers the SDK answers -32601
+  // "Method not found", which failed the Glama build and froze the listing.
+  // Capabilities are declared in the constructor above, so these empty-but-
+  // valid listings are accepted and all four keyless calls now succeed.
+  server.server.setRequestHandler(ListPromptsRequestSchema, async () => ({ prompts: [] }));
+  server.server.setRequestHandler(ListResourcesRequestSchema, async () => ({ resources: [] }));
+  server.server.setRequestHandler(ListResourceTemplatesRequestSchema, async () => ({ resourceTemplates: [] }));
 
   return server;
 }

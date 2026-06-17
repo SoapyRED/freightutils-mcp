@@ -1,0 +1,27 @@
+# Keep the Docker build context minimal and deterministic.
+# The image is built from source (npm ci -> npm run build), so none of the
+# generated, vendored, or test artifacts below belong in the context.
+
+node_modules
+dist
+dist-test
+.git
+.gitignore
+.github
+
+# logs
+*.log
+npm-debug.log*
+
+# tests (the runtime image never needs them; build excludes them via tsconfig)
+src/**/*.test.ts
+tsconfig.test.json
+
+# secrets / packaged tarballs
+.env
+.env.*
+*.tgz
+
+# docker meta
+Dockerfile
+.dockerignore

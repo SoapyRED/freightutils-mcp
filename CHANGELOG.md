@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.4.1 — 2026-06-17
+
+### Fixed
+
+- **Keyless introspection: `resources/list` and `prompts/list` now succeed.** The server declared neither the `prompts` nor the `resources` capability, so a keyless `resources/list` / `prompts/list` returned JSON-RPC `-32601` "Method not found". Sandbox builders that compile from source and probe `initialize + tools/list + resources/list + prompts/list` with **no credentials** (e.g. Glama) failed on the last two calls — which froze our Glama listing on an old build. The server now declares `capabilities: { prompts, resources }` and answers both list methods (plus `resources/templates/list`) with an empty-but-valid result. `initialize`, `tools/list` (19 tools), `resources/list`, and `prompts/list` all succeed with no env key. The API key stays optional and call-time-only — startup and all four list methods never require it.
+
+### Added
+
+- **Explicit multi-stage `Dockerfile` + `.dockerignore`** so sandbox builders no longer infer the build. The builder stage runs `npm ci` + `npm run build`; the runtime stage installs prod-only dependencies and runs the stdio entry `dist/bin/cli.js` with no required environment. The Node base image, the build output dir (`dist`) and the entry are derived from `package.json` (`engines` / `bin`) and `tsconfig.json` (`outDir`), not hardcoded.
+
+### Notes
+
+- No tool-count or schema change — still 19 tools, same names and enriched schemas. `serverInfo.version` reads dynamically from `package.json`, now `2.4.1`. The behaviour change is purely additive (keyless list methods now respond), so this is a patch release. Mirrors the keyless-introspection contract the Glama/Smithery sandboxes require.
+
 ## 2.4.0 — 2026-06-16
 
 ### Changed
