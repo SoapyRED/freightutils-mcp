@@ -224,8 +224,8 @@ AWB prefixes are 3-digit codes used on air waybills to identify the issuing carr
 
   schema: z.object({
     query: z.string().min(2, 'Query must be at least 2 characters').optional().describe('General search (name, code, prefix, or country — min 2 chars)'),
-    iata: z.string().length(2, 'IATA code must be exactly 2 characters').optional().describe('Exact IATA code (2 chars, e.g., "EK")'),
-    icao: z.string().length(3, 'ICAO code must be exactly 3 characters').optional().describe('Exact ICAO code (3 chars, e.g., "UAE")'),
+    iata: z.string().regex(/^[A-Za-z0-9]{2}$/, 'IATA code must be 2 letters or digits (e.g., "EK", "U2")').optional().describe('Exact IATA code (2 alphanumeric chars)'),
+    icao: z.string().regex(/^[A-Za-z]{3}$/, 'ICAO code must be 3 letters (e.g., "UAE", "BAW")').optional().describe('Exact ICAO code (3 letters)'),
     prefix: z.string().regex(/^\d{3}$/, 'AWB prefix must be exactly 3 digits').optional().describe('AWB prefix (3 digits, e.g., "176")'),
     country: z.string().min(2, 'Country must be at least 2 characters').optional().describe('Filter by country name (min 2 chars)'),
   }).strict(),
@@ -257,7 +257,7 @@ Use this tool when you need to:
 Provide a container type for specs. Add item dimensions (l, w, h in cm) to calculate loading.`,
 
   schema: z.object({
-    type: z.string().optional()
+    type: z.string().min(2, 'Container type must be at least 2 characters').optional()
       .describe('Container slug (e.g., "20ft-standard", "40ft-high-cube"). Omit to list all types.'),
     item_length_cm: z.number().positive().optional().describe('Item length in cm (for loading calculation)'),
     item_width_cm: z.number().positive().optional().describe('Item width in cm'),
@@ -293,9 +293,9 @@ Use this tool when you need to:
 Provide a search term for description-based search, or an exact HS code for detailed lookup.`,
 
   schema: z.object({
-    query: z.string().optional().describe('Search by product description (min 2 chars)'),
-    code: z.string().optional().describe('Exact HS code lookup (2-6 digits)'),
-    section: z.string().optional().describe('Browse by section (Roman numeral, e.g., "II")'),
+    query: z.string().min(2, 'Search term must be at least 2 characters').optional().describe('Search by product description (min 2 chars)'),
+    code: z.string().regex(/^\d{2,6}$/, 'HS code must be 2–6 digits').optional().describe('Exact HS code lookup (2-6 digits)'),
+    section: z.string().regex(/^[ivxIVX]{1,5}$/, 'Section must be a Roman numeral I–XXI').optional().describe('Browse by section (Roman numeral I–XXI, e.g., "II")'),
   }).strict(),
 
   annotations: readOnlyAnnotations('HS Code Lookup'),
@@ -321,7 +321,7 @@ Use this tool when you need to:
 - Check which Incoterms apply to sea freight vs any mode`,
 
   schema: z.object({
-    code: z.string().optional().describe('Incoterm code (e.g., "FOB", "CIF", "EXW")'),
+    code: z.string().regex(/^[A-Za-z]{3}$/, 'Incoterm code must be 3 letters (e.g., "FOB", "CIF", "EXW")').optional().describe('Incoterm code (3 letters, e.g., "FOB", "CIF", "EXW")'),
     category: z.enum(['any_mode', 'sea_only']).optional().describe('Filter by transport mode category'),
   }).strict(),
 
@@ -393,8 +393,8 @@ Note: Short tons (US) = 2,000 lbs. Long tons (UK) = 2,240 lbs. Metric tonnes = 2
 
   schema: z.object({
     value: z.number().describe('The value to convert'),
-    from: z.string().describe('Source unit code (e.g., "kg", "cbm", "cm")'),
-    to: z.string().describe('Target unit code (e.g., "lbs", "cuft", "inches")'),
+    from: z.enum(['kg','lbs','oz','tonnes','short_tons','long_tons','cbm','cuft','cuin','litres','gal_us','gal_uk','cm','inches','m','feet','mm']).describe('Source unit — weight (kg, lbs, oz, tonnes, short_tons, long_tons), volume (cbm, cuft, cuin, litres, gal_us, gal_uk) or length (cm, inches, m, feet, mm)'),
+    to: z.enum(['kg','lbs','oz','tonnes','short_tons','long_tons','cbm','cuft','cuin','litres','gal_us','gal_uk','cm','inches','m','feet','mm','chargeable_kg','freight_tonnes']).describe('Target unit — any source unit, plus the freight targets chargeable_kg and freight_tonnes (only valid from cbm)'),
   }).strict(),
 
   annotations: readOnlyAnnotations('Unit Converter'),
@@ -476,9 +476,9 @@ Use this tool when you need to:
 
   schema: z.object({
     query: z.string().min(2, 'Query must be at least 2 characters').optional().describe('Search by location name (e.g., "rotterdam", "heathrow")'),
-    code: z.string().length(5, 'UN/LOCODE must be exactly 5 characters (2-letter country + 3-char location)').regex(/^[A-Z0-9]{5}$/i, 'UN/LOCODE must be alphanumeric').optional().describe('Exact UN/LOCODE lookup (e.g., "GBLHR", "NLRTM")'),
-    country: z.string().length(2, 'Country must be a 2-letter ISO code').regex(/^[A-Z]{2}$/i, 'Country must be a 2-letter ISO code (e.g., "GB", "NL")').optional().describe('Filter by country code (e.g., "GB", "NL")'),
-    function: z.string().optional().describe('Filter by function: port, airport, rail, road, icd, border'),
+    code: z.string().regex(/^[A-Za-z0-9]{5}$/, 'UN/LOCODE must be 5 characters: 2-letter country + 3-char location (e.g. "GBLHR")').optional().describe('Exact UN/LOCODE lookup (e.g., "GBLHR", "NLRTM")'),
+    country: z.string().regex(/^[A-Za-z]{2}$/, 'Country must be a 2-letter ISO code (e.g. "GB", "NL")').optional().describe('Filter by country code (e.g., "GB", "NL")'),
+    function_type: z.enum(['port', 'airport', 'rail', 'road', 'icd', 'border']).optional().describe('Filter by location function'),
     limit: z.number().int().min(1).max(100).optional().describe('Max results (default: 20, max: 100)'),
   }).strict(),
 
@@ -487,7 +487,7 @@ Use this tool when you need to:
   handler: async (args) =>
     apiGet('unlocode', {
       q: args.query, code: args.code, country: args.country,
-      function: args.function, limit: args.limit,
+      function: args.function_type, limit: args.limit,
     }),
 };
 
@@ -509,11 +509,11 @@ Use this tool when you need to:
 
   schema: z.object({
     commodity_code: z.string().regex(/^\d{6,10}$/, 'Commodity code must be 6–10 digits').describe('HS/tariff code (6–10 digits, e.g., "847989")'),
-    origin_country: z.string().length(2, 'Origin country must be a 2-letter ISO code').regex(/^[A-Z]{2}$/i, 'Origin country must be a 2-letter ISO code (e.g., "CN", "DE")').describe('ISO 2-letter origin country code (e.g., "CN", "DE")'),
+    origin_country: z.string().regex(/^[A-Za-z]{2}$/, 'Origin country must be a 2-letter ISO code (e.g., "CN", "DE")').describe('ISO 2-letter origin country code (e.g., "CN", "DE")'),
     customs_value: z.number().positive().describe('Goods value in GBP'),
     freight_cost: z.number().optional().describe('Freight cost in GBP (added to CIF value)'),
     insurance_cost: z.number().optional().describe('Insurance cost in GBP (added to CIF value)'),
-    incoterm: z.string().optional().describe('Incoterm (e.g., "FOB", "CIF", "EXW")'),
+    incoterm: z.enum(['EXW','FCA','FAS','FOB','CFR','CIF','CPT','CIP','DAP','DPU','DDP']).optional().describe('Incoterm basis'),
   }).strict(),
 
   annotations: readOnlyAnnotations('UK Duty & VAT Calculator'),
@@ -604,7 +604,7 @@ Use this tool when you need to:
 - Find aircraft-compatible ULDs`,
 
   schema: z.object({
-    type: z.string().optional().describe('ULD code (e.g., "AKE", "PMC"). Omit to list all.'),
+    type: z.string().min(2, 'ULD type must be at least 2 characters').optional().describe('ULD code (e.g., "AKE", "PMC") or slug (e.g., "ake-ld3"). Omit to list all.'),
     category: z.enum(['container', 'pallet', 'special']).optional().describe('Filter by category'),
     deck: z.enum(['lower', 'main']).optional().describe('Filter by deck position'),
   }).strict(),
@@ -632,7 +632,7 @@ Use this tool when you need to:
 - Check payload limits for heavy shipments`,
 
   schema: z.object({
-    slug: z.string().optional().describe('Vehicle slug (e.g., "standard-curtainsider"). Omit to list all.'),
+    slug: z.string().min(2, 'Vehicle slug must be at least 2 characters').optional().describe('Vehicle slug (e.g., "standard-curtainsider"). Omit to list all.'),
     category: z.enum(['articulated', 'rigid', 'van']).optional().describe('Filter by category'),
     region: z.enum(['EU', 'US']).optional().describe('Filter by region'),
   }).strict(),

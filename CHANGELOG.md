@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.5.0 — 2026-06-19
+
+### Changed
+
+- **Loose-schema tightening across the tool inputs — garbage is now rejected at the schema layer while every legitimate input form still validates.** Several tools advertised a bare `z.string()` where the description promised a specific format, so malformed values passed validation and only failed (or silently returned nothing) downstream. Each is now constrained to exactly the forms its underlying data/logic accepts, with a clear error message, without narrowing any feature:
+  - **`unit_converter`** — `from` is now an enum of the 17 supported unit codes (weight / volume / length); `to` is those plus the freight targets `chargeable_kg` and `freight_tonnes`. Unknown units are rejected with the valid set surfaced in `tools/list`.
+  - **`hs_code_lookup`** — `code` must be 2–6 digits, `section` a Roman numeral (I–XXI), `query` ≥ 2 chars.
+  - **`incoterms_lookup`** — `code` must be a 3-letter Incoterm code (any case).
+  - **`uk_duty_calculator`** — `incoterm` is now the 11-value Incoterms enum (commodity_code `^\d{6,10}$` and origin_country `^[A-Za-z]{2}$` were already tight; regex form aligned with the website surface).
+  - **`airline_lookup`** — `iata` `^[A-Za-z0-9]{2}$`, `icao` `^[A-Za-z]{3}$` (upgraded from length checks); the 2-char IATA / 3-char ICAO / 3-digit AWB-prefix / free-form country+query union is fully preserved.
+  - **`unlocode_lookup`** — the function filter is now **`function_type`** (an enum of `port | airport | rail | road | icd | border`), renamed from the previous bare-string `function` to match the website MCP surface and validated as an enum; `code` / `country` regexes aligned to the website (`^[A-Za-z0-9]{5}$` / `^[A-Za-z]{2}$`). **Note:** callers that passed `function` must switch to `function_type`.
+  - **`container_lookup` / `uld_lookup` / `vehicle_lookup`** — the slug/code selector now requires ≥ 2 chars; these accept a code **or** slug from a fixed reference set, so they stay permissive (the handler returns a clear "not found" for unknown values) rather than being narrowed to a brittle enum.
+
+### Notes
+
+- **No tool-count or tool-list change — still 19 tools, same names.** This is a FAULT 13 fix-once-mirror-everywhere release: the website `/api/mcp` surface ([`app/api/mcp/[transport]/route.ts`](https://github.com/SoapyRED/freighttools)) was tightened to the identical schemas in the same change, so `tools/list` and input validation match across both surfaces. `serverInfo.version` reads dynamically from `package.json`, now `2.5.0`. Minor bump because the advertised input schemas changed (stricter validation + the `unlocode_lookup` `function` → `function_type` rename).
+
 ## 2.4.1 — 2026-06-17
 
 ### Fixed
