@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.6.0 — 2026-06-22
+
+### Changed
+
+- **Repositioned as the neutral freight reference layer for AI agents** (metadata/copy only — no tool, schema, or behaviour change). The `package.json` description, README lead, and `server.json`/registry description now lead with the neutral-layer voice: authoritative dangerous-goods, customs, location and freight-calculation data an agent can call and cite, from primary sources (ADR 2025 / UNECE, HS 2022 / WCO, IATA-regulated airline prefixes) — neutral by design, no freight to sell and no carrier to push. Mirrors the same repositioning applied across the website, OpenAPI spec, llms.txt and GitHub About so every source agents and directories read is consistent. Removed "basic usage" framing from the install copy. Still 19 tools, same names and schemas; minor bump so the corrected metadata propagates to npm, the MCP Registry, Smithery, and Glama on re-scan.
+
+### Security
+
+- Verified `@modelcontextprotocol/sdk` is on **1.29.0** (installed), at or above **1.26.0** which patches CVE-2026-25536 — no change required.
+
 ## 2.5.0 — 2026-06-19
 
 ### Changed

@@ -6,9 +6,11 @@
 [![License: MIT](https://img.shields.io/npm/l/freightutils-mcp)](https://opensource.org/licenses/MIT)
 [![FreightUtils MCP server](https://glama.ai/mcp/servers/SoapyRED/freightutils-mcp/badges/score.svg)](https://glama.ai/mcp/servers/SoapyRED/freightutils-mcp)
 
-A [Model Context Protocol](https://modelcontextprotocol.io/) server that gives AI agents access to 19 freight calculation and reference tools, covering road, air, and sea freight.
+**The neutral freight reference layer for AI agents.**
 
-Built by an ADR-certified freight transport planner for AI agents, developers, and freight professionals.
+FreightUtils is the neutral freight reference layer for AI agents — authoritative dangerous-goods, customs, location and freight-calculation data an agent can call and cite, from primary sources (ADR 2025 / UNECE, HS 2022 / WCO, IATA-regulated airline prefixes). Neutral by design: no freight to sell and no carrier to push, so an agent can trust it as ground truth regardless of who carries the load.
+
+This [Model Context Protocol](https://modelcontextprotocol.io/) server gives AI agents access to 19 freight calculation and reference tools, covering road, air, and sea freight. Built by a UK ADR-certified freight transport planner.
 
 **Website:** https://www.freightutils.com
 **API Docs:** https://www.freightutils.com/api-docs
@@ -89,7 +91,7 @@ https://www.freightutils.com/api/mcp
 
 > The older URL `https://www.freightutils.com/api/mcp/mcp` still works for backwards compatibility with existing clients.
 
-No authentication required for basic usage.
+No API key required to get started — anonymous calls work out of the box (see Rate Limits below).
 
 ### Authenticating with a Pro key
 
