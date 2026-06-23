@@ -21,6 +21,11 @@ export interface ToolDef {
   schema: z.AnyZodObject;
   annotations: ToolAnnotationShape;
   handler: (args: Record<string, unknown>) => Promise<unknown>;
+  // Optional output schema (ZodRawShape) — when present the tool is registered
+  // via registerTool with structuredContent (freightutils-tool-quality bar).
+  outputSchema?: z.ZodRawShape;
+  // Optional one-line human citation appended to the text content (skill §5).
+  citation?: (result: unknown) => string;
 }
 
 // Every FreightUtils tool is a pure, read-only lookup or deterministic
@@ -711,6 +716,74 @@ Returns the subscription URL plus the tier/limit/price metadata. Agents must han
 };
 
 // ─────────────────────────────────────────────────────────────
+//  Emissions Calculator (ISO 14083 / GLEC v3.2)
+//  registerTool with full output schema + structuredContent; proxies
+//  /api/emissions so the computed result + _source come from REST.
+// ─────────────────────────────────────────────────────────────
+
+const emissionsCalculator: ToolDef = {
+  name: 'emissions_calculator',
+  description: `Estimate freight transport greenhouse-gas emissions (kgCO2e) for a shipment leg, per ISO 14083:2023 / GLEC Framework v3.2: emissions = mass × distance × a published emission-intensity factor (kgCO2e/tonne-km).
+
+Provide mass + distance_km + mode (road | rail | sea | air | inland_waterway); optionally choose sub_mode, region/authority (uk = DEFRA, us = EPA, fr = ADEME) and basis (wtw default, or ttw). Returns well-to-wheel AND tank-to-wheel emissions where the factor has both, the exact factor used (value, authority, edition), the tonne-km activity, and a _source citing BOTH the ISO method and the specific open factor.
+
+Use when you need a carbon estimate for a shipment whose mass and distance are already known. Distinct from cbm_calculator / ldm_calculator / chargeable_weight_calculator (those size or bill a shipment; this one estimates its CO2e). Distance must be provided — this tool does NOT route, geocode, or compute distances. Best-effort reference estimate from open factors (DEFRA / EPA / ADEME) — NOT a verified or audited carbon report. An unknown mode/sub_mode/region returns available:false with the covered options, never a fabricated factor.`,
+
+  schema: z.object({
+    mass: z.number().positive().describe('Shipment mass, expressed in mass_unit. Example: 1000'),
+    mass_unit: z.enum(['kg', 'tonnes']).optional().describe('Unit for mass (default: kg)'),
+    distance_km: z.number().positive().describe('Transport distance in kilometres — you provide it; the tool does not route'),
+    mode: z.enum(['road', 'rail', 'sea', 'air', 'inland_waterway']).describe('Transport mode'),
+    sub_mode: z.string().optional().describe('Optional sub-mode / vehicle class (e.g. "articulated", "container ship", "long-haul"). Omit for the representative default.'),
+    region: z.enum(['uk', 'us', 'fr']).optional().describe('Factor source/region: uk = DEFRA, us = EPA, fr = ADEME. Default is per-mode.'),
+    basis: z.enum(['wtw', 'ttw']).optional().describe('Emissions basis: wtw = well-to-wheel incl. upstream (default), ttw = tank-to-wheel / operation only'),
+  }).strict(),
+
+  outputSchema: {
+    available: z.boolean(),
+    methodology: z.string(),
+    disclaimer: z.string(),
+    inputs: z.object({ mass: z.number(), mass_unit: z.string(), mass_tonnes: z.number(), distance_km: z.number(), mode: z.string(), sub_mode: z.string(), region: z.string(), basis: z.string() }).optional(),
+    tonne_km: z.number().optional(),
+    factor: z.object({ id: z.string(), mode: z.string(), sub_mode: z.string(), authority: z.string(), edition: z.string(), region: z.string(), unit: z.string(), wtw: z.number().nullable(), ttw: z.number().nullable() }).optional(),
+    emissions: z.object({ wtw_kgco2e: z.number().nullable(), ttw_kgco2e: z.number().nullable(), primary_kgco2e: z.number(), basis_used: z.string() }).optional(),
+    _source: z.object({
+      type: z.string(), standard: z.string(), reference: z.string(), source_url: z.string(), computed_by: z.string(),
+      factor: z.object({ authority: z.string(), edition: z.string(), value: z.number(), unit: z.string(), basis: z.string(), source_url: z.string(), licence: z.string() }),
+    }).optional(),
+    message: z.string().optional(),
+    available_for: z.object({ modes: z.array(z.string()), regions_for_mode: z.array(z.string()), sub_modes: z.array(z.object({ region: z.string(), id: z.string(), sub_mode: z.string() })) }).optional(),
+  },
+
+  annotations: readOnlyAnnotations('Freight Emissions Calculator'),
+
+  handler: async (args) =>
+    apiGet('emissions', {
+      mass: args.mass,
+      mass_unit: args.mass_unit,
+      distance_km: args.distance_km,
+      mode: args.mode,
+      sub_mode: args.sub_mode,
+      region: args.region,
+      basis: args.basis,
+    }),
+
+  citation: (result: unknown) => {
+    const r = result as {
+      available?: boolean;
+      factor?: { authority?: string; edition?: string; unit?: string };
+      emissions?: { basis_used?: string };
+    };
+    if (!r || r.available === false) {
+      return 'Source: FreightUtils emissions methodology (ISO 14083:2023 / GLEC Framework v3.2) — freightutils.com';
+    }
+    const f = r.factor ?? {};
+    const b = (r.emissions?.basis_used ?? '').toUpperCase();
+    return `Source: ${f.authority} (${f.edition}), ${f.unit} ${b}; method ISO 14083:2023 / GLEC Framework v3.2 — computed by freightutils.com`;
+  },
+};
+
+// ─────────────────────────────────────────────────────────────
 //  Export all tools
 // ─────────────────────────────────────────────────────────────
 
@@ -733,5 +806,6 @@ export const ALL_TOOLS: ToolDef[] = [
   shipmentSummary,
   uldLookup,
   vehicleLookup,
+  emissionsCalculator,
   getSubscribeLink,
 ];

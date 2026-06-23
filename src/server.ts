@@ -26,28 +26,58 @@ export function createServer(): McpServer {
 
   // Register every tool
   for (const tool of ALL_TOOLS) {
-    server.tool(
-      tool.name,
-      tool.description,
-      tool.schema.shape,
-      tool.annotations,
-      async (args: Record<string, unknown>) => {
-        try {
-          const result = await tool.handler(args);
-          return {
-            content: [
+    if (tool.outputSchema) {
+      // freightutils-tool-quality bar: register with outputSchema +
+      // structuredContent + a human citation line. Coexists with the legacy
+      // server.tool() path below (the other tools' output-schema lift is a
+      // separate sprint).
+      server.registerTool(
+        tool.name,
+        {
+          description: tool.description,
+          inputSchema: tool.schema.shape,
+          outputSchema: tool.outputSchema,
+          annotations: tool.annotations,
+        },
+        async (args: Record<string, unknown>) => {
+          try {
+            const result = await tool.handler(args);
+            const content: { type: 'text'; text: string }[] = [
               { type: 'text' as const, text: JSON.stringify(result, null, 2) },
-            ],
-          };
-        } catch (err: unknown) {
-          const message = err instanceof Error ? err.message : String(err);
-          return {
-            content: [{ type: 'text' as const, text: `Error: ${message}` }],
-            isError: true,
-          };
-        }
-      },
-    );
+            ];
+            const cite = tool.citation?.(result);
+            if (cite) content.push({ type: 'text' as const, text: cite });
+            return { structuredContent: result as Record<string, unknown>, content };
+          } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
+            return { content: [{ type: 'text' as const, text: `Error: ${message}` }], isError: true };
+          }
+        },
+      );
+    } else {
+      server.tool(
+        tool.name,
+        tool.description,
+        tool.schema.shape,
+        tool.annotations,
+        async (args: Record<string, unknown>) => {
+          try {
+            const result = await tool.handler(args);
+            return {
+              content: [
+                { type: 'text' as const, text: JSON.stringify(result, null, 2) },
+              ],
+            };
+          } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : String(err);
+            return {
+              content: [{ type: 'text' as const, text: `Error: ${message}` }],
+              isError: true,
+            };
+          }
+        },
+      );
+    }
   }
 
   // This server exposes tools only — no prompts, no resources. But keyless MCP
