@@ -833,6 +833,48 @@ Use to confirm a container/AWB/IMO number is well-formed, or to extract identifi
 };
 
 // ─────────────────────────────────────────────────────────────
+//  ICS2 Stop-Words Checker (EU ICS2 goods-description terms)
+//  registerTool with full output schema + structuredContent; proxies
+//  /api/ics2-check so the result + _source come from REST. Reference only.
+// ─────────────────────────────────────────────────────────────
+
+const ics2Check: ToolDef = {
+  name: 'ics2_check',
+  description: `Check a goods description against the official EU ICS2 stop-words list — terms the European Commission deems too vague/generic to be accepted in an entry summary declaration (ENS) goods-description field (data element 18 05 000 000).
+
+Pass description=<goods description>; returns the flagged terms (each with a note: standalone term = automatic rejection, embedded = make the description more specific), a clean boolean, a caveat, and a _source citing the EU list + legal basis.
+
+Use to QA a goods description BEFORE filing an ENS — for customs/documentation teams, brokers, forwarders' documentation side, and agents building filing pipelines. STRICTLY a reference check: NOT an ENS filing, NOT a customs-compliance determination, NOT legal advice. The list is non-exhaustive and updated periodically; clean does NOT guarantee acceptance. No binary accepted/rejected verdict. Distinct from hs_code_lookup (commodity codes) and uk_duty_calculator (duty/VAT).`,
+
+  schema: z.object({
+    description: z.string().describe('The goods description to check against the EU ICS2 stop-words list.'),
+  }).strict(),
+
+  outputSchema: {
+    description: z.string(),
+    flagged: z.array(z.object({ term: z.string(), note: z.string() })),
+    clean: z.boolean(),
+    caveat: z.string(),
+    _source: z.object({
+      type: z.string(), authority: z.string(), dataset: z.string(), legal_basis: z.string(),
+      list_in_force: z.string(), source_url: z.string(), licence: z.string(),
+      retrieved: z.string(), non_exhaustive: z.boolean(), retrieved_via: z.string(),
+    }),
+    disclaimer: z.string(),
+  },
+
+  annotations: readOnlyAnnotations('ICS2 Stop-Words Checker'),
+
+  handler: async (args) => apiGet('ics2-check', { description: args.description }),
+
+  citation: (result: unknown) => {
+    const r = result as { _source?: { authority?: string; legal_basis?: string; list_in_force?: string } };
+    const s = r._source ?? {};
+    return `Source: EU ICS2 stop-words list — ${s.authority ?? 'European Commission DG TAXUD'} (${s.legal_basis ?? 'Commission Delegated Regulation (EU) 2015/2446'}), in force ${s.list_in_force ?? '2026-05-04'} — checked by freightutils.com`;
+  },
+};
+
+// ─────────────────────────────────────────────────────────────
 //  Export all tools
 // ─────────────────────────────────────────────────────────────
 
@@ -857,5 +899,6 @@ export const ALL_TOOLS: ToolDef[] = [
   vehicleLookup,
   emissionsCalculator,
   identifierValidator,
+  ics2Check,
   getSubscribeLink,
 ];
