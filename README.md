@@ -10,14 +10,14 @@
 
 FreightUtils is the neutral freight reference layer for AI agents — authoritative dangerous-goods, customs, location and freight-calculation data an agent can call and cite, from primary sources (ADR 2025 / UNECE, HS 2022 / WCO, IATA-regulated airline prefixes). Neutral by design: no freight to sell and no carrier to push, so an agent can trust it as ground truth regardless of who carries the load.
 
-This [Model Context Protocol](https://modelcontextprotocol.io/) server gives AI agents access to 20 freight calculation and reference tools, covering road, air, and sea freight. Built by a UK ADR-certified freight transport planner.
+This [Model Context Protocol](https://modelcontextprotocol.io/) server gives AI agents access to 21 freight calculation and reference tools, covering road, air, and sea freight. Built by a UK ADR-certified freight transport planner.
 
 **Website:** https://www.freightutils.com
 **API Docs:** https://www.freightutils.com/api-docs
 
 ---
 
-## Tools (20)
+## Tools (21)
 
 ### Calculators
 | Tool | Description |
@@ -52,6 +52,11 @@ This [Model Context Protocol](https://modelcontextprotocol.io/) server gives AI 
 | `unlocode_lookup` | 116,129+ UN/LOCODE transport locations |
 | `uld_lookup` | 16 air cargo ULD types (LD3, PMC, etc.) |
 | `vehicle_lookup` | 17 road freight vehicles and trailers |
+
+### Validation
+| Tool | Description |
+|------|-------------|
+| `validate` | Validate & parse container (ISO 6346), Air Waybill (modulus-7) and IMO ship-number check digits |
 
 ### Composite
 | Tool | Description |
@@ -133,14 +138,14 @@ You should see three ticks and `All checks passed`:
 ```
 FreightUtils MCP Diagnostic
 ───────────────────────────
-package: freightutils-mcp@2.7.0
+package: freightutils-mcp@2.8.0
 health:  https://www.freightutils.com/api/mcp/health
 
 [1/3] Backend health (https://www.freightutils.com/api/mcp/health)
-      ✓ status=ok mcp_version=2.7.0 tools_registered=20 (143ms)
+      ✓ status=ok mcp_version=2.8.0 tools_registered=21 (143ms)
 
 [2/3] MCP handshake (in-process via InMemoryTransport)
-      ✓ server freightutils-mcp@2.7.0 initialized; tools/list returned 20 tools
+      ✓ server freightutils-mcp@2.8.0 initialized; tools/list returned 21 tools
 
 [3/3] End-to-end tool call (cbm_calculator l=120 w=80 h=100)
       ✓ cbm_calculator → total=0.96 m³ (expected 0.96) (218ms)

@@ -1,6 +1,6 @@
 {
   "name": "freightutils-mcp",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "mcpName": "io.github.SoapyRED/freightutils",
   "description": "Neutral freight reference and calculation tools for AI agents — ADR dangerous goods, HS codes, airline codes, UN/LOCODE, Incoterms and freight math from authoritative sources.",
   "author": "FreightUtils <contact@freightutils.com>",

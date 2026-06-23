@@ -784,6 +784,55 @@ Use when you need a carbon estimate for a shipment whose mass and distance are a
 };
 
 // ─────────────────────────────────────────────────────────────
+//  Identifier Validator (ISO 6346 / IATA AWB / IMO)
+//  registerTool with full output schema + structuredContent; proxies
+//  /api/validate so the computed result + _source come from REST.
+// ─────────────────────────────────────────────────────────────
+
+const identifierValidator: ToolDef = {
+  name: 'validate',
+  description: `Validate and parse freight identifiers by their public check-digit algorithms: shipping container numbers (ISO 6346), air waybill (AWB) numbers (IATA modulus-7) and IMO ship identification numbers.
+
+Two modes: pass text=<arbitrary string> to find and validate every identifier in it (e.g. a booking-email line), OR pass value=<identifier> + type=<container|awb|imo> to validate one. Returns, per identifier found: type, the normalised form, valid (check-digit pass/fail), the expected vs actual check digit, and details (container → owner prefix + equipment category; AWB → airline prefix + the airline, resolved from the AWB-prefix dataset; IMO → the 7-digit number).
+
+Use to confirm a container/AWB/IMO number is well-formed, or to extract identifiers from a freeform string. STRUCTURAL ONLY — a valid check digit means well-formed, NOT that the container/shipment/vessel exists or is active; not a registry/tracking lookup. Distinct from container_lookup (container TYPE specs) and airline_lookup (airline search); this checks an identifier's check digit and, for an AWB, names the operating airline.`,
+
+  schema: z.object({
+    text: z.string().optional().describe('Arbitrary string to scan for container / AWB / IMO identifiers (parse mode). Provide this OR value+type.'),
+    value: z.string().optional().describe('A single identifier to validate (typed mode). Requires type.'),
+    type: z.enum(['container', 'awb', 'imo']).optional().describe('Identifier type for value: container = ISO 6346, awb = IATA Air Waybill, imo = IMO ship number.'),
+  }).strict(),
+
+  outputSchema: {
+    found: z.array(z.object({
+      type: z.string(),
+      raw: z.string(),
+      normalised: z.string(),
+      valid: z.boolean(),
+      check_digit: z.object({ expected: z.number().nullable(), actual: z.number().nullable() }),
+      details: z.record(z.string(), z.unknown()),
+      _source: z.object({ type: z.string(), standard: z.string(), reference: z.string(), authority: z.string(), source_url: z.string(), computed_by: z.string() }),
+    })),
+    disclaimer: z.string(),
+    note: z.string().optional(),
+  },
+
+  annotations: readOnlyAnnotations('Freight Identifier Validator'),
+
+  handler: async (args) =>
+    apiGet('validate', { text: args.text, value: args.value, type: args.type }),
+
+  citation: (result: unknown) => {
+    const r = result as { found?: { _source?: { reference?: string } }[] };
+    if (!r.found || r.found.length === 0) {
+      return 'Structural identifier validation (ISO 6346 / IATA AWB / IMO) — computed by freightutils.com';
+    }
+    const refs = [...new Set(r.found.map((h) => (h._source?.reference ?? '').split(' — ')[0]).filter(Boolean))].join(' ; ');
+    return `Source: ${refs} — structural check-digit validation, computed by freightutils.com`;
+  },
+};
+
+// ─────────────────────────────────────────────────────────────
 //  Export all tools
 // ─────────────────────────────────────────────────────────────
 
@@ -807,5 +856,6 @@ export const ALL_TOOLS: ToolDef[] = [
   uldLookup,
   vehicleLookup,
   emissionsCalculator,
+  identifierValidator,
   getSubscribeLink,
 ];
