@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.10.0 — 2026-06-24
+
+### Added
+
+- **New tool: `airport_lookup`** — look up an airport by IATA code (3 letters, e.g. `LHR`), ICAO code (4 chars, e.g. `EGLL`), or name/city search. Returns the full record (both codes, name, type, municipality, region, country, latitude/longitude, elevation), with ranked candidates for ambiguous names and an optional `type` filter. Proxies `GET /api/airports`.
+- **New tool: `nearest_airport`** — find the airports nearest to a caller-provided `latitude`/`longitude`, sorted by great-circle (haversine) distance with `distance_km` on each result. Optional `radius_km`, `max_results` (1–50, default 10) and `type` filter. Coordinates are **input only — never stored or logged**. Proxies `GET /api/nearest-airport`.
+- Both tools are backed by the public-domain **OurAirports** dataset (85,555 airports), cross-checked against OpenFlights + Wikidata, and registered via `server.registerTool()` with full output schemas + `structuredContent` and a `_source` citing OurAirports.
+- **Tool count: 22 → 24** (REST surface: 21 → 23 endpoints).
+
 ## 2.6.0 — 2026-06-22
 
 ### Changed

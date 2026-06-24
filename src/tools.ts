@@ -875,6 +875,85 @@ Use to QA a goods description BEFORE filing an ENS — for customs/documentation
 };
 
 // ─────────────────────────────────────────────────────────────
+//  Airports (OurAirports, public domain) — airport_lookup + nearest_airport
+// ─────────────────────────────────────────────────────────────
+
+const airportTypeEnum = z.enum(['large_airport', 'medium_airport', 'small_airport', 'heliport', 'closed', 'seaplane_base']);
+const airportObject = z.object({
+  ident: z.string(),
+  iata_code: z.string().nullable(),
+  name: z.string(),
+  type: z.string(),
+  municipality: z.string().nullable(),
+  region: z.string().nullable(),
+  country: z.string(),
+  country_name: z.string().nullable(),
+  latitude: z.number(),
+  longitude: z.number(),
+  elevation_ft: z.number().nullable(),
+});
+const airportSourceShape = z.object({
+  type: z.string(),
+  authority: z.string(),
+  dataset: z.string().optional(),
+  source_url: z.string().optional(),
+  data_vintage: z.string().optional(),
+  licence: z.string().optional(),
+  retrieved_via: z.string().optional(),
+});
+const airportCitation = (result: unknown) => {
+  const r = result as { _source?: { citeShort?: string; authority?: string } };
+  const s = r._source ?? {};
+  return `Source: ${s.authority ?? 'OurAirports (public domain)'} — cross-checked vs OpenFlights + Wikidata — via freightutils.com`;
+};
+
+const airportLookup: ToolDef = {
+  name: 'airport_lookup',
+  description: `Look up an airport by IATA code (3 letters, e.g. "LHR"), ICAO code (4 chars, e.g. "EGLL"), or free-text name/city search (e.g. "heathrow"). Returns the full record: IATA + ICAO, name, type (large/medium/small/heliport/closed/seaplane), municipality, region, country, latitude/longitude and elevation. Provide one of iata, icao, or query; optional type filter. Ambiguous name searches return ranked candidates. Covers 85,555 airports worldwide (OurAirports, public domain, cross-checked vs OpenFlights + Wikidata). Use when an agent has an airport code or name and needs the airport's identity, location or codes. Distinct from airline_lookup (which searches CARRIERS / AWB prefixes, not airports) and unlocode_lookup (general UN/LOCODE transport locations of which airports are one function). Reference data only — not for navigation; verify current codes with IATA/ICAO.`,
+  schema: z.object({
+    iata: z.string().regex(/^[A-Za-z]{3}$/, 'IATA code must be 3 letters (e.g. "LHR")').optional().describe('Exact 3-letter IATA code'),
+    icao: z.string().regex(/^[A-Za-z0-9]{4}$/, 'ICAO code must be 4 characters (e.g. "EGLL")').optional().describe('Exact 4-character ICAO / ident'),
+    query: z.string().min(2, 'Query must be at least 2 characters').optional().describe('Name / city / municipality search (min 2 chars)'),
+    type: airportTypeEnum.optional().describe('Optional filter by airport type'),
+  }).strict(),
+  outputSchema: {
+    count: z.number(),
+    results: z.array(airportObject),
+    disclaimer: z.string(),
+    meta: z.record(z.string(), z.unknown()).optional(),
+    _source: airportSourceShape,
+  },
+  annotations: readOnlyAnnotations('Airport Code Lookup'),
+  handler: async (args) => apiGet('airports', { iata: args.iata, icao: args.icao, q: args.query, type: args.type }),
+  citation: airportCitation,
+};
+
+const nearestAirport: ToolDef = {
+  name: 'nearest_airport',
+  description: `Find the airports nearest to a caller-provided latitude/longitude, sorted by great-circle (haversine) distance with distance_km on each result. Inputs: latitude, longitude (required), optional radius_km, max_results (1-50, default 10) and type filter (e.g. large_airport only). Coordinates are INPUT only — nothing is stored or logged. Searches 85,555 airports (OurAirports, public domain). Use when an agent already holds a coordinate (a port, warehouse, city centre, or the user's location) and needs the closest airport(s). This tool does NOT geocode place names and does NOT compute routes — pass coordinates you already have. Distinct from airport_lookup (exact code / name lookup, no distance) and unlocode_lookup (named transport-location search).`,
+  schema: z.object({
+    latitude: z.number().min(-90).max(90).describe('Latitude in decimal degrees (-90 to 90)'),
+    longitude: z.number().min(-180).max(180).describe('Longitude in decimal degrees (-180 to 180)'),
+    radius_km: z.number().positive().optional().describe('Optional maximum distance in kilometres'),
+    max_results: z.number().int().min(1).max(50).optional().describe('Max results to return (1-50, default 10)'),
+    type: airportTypeEnum.optional().describe('Optional filter by airport type'),
+  }).strict(),
+  outputSchema: {
+    count: z.number(),
+    results: z.array(airportObject.extend({ distance_km: z.number() })),
+    disclaimer: z.string(),
+    meta: z.record(z.string(), z.unknown()).optional(),
+    _source: airportSourceShape,
+  },
+  annotations: readOnlyAnnotations('Nearest Airport'),
+  handler: async (args) => apiGet('nearest-airport', {
+    lat: args.latitude, lon: args.longitude,
+    radius_km: args.radius_km, max_results: args.max_results, type: args.type,
+  }),
+  citation: airportCitation,
+};
+
+// ─────────────────────────────────────────────────────────────
 //  Export all tools
 // ─────────────────────────────────────────────────────────────
 
@@ -900,5 +979,7 @@ export const ALL_TOOLS: ToolDef[] = [
   emissionsCalculator,
   identifierValidator,
   ics2Check,
+  airportLookup,
+  nearestAirport,
   getSubscribeLink,
 ];
