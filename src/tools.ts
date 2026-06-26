@@ -727,7 +727,7 @@ const emissionsCalculator: ToolDef = {
 
 Provide mass + distance_km + mode (road | rail | sea | air | inland_waterway); optionally choose sub_mode, region/authority (uk = DEFRA, us = EPA, fr = ADEME) and basis (wtw default, or ttw). Returns well-to-wheel AND tank-to-wheel emissions where the factor has both, the exact factor used (value, authority, edition), the tonne-km activity, and a _source citing BOTH the ISO method and the specific open factor.
 
-Use when you need a carbon estimate for a shipment whose mass and distance are already known. Distinct from cbm_calculator / ldm_calculator / chargeable_weight_calculator (those size or bill a shipment; this one estimates its CO2e). Distance must be provided — this tool does NOT route, geocode, or compute distances. Best-effort reference estimate from open factors (DEFRA / EPA / ADEME) — NOT a verified or audited carbon report. An unknown mode/sub_mode/region returns available:false with the covered options, never a fabricated factor.`,
+Use when you need a carbon estimate for a shipment whose mass and distance are already known. Distinct from cbm_calculator / ldm_calculator / chargeable_weight_calculator (those size or bill a shipment; this one estimates its CO2e). Distance must be provided — this tool does NOT route, geocode, or compute distances. Best-effort reference estimate from open factors (DEFRA / EPA / ADEME) — NOT a verified or audited carbon report. IMPORTANT: pass ACTUAL GROSS MASS, not chargeable/volumetric weight (a common air-freight mistake — see mass_basis). The fleet-average factor already includes average empty running (see empty_running) — do NOT add your own empty-return leg. Sea and air are low-representativeness generic defaults: real emissions vary materially by vessel/aircraft type, load factor and routing (see representativeness + the result summary). An unknown mode/sub_mode/region returns available:false with the covered options, never a fabricated factor.`,
 
   schema: z.object({
     mass: z.number().positive().describe('Shipment mass, expressed in mass_unit. Example: 1000'),
@@ -747,9 +747,14 @@ Use when you need a carbon estimate for a shipment whose mass and distance are a
     tonne_km: z.number().optional(),
     factor: z.object({ id: z.string(), mode: z.string(), sub_mode: z.string(), authority: z.string(), edition: z.string(), region: z.string(), unit: z.string(), wtw: z.number().nullable(), ttw: z.number().nullable() }).optional(),
     emissions: z.object({ wtw_kgco2e: z.number().nullable(), ttw_kgco2e: z.number().nullable(), primary_kgco2e: z.number(), basis_used: z.string() }).optional(),
+    summary: z.string().optional(),
+    mass_basis: z.string().optional(),
+    empty_running: z.string().optional(),
+    representativeness: z.string().optional(),
+    confidence: z.string().optional(),
     _source: z.object({
       type: z.string(), standard: z.string(), reference: z.string(), source_url: z.string(), computed_by: z.string(),
-      factor: z.object({ authority: z.string(), edition: z.string(), value: z.number(), unit: z.string(), basis: z.string(), source_url: z.string(), licence: z.string() }),
+      factor: z.object({ authority: z.string(), edition: z.string(), value: z.number(), unit: z.string(), basis: z.string(), last_verified: z.string(), source_url: z.string(), licence: z.string() }),
     }).optional(),
     message: z.string().optional(),
     available_for: z.object({ modes: z.array(z.string()), regions_for_mode: z.array(z.string()), sub_modes: z.array(z.object({ region: z.string(), id: z.string(), sub_mode: z.string() })) }).optional(),

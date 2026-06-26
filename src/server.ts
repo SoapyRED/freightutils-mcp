@@ -42,9 +42,13 @@ export function createServer(): McpServer {
         async (args: Record<string, unknown>) => {
           try {
             const result = await tool.handler(args);
-            const content: { type: 'text'; text: string }[] = [
-              { type: 'text' as const, text: JSON.stringify(result, null, 2) },
-            ];
+            const content: { type: 'text'; text: string }[] = [];
+            // Lead with a human-readable `summary` when the tool provides one (e.g. emissions —
+            // surfaces the empty-running / actual-mass / sea-air-variance caveats, not just the
+            // number), then the full JSON.
+            const summary = (result as { summary?: unknown } | null)?.summary;
+            if (typeof summary === 'string' && summary) content.push({ type: 'text' as const, text: summary });
+            content.push({ type: 'text' as const, text: JSON.stringify(result, null, 2) });
             const cite = tool.citation?.(result);
             if (cite) content.push({ type: 'text' as const, text: cite });
             return { structuredContent: result as Record<string, unknown>, content };
