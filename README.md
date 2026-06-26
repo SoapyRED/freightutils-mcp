@@ -29,7 +29,7 @@ This [Model Context Protocol](https://modelcontextprotocol.io/) server gives AI 
 | `container_lookup` | ISO container specs (10 types) and loading calculation |
 | `unit_converter` | Weight, volume, length, and freight-specific conversions |
 | `consignment_calculator` | Multi-item CBM, LDM, volumetric & mode-specific chargeable weight (sea/air/road) + advisory flags |
-| `emissions_calculator` | Freight CO2e per ISO 14083 / GLEC v3.2 — open DEFRA, EPA, ADEME factors (WTW + TTW) |
+| `emissions_calculator` | Freight CO2e via the ISO 14083 / GLEC distance-based method — open DEFRA/EPA/ADEME factors (WTW + TTW); use actual gross mass (not chargeable/volumetric); result carries empty_running + representativeness (sea/air = low) + a summary |
 
 ### Dangerous Goods (ADR)
 | Tool | Description |
