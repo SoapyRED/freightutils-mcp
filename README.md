@@ -12,6 +12,8 @@ FreightUtils is the neutral freight reference layer for AI agents — authoritat
 
 This [Model Context Protocol](https://modelcontextprotocol.io/) server gives AI agents access to 24 freight calculation and reference tools, covering road, air, and sea freight. Built by a UK ADR-certified freight transport planner.
 
+Every response cites its source — a `_source` block with the authority, edition, licence and last-verified date — and the tools are deterministic, not generated answers. Reference only: never filing, booking, or legal advice, and results state when human review is required (`validate` is structural check-digit validation only; a clean `ics2_check` is not ENS acceptance; emissions figures are estimates, not audited reports).
+
 **Website:** https://www.freightutils.com
 **API Docs:** https://www.freightutils.com/api-docs
 
@@ -59,7 +61,7 @@ This [Model Context Protocol](https://modelcontextprotocol.io/) server gives AI 
 ### Validation
 | Tool | Description |
 |------|-------------|
-| `validate` | Validate & parse container (ISO 6346), Air Waybill (modulus-7) and IMO ship-number check digits |
+| `validate` | Parse any text (a booking line, an email) to find & validate every container (ISO 6346), AWB (modulus-7) and IMO number in it — or validate a single identifier by type |
 
 ### Composite
 | Tool | Description |
@@ -263,6 +265,7 @@ FreightUtils ships across multiple distribution surfaces. Pick the one that fits
 - **REST API** — 23 endpoints, free tier (100/day) and Pro tier (50K/month, £19/mo). [API docs](https://www.freightutils.com/api-docs)
 - **MCP server** — for LLM agents and AI tooling. [npm: freightutils-mcp](https://www.npmjs.com/package/freightutils-mcp) · [MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=freightutils)
 - **n8n custom node** — for workflow automation. [npm: n8n-nodes-freightutils](https://www.npmjs.com/package/n8n-nodes-freightutils)
+- **Custom GPT** — the [FreightUtils GPT](https://chatgpt.com/g/g-69fb8fdb0a5c819182c73f8d224cc3d0) on the OpenAI GPT Store, backed by the same OpenAPI spec.
 
 Same data, same compliance reference set (ADR 2025, HS 2022, IATA-regulated airline prefixes), every surface kept in sync.
 
