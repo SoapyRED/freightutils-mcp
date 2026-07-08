@@ -3,6 +3,15 @@
   "name": "io.github.SoapyRED/freightutils",
   "title": "FreightUtils MCP Server",
   "description": "Neutral freight reference + validation layer for AI agents: ADR, HS, UN/LOCODE, freight math",
+  "websiteUrl": "https://www.freightutils.com",
+  "icons": [
+    {
+      "src": "https://www.freightutils.com/brand/icon-512.png",
+      "mimeType": "image/png",
+      "sizes": ["512x512"],
+      "theme": "light"
+    }
+  ],
   "repository": {
     "url": "https://github.com/SoapyRED/freightutils-mcp",
     "source": "github"
