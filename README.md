@@ -51,7 +51,7 @@ Every response cites its source — a `_source` block with the authority, editio
 ### Reference Data
 | Tool | Description |
 |------|-------------|
-| `airline_lookup` | 6,352 airlines with IATA/ICAO codes and AWB prefixes |
+| `airline_lookup` | 6,357 airlines with IATA/ICAO codes and AWB prefixes |
 | `unlocode_lookup` | 116,129+ UN/LOCODE transport locations |
 | `airport_lookup` | 85,555 airports by IATA/ICAO code, name or city (OurAirports) |
 | `nearest_airport` | Nearest airports to a latitude/longitude, by great-circle distance |

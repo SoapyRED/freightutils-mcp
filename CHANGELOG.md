@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.10.2 — 2026-07-08
+
+### Changed
+
+- **Docs/metadata refresh (no tool, schema, or behaviour change).** Corrected the `airline_lookup` dataset size in the README from **6,352 → 6,357** to match the live airline dataset (the count had held at 6,357 since its last additions; several surfaces still showed the stale figure). Cross-checked every other embedded dataset count against the live data — ADR 2,939, HS 6,940, UN/LOCODE 116,129, airports 85,555 all confirmed current. Tool count remains **24 MCP tools** (23 REST-backed + `get_subscribe_link`). Patch bump so the corrected metadata propagates to npm, the MCP Registry, Smithery, and Glama on their next scrape.
+
 ## 2.10.0 — 2026-06-24
 
 ### Added
