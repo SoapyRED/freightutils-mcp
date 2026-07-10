@@ -1,5 +1,18 @@
 # Changelog
 
+## 2.11.0 — 2026-07-10
+
+### Added
+
+- **Typed output schemas + structured results on all 24 tools.** Every tool now declares an `outputSchema` (the FreightUtils v1 response envelope with a tool-specific `result` shape) and `tools/call` returns `structuredContent`: the envelope carries the answer under `result`, plus `confidence` (level + basis, match-quality score where applicable), `normalized_input` (interpreted inputs and defaults applied), `warnings` (e.g. `FUZZY_BEST_MATCH`, `PROVENANCE_PENDING`), `_source` (authority, checked date, provenance status) and a ready-to-use `citation`. Envelopes are built by the FreightUtils API itself (`?envelope=1`) — the same contract as the hosted `/api/mcp` surface and the REST opt-in, verified field-for-field.
+- **Compatibility:** the flat JSON on the text channel (`content[0].text`) is **byte-identical** to 2.10.x for every tool, including error behaviour, so text-parsing consumers are unaffected. Non-error calls now also append the envelope's one-line citation as an additional text item. The five tools that already shipped `structuredContent` (`emissions_calculator`, `validate`, `ics2_check`, `airport_lookup`, `nearest_airport`) keep their text layout byte-identical, but their `structuredContent` is now the envelope (previously the flat body) — structured consumers of those five should read the payload under `result`.
+- Note: each `tools/call` now makes two API requests (flat + envelope), which counts double against rate limits (anonymous: 25 requests/day per IP; error paths still cost one).
+
+### Changed
+
+- **All 24 tool definitions rewritten for agent intent-matching**: per-tool behaviour prose (limits, rounding, no-match and rate-limit signaling incl. `retry_after_seconds`), parameter descriptions with accepted formats, defaults and inline examples, an explicit "Returns:" line backed by the new output schema, proactive limitations ("structural check, not a registry lookup"; "reference data, not legal or compliance advice"), and cross-references between related tools (adr_lookup ↔ adr_lq_eq_check ↔ adr_exemption_calculator; cbm ↔ chargeable_weight ↔ consignment ↔ shipment_summary; airport_lookup ↔ nearest_airport; hs_code_lookup ↔ uk_duty_calculator; validate ↔ the lookups it defers to).
+- Package description now leads with the typed, source-cited envelope alongside the neutral-reference positioning.
+
 ## 2.10.2 — 2026-07-08
 
 ### Changed

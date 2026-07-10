@@ -22,12 +22,18 @@ export function buildHeaders(extra?: Record<string, string>): Record<string, str
   return headers;
 }
 
-export async function apiGet(endpoint: string, params: Record<string, unknown>): Promise<unknown> {
+/** Options for the two outbound helpers. `envelope: true` requests the
+ *  FreightUtils v1 response envelope (`?envelope=1`) — used for the
+ *  structuredContent channel; the flat default feeds the legacy text channel. */
+export interface ApiOpts { envelope?: boolean }
+
+export async function apiGet(endpoint: string, params: Record<string, unknown>, opts?: ApiOpts): Promise<unknown> {
   const url = new URL(`${BASE_URL}/${endpoint}`);
   for (const [k, v] of Object.entries(params)) {
     if (v === undefined || v === null || v === '') continue;
     url.searchParams.set(k, String(v));
   }
+  if (opts?.envelope) url.searchParams.set('envelope', '1');
 
   const res = await fetch(url.toString(), {
     headers: buildHeaders(),
@@ -41,8 +47,9 @@ export async function apiGet(endpoint: string, params: Record<string, unknown>):
   return res.json();
 }
 
-export async function apiPost(endpoint: string, body: unknown): Promise<unknown> {
-  const res = await fetch(`${BASE_URL}/${endpoint}`, {
+export async function apiPost(endpoint: string, body: unknown, opts?: ApiOpts): Promise<unknown> {
+  const url = `${BASE_URL}/${endpoint}${opts?.envelope ? '?envelope=1' : ''}`;
+  const res = await fetch(url, {
     method: 'POST',
     headers: buildHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(body),

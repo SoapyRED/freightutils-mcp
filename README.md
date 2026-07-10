@@ -14,6 +14,8 @@ This [Model Context Protocol](https://modelcontextprotocol.io/) server gives AI 
 
 Every response cites its source — a `_source` block with the authority, edition, licence and last-verified date — and the tools are deterministic, not generated answers. Reference only: never filing, booking, or legal advice, and results state when human review is required (`validate` is structural check-digit validation only; a clean `ics2_check` is not ENS acceptance; emissions figures are estimates, not audited reports).
 
+Since **2.11.0**, every tool also declares a typed `outputSchema` and returns `structuredContent` — the FreightUtils v1 response envelope: the answer under `result`, plus `confidence`, `normalized_input`, `warnings`, `_source` and a ready-to-use `citation`. The legacy flat JSON text channel is unchanged (byte-identical), so existing text-parsing consumers are unaffected.
+
 **Website:** https://www.freightutils.com
 **API Docs:** https://www.freightutils.com/api-docs
 
