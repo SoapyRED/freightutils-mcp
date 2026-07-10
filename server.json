@@ -8,7 +8,9 @@
     {
       "src": "https://www.freightutils.com/brand/icon-512.png",
       "mimeType": "image/png",
-      "sizes": ["512x512"],
+      "sizes": [
+        "512x512"
+      ],
       "theme": "light"
     }
   ],
@@ -16,7 +18,7 @@
     "url": "https://github.com/SoapyRED/freightutils-mcp",
     "source": "github"
   },
-  "version": "2.10.2",
+  "version": "2.11.0",
   "remotes": [
     {
       "type": "streamable-http",
@@ -27,7 +29,7 @@
     {
       "registryType": "npm",
       "identifier": "freightutils-mcp",
-      "version": "2.10.2",
+      "version": "2.11.0",
       "transport": {
         "type": "stdio"
       }
