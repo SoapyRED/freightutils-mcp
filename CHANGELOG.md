@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.11.1 — 2026-07-11
+
+### Fixed
+
+- **`uld_lookup` description count corrected 15 → 16.** The 2.11.0 definitions rewrite carried the stale "15 types" figure from the previous description; the ULD dataset has held **16 types** since the HMA/AMJ additions, and a no-`type` listing returns 16 records. Caught by the pre-merge adversarial review of the website's hosted-description port (which generates the hosted `/api/mcp` text from this package, so both surfaces pick up the fix together). Docs-only patch — no tool, schema, or behaviour change.
+
 ## 2.11.0 — 2026-07-10
 
 ### Added
