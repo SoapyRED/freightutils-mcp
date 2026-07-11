@@ -867,9 +867,9 @@ Related: consignment_calculator (canonical snake_case lines[] shape with advisor
 
 const uldLookup: ToolDef = {
   name: 'uld_lookup',
-  description: `Look up air-cargo ULD (Unit Load Device) specifications — 15 types spanning lower-deck containers (AKE/LD3 and family), main-deck pallets (PMC, PAG and family) and temperature-controlled units. Each record carries external/internal/door dimensions (cm), tare and max gross weight (kg), usable volume (m³), deck position and compatible aircraft.
+  description: `Look up air-cargo ULD (Unit Load Device) specifications — 16 types spanning lower-deck containers (AKE/LD3 and family), main-deck pallets (PMC, PAG and family) and temperature-controlled units. Each record carries external/internal/door dimensions (cm), tare and max gross weight (kg), usable volume (m³), deck position and compatible aircraft.
 
-Provide type as an IATA code ("AKE", "PMC") or slug ("ake-ld3"); omit it to list all 15; category (container | pallet | special) and deck (lower | main) filter the list.
+Provide type as an IATA code ("AKE", "PMC") or slug ("ake-ld3"); omit it to list all 16; category (container | pallet | special) and deck (lower | main) filter the list.
 
 Behavior: read-only; an unknown type errors with the valid list; per-record provenance (sources, audited_at, decision_rationale) is included. ${RATE}
 
@@ -880,7 +880,7 @@ Limitations: manufacturer-typical specs, provenance pending independent verifica
 Related: chargeable_weight_calculator (what the cargo inside is billed at), container_lookup (the sea-freight equivalent), airline_lookup (whose aircraft it flies on).`,
 
   schema: z.object({
-    type: z.string().min(2, 'ULD type must be at least 2 characters').optional().describe('IATA ULD code or slug. Examples: "AKE", "PMC", "ake-ld3". Omit to list all 15.'),
+    type: z.string().min(2, 'ULD type must be at least 2 characters').optional().describe('IATA ULD code or slug. Examples: "AKE", "PMC", "ake-ld3". Omit to list all 16.'),
     category: z.enum(['container', 'pallet', 'special']).optional().describe('Filter by ULD category.'),
     deck: z.enum(['lower', 'main']).optional().describe('Filter by deck position.'),
   }).strict(),
