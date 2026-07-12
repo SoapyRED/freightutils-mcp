@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.11.2 — 2026-07-12
+
+### Changed
+
+- **Envelope-first: successful calls cost ONE API request again** (supersedes the 2.11.0/2.11.1 double-request caveat). Each `tools/call` now fetches the envelope with the API's `legacy_source` bridge (`?envelope=1&legacy_source=1`) and reconstructs the flat legacy text channel from `result` + the bridge's verbatim `_source` block (insert at `legacy_source_pos` when present, else append) — `content[0].text` stays **byte-identical** to 2.10.x/2.11.x for every tool, and `structuredContent` is the clean public v1 envelope with the bridge stripped (byte-equal to the default `?envelope=1` response). Error paths fall back to the flat call so error text keeps its exact legacy bytes (2 requests — the rare path). Anonymous and Pro rate-limit budgets are hit **once per successful call** again; transient network failures on the envelope leg get one retry.
+- Requires freightutils.com API with the `legacy_source` bridge (live since 2026-07-12). Local tools (`get_subscribe_link`) are unaffected.
+
 ## 2.11.1 — 2026-07-11
 
 ### Fixed
