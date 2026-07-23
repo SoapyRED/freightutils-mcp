@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.12.0 — 2026-07-23
+
+### Added
+
+- **`adr_lq_eq_check` and `adr_exemption_calculator` now accept `packing_group` (I|II|III) and `variant_index`** to disambiguate a UN number that has more than one ADR Table A row. Many UN numbers carry several rows that differ by packing group and/or concentration — e.g. UN 1789 (PG II: LQ 1 L / E2 / TC 2 vs PG III: LQ 5 L / E1 / TC 3) or UN 1790 (three hydrogen-fluoride concentration bands with different transport categories). `packing_group` is an optional item field on both tools (plus a top-level field on `adr_exemption_calculator`'s single-substance form); `variant_index` matches the index `adr_lookup` already returns.
+
+### Fixed
+
+- **Multi-variant UNs no longer get a silent, wrong verdict.** Both tools previously resolved a UN to a single row by taking the first variant, then emitted a confident deterministic verdict against a possibly-wrong packing group. Now a UN that resolves to more than one row **without** a `packing_group` / `variant_index` returns `ok: false` with `blocking_errors: [{ code: "AMBIGUOUS_UN_VARIANT" }]`, `human_review_required: true`, and `candidates[]` (each candidate's `variant_index`, `packing_group`, `proper_shipping_name` and the tool-specific decision fields) under `result` — and **no** verdict. Supply a disambiguator to get a verdict. Single-row UNs are completely unchanged (backward compatible).
+- The ambiguous response is HTTP 200 with `ok: false`, so the structured `candidates[]` flow through the stdio proxy intact (a non-2xx would surface only an error string).
+
 ## 2.11.2 — 2026-07-12
 
 ### Changed

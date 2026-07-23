@@ -247,20 +247,26 @@ const adrExemptionCalculator: ToolDef = {
 
 Provide un_number + quantity for a single substance, or items[] for a mixed load (items takes precedence if both are given). Quantities are in kg or litres per the substance's ADR unit.
 
-Behavior: deterministic points arithmetic over ADR 2025 reference data; UN numbers that cannot be resolved are reported in warnings; exempt is the overall verdict. ${RATE}
+Multi-variant UNs: a UN number with more than one ADR Table A row (packing group / concentration variant — e.g. UN 1789 PG II vs PG III have different transport categories) needs packing_group (I|II|III) or variant_index (from adr_lookup) to pin one row. Without a disambiguator the tool returns blocking_errors[AMBIGUOUS_UN_VARIANT] + human_review_required + candidates[] (each candidate's variant_index, packing_group, proper_shipping_name, transport_category, multiplier) and NO verdict, rather than silently guessing a row. Single-row UNs are unchanged.
 
-Returns: items[] (each with transport_category, multiplier, points), total_points, threshold (1000), exempt, has_category_zero, warnings and message under result, ${ENV}
+Behavior: deterministic points arithmetic over ADR 2025 reference data; a UN that cannot be found returns blocking_errors (NOT_FOUND); exempt is the overall verdict. ${RATE}
+
+Returns: items[] (each with packing_group, variant_index, transport_category, multiplier, points), total_points, threshold (1000), exempt, has_category_zero, has_quantity_exceedance, warnings and message under result — or, when a UN is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
 
 Limitations: a deterministic calculation over reference data, not legal advice — even exempt loads keep core duties (packaging, marking, documentation), and mixed-packing rules still apply; verify against the current UNECE ADR text.
 
-Related: adr_lookup (per-substance data incl. transport category), adr_lq_eq_check (the LQ/EQ relief routes instead of 1.1.3.6).`,
+Related: adr_lookup (per-substance data incl. transport category + variant_index), adr_lq_eq_check (the LQ/EQ relief routes instead of 1.1.3.6).`,
 
   schema: z.object({
     un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN"').optional().describe('UN number for a single-substance check — 4 digits, optionally "UN"-prefixed. Example: "1203".'),
     quantity: z.number().positive().optional().describe('Quantity for the single-substance check, in kg or litres per the substance\'s ADR unit. Example: 100.'),
+    packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group (I, II or III) — only needed to disambiguate a UN with more than one ADR Table A row (e.g. UN 1789). Ignored for single-row UNs. Single-substance form only.'),
+    variant_index: z.number().int().nonnegative().optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants that share a packing group (concentration bands). Ignored for single-row UNs. Single-substance form only.'),
     items: z.array(z.object({
       un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN"').describe('UN number — 4 digits, optionally "UN"-prefixed. Example: "1263".'),
       quantity: z.number().positive().describe('Quantity in kg or litres per the substance\'s ADR unit.'),
+      packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group for a multi-variant UN.'),
+      variant_index: z.number().int().nonnegative().optional().describe('ADR Table A variant index for a multi-variant UN.'),
     })).optional().describe('Mixed-load items (use INSTEAD of un_number/quantity).'),
   }).strict(),
 
@@ -269,6 +275,8 @@ Related: adr_lookup (per-substance data incl. transport category), adr_lq_eq_che
       un_number: z.string(),
       proper_shipping_name: z.string(),
       class: z.string(),
+      packing_group: z.string(),
+      variant_index: z.number(),
       transport_category: z.string(),
       quantity: z.number(),
       multiplier: z.number(),
@@ -281,6 +289,17 @@ Related: adr_lookup (per-substance data incl. transport category), adr_lq_eq_che
     has_quantity_exceedance: z.boolean(),
     warnings: z.array(z.unknown()),
     message: z.string(),
+    // Ambiguous-UN path: no verdict, candidates to disambiguate.
+    human_review_required: z.boolean(),
+    candidates: z.array(loose({
+      item_index: z.number(),
+      un_number: z.string(),
+      variant_index: z.number(),
+      packing_group: z.string(),
+      proper_shipping_name: z.string(),
+      transport_category: z.string(),
+      multiplier: z.number(),
+    })),
   }),
 
   annotations: readOnlyAnnotations('ADR 1.1.3.6 Exemption Calculator'),
@@ -289,7 +308,10 @@ Related: adr_lookup (per-substance data incl. transport category), adr_lq_eq_che
     if (args.items) {
       return apiPost('adr-calculator', { items: args.items }, opts);
     }
-    return apiGet('adr-calculator', { un: args.un_number, qty: args.quantity }, opts);
+    return apiGet('adr-calculator', {
+      un: args.un_number, qty: args.quantity,
+      packing_group: args.packing_group, variant_index: args.variant_index,
+    }, opts);
   },
 };
 
@@ -945,13 +967,15 @@ const adrLqEqCheck: ToolDef = {
 
 Provide mode ("lq" or "eq") and 1-20 items, each with un_number, quantity and unit — ml or L for liquids, g or kg for solids; quantity is per INNER packaging, not the whole load.
 
+Multi-variant UNs: a UN number with more than one ADR Table A row (packing group / concentration variant — e.g. UN 1789 PG II LQ 1 L vs PG III LQ 5 L) needs packing_group (I|II|III) or variant_index (from adr_lookup) on that item to pin one row. Without a disambiguator the tool returns blocking_errors[AMBIGUOUS_UN_VARIANT] + human_review_required + candidates[] (each candidate's variant_index, packing_group, proper_shipping_name, limited_quantity, excepted_quantity) and NO verdict, rather than silently checking the wrong packing group. Single-row UNs are unchanged.
+
 Behavior: deterministic reference check; each item gets a status and reason (an LQ value of "0" or code E0 means the relief is not permitted for that substance), with overall_status and summary counts across the batch. ${RATE}
 
-Returns: mode, overall_status, items[] (un_number, substance, class, packing_group, lq_limit or eq_code, quantity_entered, status, reason), summary {total_items, qualifying, exceeding, not_permitted} and the ADR chapter references under result, ${ENV}
+Returns: mode, overall_status, items[] (un_number, variant_index, substance, class, packing_group, lq_limit or eq_code, quantity_entered, status, reason), summary {total_items, qualifying, exceeding, not_permitted} and the ADR chapter references under result — or, when a UN is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
 
 Limitations: a quantity-threshold check only — LQ/EQ relief also requires packaging, marking and documentation conformity that this tool does not assess; not legal advice, verify against the current UNECE ADR text.
 
-Related: adr_lookup (the per-substance LQ/EQ values), adr_exemption_calculator (the 1.1.3.6 load-points route instead).`,
+Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exemption_calculator (the 1.1.3.6 load-points route instead).`,
 
   schema: z.object({
     mode: z.enum(['lq', 'eq']).describe('Check mode: "lq" (Limited Quantity, ADR 3.4) or "eq" (Excepted Quantity, ADR 3.5).'),
@@ -960,6 +984,8 @@ Related: adr_lookup (the per-substance LQ/EQ values), adr_exemption_calculator (
       quantity: z.number().positive().describe('Quantity per INNER packaging, in the chosen unit. Example: 0.5.'),
       unit: z.enum(['ml', 'L', 'g', 'kg']).describe('Unit: "ml" or "L" for liquids, "g" or "kg" for solids.'),
       inner_packaging_qty: z.number().int().positive().optional().describe('EQ mode only: number of inner packagings per outer package, for the per-outer limit check. Example: 10.'),
+      packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group (I, II or III) — only needed to disambiguate a UN with more than one ADR Table A row (e.g. UN 1789). Ignored for single-row UNs.'),
+      variant_index: z.number().int().nonnegative().optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants sharing a packing group (concentration bands). Ignored for single-row UNs.'),
     })).min(1).max(20).describe('Items to check (1-20 per call).'),
   }).strict(),
 
@@ -968,6 +994,7 @@ Related: adr_lookup (the per-substance LQ/EQ values), adr_exemption_calculator (
     overall_status: z.string(),
     items: z.array(loose({
       un_number: z.string(),
+      variant_index: z.number(),
       substance: z.string(),
       class: z.string(),
       packing_group: z.string(),
@@ -987,6 +1014,17 @@ Related: adr_lookup (the per-substance LQ/EQ values), adr_exemption_calculator (
       not_permitted: z.number(),
     }),
     references: z.record(z.string(), z.unknown()),
+    // Ambiguous-UN path: no verdict, candidates to disambiguate.
+    human_review_required: z.boolean(),
+    candidates: z.array(loose({
+      item_index: z.number(),
+      un_number: z.string(),
+      variant_index: z.number(),
+      packing_group: z.string(),
+      proper_shipping_name: z.string(),
+      limited_quantity: z.string(),
+      excepted_quantity: z.string(),
+    })),
   }),
 
   annotations: readOnlyAnnotations('ADR LQ / EQ Exemption Check'),
