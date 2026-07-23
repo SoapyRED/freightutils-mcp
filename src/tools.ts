@@ -897,7 +897,7 @@ Behavior: read-only; an unknown type errors with the valid list; per-record prov
 
 Returns: the ULD record (or filtered list) under result, ${ENV}
 
-Limitations: manufacturer-typical specs, provenance pending independent verification (the envelope's provenance_status says so) — airline-specific ULD variants differ; confirm with the carrier.
+Limitations: specs are compiled from manufacturer and carrier-published sources and provenance-verified against ≥4 independent sources per record (the envelope's provenance_status says so) — but airline-specific ULD variants still differ; confirm operationally critical dimensions with the carrier.
 
 Related: chargeable_weight_calculator (what the cargo inside is billed at), container_lookup (the sea-freight equivalent), airline_lookup (whose aircraft it flies on).`,
 

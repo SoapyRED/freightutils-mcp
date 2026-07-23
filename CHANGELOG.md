@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.12.1 — 2026-07-23
+
+### Changed
+
+- **`uld_lookup` description now states provenance is verified, not pending.** The ULD dataset's provenance was reconciled to `verified` after all 16 records were cross-checked against ≥4 independent authoritative sources each (AKE at 6/6), so the tool's "Limitations" line no longer says "provenance pending independent verification" — it now reads that the specs are compiled from manufacturer and carrier-published sources and provenance-verified against ≥4 independent sources per record, while noting airline-specific ULD variants still differ (confirm operationally critical dimensions with the carrier). The response envelope's `_source.provenance_status` for `uld_lookup` returns `verified` accordingly. Docs-only patch — no tool, schema, or behaviour change; `airline_lookup`, `container_lookup` and `vehicle_lookup` keep their pending-verification limitation lines. Keeps the hosted `/api/mcp` description (generated from this package) in sync with the website envelope — FAULT-13 distribution sync.
+
 ## 2.12.0 — 2026-07-23
 
 ### Added
