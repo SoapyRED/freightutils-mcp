@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.12.3 — 2026-08-03
+
+### Changed
+
+- **`uld_lookup`'s limitations line went stale in the OTHER direction — it now says what is actually missing.** 2.12.2 told agents that "as of 2026-07-26 no source carries a timestamped content read and none has been second-agent verified". Both clauses stopped being true on 2026-08-03, when the second agent in the documented two-agent model finally ran against the ULD dataset: all **77** record-source pairings were read and verdicted (26 CONFIRMED, 30 MISMATCH, 19 NOT-ON-PAGE, 2 lost to context compaction), 26 confirmed reads now carry a stamped `accessed_at`, and 14 of the 16 records carry a `chrome_verified_at`. The **status is unchanged and still correct** — provenance is `pending` — but the reason the description gave for it understated the work done while overstating the gap. A hardcoded "nothing has been checked" on a dataset that has now been checked is the same defect class as the over-claim 2.12.2 was written to retract; it simply fails safe instead of unsafe.
+- **The line now names the real blocker: corroboration, not absence of reads.** Provenance stays pending because no record yet has a confirmed primary source **plus** a second independent non-tertiary source agreeing with it — on each record that second source either contradicted the stored value or did not list the code at all. This is not a quibble about Wikipedia: promoting the ULD reseller sites out of the tertiary tier changes the outcome for exactly one record out of sixteen.
+- **New explicit warning on `tare_weight`.** No non-tertiary source confirms tare on **any** of the 16 records, so any payload an agent derives from `max_gross_weight − tare_weight` currently rests on a figure nothing independent corroborates. `internal_dimensions` is confirmed on exactly one record. That distinction cannot be expressed by the record-level `provenance_status` alone, so the description states it directly.
+
+Docs-only patch — no tool, schema or behaviour change in this package; still 24 tools.
+
+**Why this needed a republish rather than a website fix.** The hosted `/api/mcp` renders tool descriptions from `lib/generated/mcp-tool-descriptions.ts`, which the website generates from `node_modules/freightutils-mcp/dist/tools.js` — the **installed, published** package, not a local clone. The familiar "npm inherits it through the REST proxy, no republish needed" pattern holds for data and `_source`, which the proxy passes through live; it does **not** hold for description text, which is baked into the tarball. Until this version is published and the website re-pins to it, every surface keeps serving the stale sentence. FAULT-13 distribution sync.
+
 ## 2.12.2 — 2026-08-03
 
 ### Changed
