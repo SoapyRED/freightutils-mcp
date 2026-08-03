@@ -897,7 +897,7 @@ Behavior: read-only; an unknown type errors with the valid list; per-record prov
 
 Returns: the ULD record (or filtered list) under result, ${ENV}
 
-Limitations: specs are compiled from manufacturer and carrier-published sources and provenance-verified against ≥4 independent sources per record (the envelope's provenance_status says so) — but airline-specific ULD variants still differ; confirm operationally critical dimensions with the carrier.
+Limitations: specs are compiled from manufacturer and carrier-published sources with ≥4 cited sources per record. Provenance is PENDING, not verified — read the envelope's provenance_status rather than this sentence: as of 2026-07-26 no source carries a timestamped content read and none has been second-agent verified, so confidence is medium and a PROVENANCE_PENDING advisory rides every response. Pallet records (PMC, PAG, PGA, PLA, PAJ, PMCQ7) have NO internal dimensions — a pallet has no walls or roof; read max_build_up_height_cm for the aircraft contour ceiling and do not multiply dimensions to get a volume. Airline-specific ULD variants still differ; confirm operationally critical dimensions with the carrier.
 
 Related: chargeable_weight_calculator (what the cargo inside is billed at), container_lookup (the sea-freight equivalent), airline_lookup (whose aircraft it flies on).`,
 
