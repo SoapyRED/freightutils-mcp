@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.12.2 — 2026-08-03
+
+### Changed
+
+- **`uld_lookup` no longer claims the ULD data is provenance-verified — it is not, and 2.12.1's description said it was.** 2.12.1 changed the "Limitations" line to read "provenance-verified against ≥4 independent sources per record (the envelope's provenance_status says so)". The envelope stopped saying so: the website audit found all 16 records shipped `verified` while `chrome_verified_at` was null on every one of them and `sources` was an array of bare URL strings with no `accessed_at` slot at all — the dataset could not record the proof of the claim it was making. All 16 are now `pending`, so the hosted `/api/mcp` envelope returns `provenance_status: pending-verification` with medium confidence and a `PROVENANCE_PENDING` advisory. This package's description now matches: it states the provenance is PENDING, tells the caller to read `provenance_status` rather than trust the sentence, and says why — no source carries a timestamped content read and none has been second-agent verified. The count claim also changes from "≥4 independent sources" to "≥4 cited sources", because citing four URLs and independently verifying four sources are not the same statement and only the first one was ever true.
+- **`uld_lookup` description now warns that pallets have no internal dimensions.** The six pallet records (PMC, PAG, PGA, PLA, PAJ, PMCQ7) previously stored `internalDimensions` byte-identical to `externalDimensions`; a pallet has no walls or roof, so an agent multiplying them got a volume for a cavity that does not exist — 12.65 m³ for PMC against its own published 11.5. Those fields are now `null` upstream, and the description directs callers to `max_build_up_height_cm` for the aircraft contour ceiling instead of multiplying dimensions.
+
+Docs-only patch — no tool, schema or behaviour change in this package. Keeps the hosted `/api/mcp` tool descriptions (generated from this package) in sync with the website envelope — FAULT-13 distribution sync.
+
 ## 2.12.1 — 2026-07-23
 
 ### Changed
