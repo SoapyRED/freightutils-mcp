@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.12.4 — 2026-08-04
+
+### Changed
+
+- **`uld_lookup` said second-agent coverage was partial. It is now complete — and that changed what the honest warning is.** 2.12.3 shipped "108 of 148 citations have been read and verdicted by a second agent, 40 still carry first-agent verdicts only". Every cited record-URL pairing has now been opened and verdicted, and 145 of 148 citations carry a timestamped read; the three without one were never opened and say so. The description no longer promises a pass that is still to come, because there isn't one.
+- **The line now leads with the distinction that actually matters to a caller: coverage is not agreement.** Provenance is still `pending` on all 16 records. Reading every page is what made the disagreements *visible*, not what resolved them — so an agent reading "fully second-agent read" must not infer "verified". The description says this in as many words and still tells the caller to read the envelope's `provenance_status` rather than trust the sentence.
+- **New, and the most useful thing in this release: corroboration is now counted by PUBLISHER, not by URL.** The 148 citations resolve to **125 distinct sources**. Several records cite one publisher at several of its own addresses — one carrier's pallet table appears in three of its own documents, and three separate records cite all three — and several freight forwarders republish a single upstream template between them. Two citations of the same source cannot corroborate each other, so a record with eleven citations is not necessarily better corroborated than one with seven. An agent weighing this data could not previously tell those apart from the source list alone; now the description warns it.
+- **`tare_weight` caution updated from 11 of 16 records to 13 of 16.** This got *worse* on purpose. Reading the remaining pages withdrew two records' tare confirmations — the pages turned out to publish a different figure, a build-variant band, or nothing at all for the code. Two of the tare figures found are bands rather than point values (one carrier publishes 185–380 kg; one manufacturer publishes three figures by sheet gauge), which no amount of further reading will collapse into agreement.
+
+Docs-only patch — no tool, schema or behaviour change in this package; still 24 tools. FAULT-13 distribution sync: the hosted `/api/mcp` renders tool descriptions from the **installed, published** package, so this text does not reach any surface until the website re-pins to this version.
+
 ## 2.12.3 — 2026-08-03
 
 ### Changed
