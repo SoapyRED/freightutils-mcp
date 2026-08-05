@@ -159,8 +159,8 @@ Related: vehicle_lookup (the trailer specs behind the vehicle presets), pallet_f
     stackable: z.boolean().optional().describe('Whether pallets can be double/triple-stacked — halves (or thirds) the floor footprint. Default: false.'),
     stack_height: z.number().int().min(2).max(3).optional().describe('Stack height when stackable: 2 or 3. Default: 2.'),
     weight_kg: z.number().positive().optional().describe('Weight per pallet in kg — enables the payload side of the fits check.'),
-    vehicle: z.enum(['artic', 'rigid10', 'rigid75', 'luton', 'custom']).optional()
-      .describe('Vehicle preset: artic 13.6m (default), rigid10 = 10m rigid, rigid75 = 7.5t rigid, luton van, or custom.'),
+    vehicle: z.enum(['artic', 'rigid10', 'rigid75', 'luton', 'us53', 'us48', 'custom']).optional()
+      .describe('Vehicle preset: artic = 13.6m curtainsider (default), rigid10 = 10m rigid body / 12t payload, rigid75 = 7.5t rigid, luton = 3.5t Luton van, us53 = 53ft US/Canada trailer, us48 = 48ft US trailer, or custom. EU presets divide by the 2.40 m loading-metre convention; US trailers divide by their own 2.591 m internal width, because loading metres are not the North American pricing unit.'),
     vehicle_length_m: z.number().positive().optional()
       .describe('Custom vehicle load length in metres (required when vehicle=custom).'),
   }).strict(),
@@ -805,13 +805,13 @@ const shipmentSummary: ToolDef = {
 
 Provide mode (road | air | sea | multimodal) and items[] (dims in cm, weight in kg, quantity; optional stackable, pallet_type, hs_code, un_number, customs_value); origin/destination and incoterm refine the duty leg.
 
-Behavior: chains the same deterministic engines as the single-purpose tools; sections that cannot run (e.g. duty without a customs value) surface in warnings instead of failing the whole call. ${RATE}
+Behavior: calls the ldm_calculator, adr_lookup and uk_duty_calculator engines directly; CBM, volumetric weight and revenue tonnes are the same arithmetic inline rather than a call out. Road LDM uses the 2.40 m loading-metre convention divisor and, like ldm_calculator, treats an item with no stackable flag as NOT stacked. modeSpecific.palletSpaces is pallet FLOOR POSITIONS (the figure ldm_calculator reports); palletRows is the separate row count. Sections that cannot run (e.g. duty without a customs value) surface in warnings instead of failing the whole call. ${RATE}
 
-Returns: mode, itemCount, totals {pieces, grossWeight, volumeCBM, chargeableWeight, billingBasis}, modeSpecific (LDM / pallet spaces / suggested vehicle, or revenue tonnes / container), warnings and dataVersion under result — note this composite's result uses camelCase field names (legacy shape); ${ENV}
+Returns: mode, itemCount, totals {pieces, grossWeight, volumeCBM, chargeableWeight, billingBasis}, modeSpecific (LDM / pallet floor positions / pallet rows / suggested vehicle, or revenue tonnes / container), warnings and dataVersion (road mode attributes the vehicle dataset and the LDM divisor) under result — note this composite's result uses camelCase field names (legacy shape); ${ENV}
 
 Limitations: a planning summary, not a quotation or compliance determination.
 
-Related: consignment_calculator (canonical snake_case lines[] shape with advisory flags), cbm_calculator, chargeable_weight_calculator, ldm_calculator, adr_lookup, uk_duty_calculator (the engines this chains).`,
+Related: consignment_calculator (canonical snake_case lines[] shape with advisory flags), cbm_calculator, chargeable_weight_calculator, ldm_calculator, adr_lookup, uk_duty_calculator. ldm_calculator, adr_lookup and uk_duty_calculator are the engines this actually calls; the rest are the single-purpose equivalents of arithmetic it does inline.`,
 
   schema: z.object({
     mode: z.enum(['road', 'air', 'sea', 'multimodal']).describe('Transport mode — selects the mode-specific section of the result.'),

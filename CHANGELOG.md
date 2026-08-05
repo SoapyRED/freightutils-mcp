@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.13.0 — 2026-08-05
+
+### Added
+
+- **`ldm_calculator` accepts `us53` and `us48`.** Both values have been published by `openapi.json`, the Postman collection, `/api-docs` and the website preset table for some time; this package advertised five values while every other surface advertised seven, so a stdio customer asking for a 53ft US trailer got a schema rejection for a vehicle the REST API has always accepted. Purely additive — no value renamed, none removed.
+
+### Changed
+
+- **`shipment_summary`'s description said it chained engines it did not call.** It claimed to "chain the same deterministic engines as the single-purpose tools" and listed `ldm_calculator` among "the engines this chains", while importing only the ADR and duty modules and carrying a private copy of the LDM formula with its own hardcoded divisor. The website now genuinely calls the `ldm_calculator` engine, and the description says which engines are actually called and which are inline arithmetic — the two claims are separated instead of averaged.
+- **`shipment_summary` and `ldm_calculator` disagreed about silence, and now do not.** An item with no `stackable` flag was treated as DOUBLE-STACKED by `shipment_summary` and as not stacked by `ldm_calculator`, so the same load returned two different loading-metre figures depending on which tool you asked. They now share `ldm_calculator`'s documented default. **This changes served values:** an unflagged item's LDM doubles, which is the conservative direction — assuming a load stacks when nobody said so under-quotes the space it needs.
+- **`shipment_summary.modeSpecific.palletSpaces` was a row count under a spaces name.** It reported `ceil(quantity / (stackFactor x palletsAbreast))`, so 16 non-stackable Euro pallets came back as 6 while `ldm_calculator` reported 16 for the identical load. `palletSpaces` now holds pallet floor positions — the figure the name promises and the one `ldm_calculator` returns — and the row count moved to a new `palletRows` field rather than being dropped.
+- **Road `dataVersion` is no longer structurally empty.** Only `adr`, `hs` and `duty` were declarable, so a road-mode response attributed nothing at all while the envelope claimed high confidence and a deterministic method. It now carries `vehicle` and `ldm`.
+- **`ldm_calculator`'s vehicle descriptions state which divisor each preset uses.** EU presets divide by the 2.40 m loading-metre convention; US trailers divide by their own 2.591 m internal width, because loading metres are not the North American pricing unit. The 2.40 m figure is a trade convention, not a measurement of any trailer — a standard curtainsider is 2.48 m inside.
+
+Schema change (two enum values added), so this is a minor bump rather than a patch. Still 24 tools. FAULT-13 distribution sync: the hosted `/api/mcp` renders descriptions from the **installed, published** package, so this text reaches no surface until the website re-pins to this version.
+
 ## 2.12.4 — 2026-08-04
 
 ### Changed
