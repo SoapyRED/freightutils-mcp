@@ -160,7 +160,7 @@ Related: vehicle_lookup (the trailer specs behind the vehicle presets), pallet_f
     stack_height: z.number().int().min(2).max(3).optional().describe('Stack height when stackable: 2 or 3. Default: 2.'),
     weight_kg: z.number().positive().optional().describe('Weight per pallet in kg — enables the payload side of the fits check.'),
     vehicle: z.enum(['artic', 'rigid10', 'rigid75', 'luton', 'us53', 'us48', 'custom']).optional()
-      .describe('Vehicle preset: artic = 13.6m curtainsider (default), rigid10 = 10m rigid body / 12t payload, rigid75 = 7.5t rigid, luton = 3.5t Luton van, us53 = 53ft US/Canada trailer, us48 = 48ft US trailer, or custom. EU presets divide by the 2.40 m loading-metre convention; US trailers divide by their own 2.591 m internal width, because loading metres are not the North American pricing unit.'),
+      .describe('Vehicle preset: artic = 13.6m curtainsider (default), rigid10 = DEPRECATED, removal in 3.0.0 (it still answers with the same figures and returns a DEPRECATED advisory in warnings[]; its 10 m length is published by no manufacturer for any rigid — use custom with vehicle_length_m, or artic), rigid75 = 7.5t rigid, luton = 3.5t Luton van, us53 = 53ft US/Canada trailer, us48 = 48ft US trailer, or custom. EU presets divide by the 2.40 m loading-metre convention; US trailers divide by their own 2.591 m internal width, because loading metres are not the North American pricing unit.'),
     vehicle_length_m: z.number().positive().optional()
       .describe('Custom vehicle load length in metres (required when vehicle=custom).'),
   }).strict(),
