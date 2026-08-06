@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.14.0 — 2026-08-06
+
+### Deprecated
+
+- **`ldm_calculator` vehicle `rigid10` is retired, and still answers.** It is deprecated on all six published enum surfaces (this package, the MCP route, `openapi.json`, the Postman collection, `/api-docs` and the website preset table) and **scheduled for removal in 3.0.0**. Nothing is removed here and **no figure changes** — a client pinned to this id keeps getting exactly what it got yesterday, which is the whole point of a window. What changes is that every `ldm_calculator` response naming it now carries `warnings[0]` with `type: "info"` and a message beginning `DEPRECATED: vehicle="rigid10"`, and the parameter description says so.
+  **Why it is going.** The preset asserts a 10 m load length with a 12,000 kg payload. The payload is real — Enterprise Flex-E-Rent publishes "Est Payload +/- 5%: 12000kg" on a 26 t DAF box, verbatim. The length is not, and it is above every manufacturer's own published ceiling: MAN's bodybuilder data gives a maximum recommended body length of 9,360 mm for the 26 t TGM, Volvo's equivalent works out to 8,760 mm, and real published bodies run 8.26–9.36 m. The two figures never appear together on one page for one vehicle. Going up a weight class does not help, because C&U 1986 reg. 7 caps a wheeled motor vehicle at 12 m overall regardless. The 10 m traces to a trade-classifieds page describing a 26 t curtainsider body as "around the 30ft (10m) mark" — 30 ft is 9.14 m.
+  **Migrating.** Use `vehicle: "custom"` with `vehicle_length_m`, or `vehicle: "artic"` if `rigid10` was standing in for "something big". No replacement preset is offered on purpose: the canonical 9.1 m rigid records are readable through `vehicle_lookup`, but their envelope is itself still unsourced, and promoting an unsourced envelope to replace a preset being retired for being unsourced would repeat the fault rather than fix it.
+
+- **`rigid75` is NOT being renamed, and that is now a decision rather than a pending item.** Its id numeral (75) elides the decimal point of 7.5 tonnes. It was a rename candidate only because it shared the `rigid<n>` prefix with `rigid10`, which encoded METRES — one prefix, two units. Retiring `rigid10` dissolves that, leaving an id that drops a decimal point: no served number is wrong, no two tools disagree, and a 75-tonne rigid is not a vehicle, so there is no competing reading. A rename would cost a second deprecation window for pinned clients to buy a cosmetic gain. Recorded as permanent.
+
 ## 2.13.0 — 2026-08-05
 
 ### Added
