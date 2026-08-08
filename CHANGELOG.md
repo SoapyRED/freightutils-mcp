@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.14.1 — 2026-08-08
+
+### Added
+
+- **Every REST call this server proxies now sends `User-Agent: freightutils-mcp/<version>`.**
+  Until now the outbound calls carried no distinguishing User-Agent, so FreightUtils' own server
+  metrics could not tell them apart from any other Node HTTP client. The only usage signal was the
+  npm download count — and downloads measure INSTALLS, not calls, which are very different numbers
+  when a package is bundled into someone's Docker image.
+  The version is read from `package.json` at module load, never typed into the source, so it moves
+  with the release. It is set in `buildHeaders()`, which `apiGet` and `apiPost` both route through
+  — the same centralisation that closed the stdio key-passthrough bug — so there is no per-tool
+  wiring to forget.
+  **This is a distinct surface from the hosted `/api/mcp` endpoint**, which the server already
+  counts separately as agent traffic. Attributing them together would double-count the hosted
+  transport and leave this one invisible, which is the situation this release ends.
+  No tool, schema, description or response changes; nothing to re-import anywhere. The server
+  records a label and a date against this and nothing else — no IP, no key, no account identifier.
+
 ## 2.14.0 — 2026-08-06
 
 ### Deprecated

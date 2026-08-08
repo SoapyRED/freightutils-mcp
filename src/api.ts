@@ -15,8 +15,39 @@
 
 const BASE_URL = process.env.FREIGHTUTILS_API_URL ?? 'https://www.freightutils.com/api';
 
+/**
+ * Versioned User-Agent, DERIVED from package.json rather than typed here.
+ *
+ * WHY THIS EXISTS: the server attributes traffic per distribution surface from
+ * this prefix. Without it, a REST call made by this stdio proxy is
+ * indistinguishable from any other Node HTTP client, so npm download counts
+ * were the only usage signal available — and downloads measure INSTALLS, not
+ * calls. This is the header that tells the two apart.
+ *
+ * NOT THE SAME SURFACE AS THE HOSTED MCP ENDPOINT. This package is a stdio
+ * server that proxies OUT to REST; /api/mcp is a separate hosted transport the
+ * server already counts as an agent source. Attributing them together would
+ * double-count the hosted one and hide this one.
+ *
+ * Read from package.json so it can never report a version the package is not,
+ * resolved once at module load.
+ *
+ * VIA createRequire, not a JSON import: this package is ESM with
+ * `module: Node16`, where import attributes are a compile error, and
+ * `rootDir: src` means importing ../package.json would push the emitted output
+ * up a directory and break the published layout. createRequire has neither
+ * problem and resolves relative to this file at runtime.
+ */
+import { createRequire } from 'node:module';
+const pkg = createRequire(import.meta.url)('../package.json') as { name: string; version: string };
+const USER_AGENT = `${pkg.name}/${pkg.version}`;
+
 export function buildHeaders(extra?: Record<string, string>): Record<string, string> {
-  const headers: Record<string, string> = { 'Accept': 'application/json', ...(extra ?? {}) };
+  const headers: Record<string, string> = {
+    'Accept': 'application/json',
+    'User-Agent': USER_AGENT,
+    ...(extra ?? {}),
+  };
   const key = process.env.FREIGHTUTILS_API_KEY;
   if (key) headers['Authorization'] = 'Bearer ' + key;
   return headers;
