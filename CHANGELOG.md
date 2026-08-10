@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.14.2 — 2026-08-10
+
+### Changed
+
+- **README claims-language honesty pass (docs only — no code, tool, schema, description or
+  response changes).** The README called the data "authoritative" and told agents they could
+  "trust it as ground truth"; the site-wide honesty pass retires both phrases everywhere they
+  describe FreightUtils itself. The data is now described as **source-backed** — the authority
+  claim sits on the named primary sources, and the citation envelope is the proof, not the
+  adjective. The freshness sentence now promises what every response actually delivers:
+  authority, edition, licence where held, and a verification status an agent can read (not a
+  "last-verified date" that pending-verification datasets do not yet carry). Mirrors the same
+  wording shipped on freightutils.com, llms.txt, and the site's structured data in the same
+  release cycle.
+
 ## 2.14.1 — 2026-08-08
 
 ### Added

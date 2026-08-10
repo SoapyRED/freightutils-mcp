@@ -8,11 +8,11 @@
 
 **The neutral freight reference layer for AI agents.**
 
-FreightUtils is the neutral freight reference layer for AI agents — authoritative dangerous-goods, customs, location and freight-calculation data an agent can call and cite, from primary sources (ADR 2025 / UNECE, HS 2022 / WCO, IATA-regulated airline prefixes). Neutral by design: no freight to sell and no carrier to push, so an agent can trust it as ground truth regardless of who carries the load.
+FreightUtils is the neutral freight reference layer for AI agents — source-backed dangerous-goods, customs, location and freight-calculation data an agent can call and cite, from primary sources (ADR 2025 / UNECE, HS 2022 / WCO, IATA-regulated airline prefixes). Neutral by design: no freight to sell and no carrier to push — a lookup returns what the named source says, with the citation attached so an agent can inspect it rather than take our word for it, regardless of who carries the load.
 
 This [Model Context Protocol](https://modelcontextprotocol.io/) server gives AI agents access to 24 freight calculation and reference tools, covering road, air, and sea freight. Built by a UK ADR-certified freight transport planner.
 
-Every response cites its source — a `_source` block with the authority, edition, licence and last-verified date — and the tools are deterministic, not generated answers. Reference only: never filing, booking, or legal advice, and results state when human review is required (`validate` is structural check-digit validation only; a clean `ics2_check` is not ENS acceptance; emissions figures are estimates, not audited reports).
+Every response cites its source — a `_source` block with the authority, edition, licence where held, and a verification status an agent can read — and the tools are deterministic, not generated answers. Reference only: never filing, booking, or legal advice, and results state when human review is required (`validate` is structural check-digit validation only; a clean `ics2_check` is not ENS acceptance; emissions figures are estimates, not audited reports).
 
 Since **2.11.0**, every tool also declares a typed `outputSchema` and returns `structuredContent` — the FreightUtils v1 response envelope: the answer under `result`, plus `confidence`, `normalized_input`, `warnings`, `_source` and a ready-to-use `citation`. The legacy flat JSON text channel is unchanged (byte-identical), so existing text-parsing consumers are unaffected.
 
