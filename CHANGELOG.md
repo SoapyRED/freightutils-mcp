@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.14.3 — 2026-08-10
+
+### Changed
+
+- **`unlocode_lookup` now states UN/LOCODE edition 2025-1 and its real count.** The backing
+  dataset moved from edition 2024-2 (116,129 entries) to UNECE's current 2025-1 release
+  (116,232 entries), ingested from the authority's official release artifact with every
+  coordinate passed through a strict range validator: 279 records where the authority
+  publishes an impossible value or an explicit placeholder now return a
+  `coordinatesBasis` explaining the withheld coordinate instead of a wrong number —
+  274 of those were previously served as confident values parsed from strings with
+  out-of-range minutes. The tool's description and qualifier name the new edition; no
+  schema, field or transport changes.
+
 ## 2.14.2 — 2026-08-10
 
 ### Changed

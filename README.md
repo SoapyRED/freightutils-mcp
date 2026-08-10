@@ -54,7 +54,7 @@ Since **2.11.0**, every tool also declares a typed `outputSchema` and returns `s
 | Tool | Description |
 |------|-------------|
 | `airline_lookup` | 6,357 airlines with IATA/ICAO codes and AWB prefixes |
-| `unlocode_lookup` | 116,129+ UN/LOCODE transport locations |
+| `unlocode_lookup` | 116,232+ UN/LOCODE transport locations |
 | `airport_lookup` | 85,555 airports by IATA/ICAO code, name or city (OurAirports) |
 | `nearest_airport` | Nearest airports to a latitude/longitude, by great-circle distance |
 | `uld_lookup` | 16 air cargo ULD types (LD3, PMC, etc.) |

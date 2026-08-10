@@ -696,7 +696,7 @@ Related: cbm_calculator / chargeable_weight_calculator / ldm_calculator (single-
 
 const unlocodeLookup: ToolDef = {
   name: 'unlocode_lookup',
-  description: `Search 116,129 UN/LOCODE transport locations worldwide — ports, airports, rail and road terminals, inland container depots and border crossings. Codes are 5 characters: a 2-letter ISO country code + a 3-character location code (GBLHR = London Heathrow, NLRTM = Rotterdam).
+  description: `Search 116,232 UN/LOCODE transport locations worldwide — ports, airports, rail and road terminals, inland container depots and border crossings. Codes are 5 characters: a 2-letter ISO country code + a 3-character location code (GBLHR = London Heathrow, NLRTM = Rotterdam).
 
 Provide code for an exact record, or query (name search, min 2 chars) optionally narrowed by country and function_type; limit caps results (default 20, max 100).
 
@@ -704,7 +704,7 @@ Behavior: read-only; exact code hits are provenance-based while fuzzy name hits 
 
 Returns: the location record(s) — code, name and name_ascii, country, subdivision, functions[], status, coordinates {lat, lon} and iata_code where assigned — under result, ${ENV}
 
-Limitations: an administrative code list (UNECE UN/LOCODE 2024-2) — confirm operational status and coordinates with the port or authority before critical use.
+Limitations: an administrative code list (UNECE UN/LOCODE 2025-1) — confirm operational status and coordinates with the port or authority before critical use.
 
 Related: airport_lookup (airport-specific records including ICAO codes), nearest_airport (find airports by coordinates).`,
 
