@@ -1,9 +1,10 @@
 import { z } from 'zod';
 
 /**
- * FreightUtils response envelope v1 — output-schema side.
+ * FreightUtils response envelope v1.1 — output-schema side. Accepts version '1' too
+ * (a transitional response can carry either).
  *
- * Mirrors the hosted contract (freightutils.com schemas/response-envelope.v1.json
+ * Mirrors the hosted contract (freightutils.com schemas/response-envelope.v1.1.json
  * and the /api/mcp ENVELOPE_OUTPUT_SHAPE) field-for-field. The envelope itself is
  * ALWAYS built by the REST API (`?envelope=1`) — this package never constructs
  * envelopes for REST-backed tools, so the contract cannot fork. The only locally
@@ -17,7 +18,7 @@ import { z } from 'zod';
  */
 export function envelopeShape(result: z.ZodTypeAny): z.ZodRawShape {
   return {
-    envelope_version: z.literal('1'),
+    envelope_version: z.enum(['1', '1.1']),
     ok: z.boolean(),
     result,
     confidence: z.object({
@@ -50,6 +51,12 @@ export function envelopeShape(result: z.ZodTypeAny): z.ZodRawShape {
       checked: z.string(),
       provenance_status: z.enum(['verified', 'pending-verification', 'computed', 'live']),
       source_url: z.string().optional(),
+      // v1.1 freshness fields — editioned datasets only; continuous datasets
+      // legitimately omit all three. EDITION_LAG (warnings[].code) fires when
+      // dataset_edition trails authority_current_edition.
+      dataset_edition: z.string().optional(),
+      authority_current_edition: z.string().optional(),
+      checked_at: z.string().optional(),
     }),
     citation: z.object({ text: z.string(), qualifier: z.string().optional() }),
   };

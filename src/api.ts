@@ -54,7 +54,7 @@ export function buildHeaders(extra?: Record<string, string>): Record<string, str
 }
 
 /** Options for the two outbound helpers. `envelope: true` requests the
- *  FreightUtils v1 response envelope (`?envelope=1`) — used for the
+ *  FreightUtils response envelope, v1.1 since 2.15.0 (`?envelope=1.1`) — used for the
  *  structuredContent channel. `legacySource: true` adds the bridge opt-in
  *  (`&legacy_source=1`): the API appends the flat channel's exact `_source`
  *  block to the envelope so the flat legacy text channel can be reconstructed
@@ -67,7 +67,7 @@ export async function apiGet(endpoint: string, params: Record<string, unknown>, 
     if (v === undefined || v === null || v === '') continue;
     url.searchParams.set(k, String(v));
   }
-  if (opts?.envelope) url.searchParams.set('envelope', '1');
+  if (opts?.envelope) url.searchParams.set('envelope', '1.1');
   if (opts?.legacySource) url.searchParams.set('legacy_source', '1');
 
   const res = await fetch(url.toString(), {
@@ -84,7 +84,7 @@ export async function apiGet(endpoint: string, params: Record<string, unknown>, 
 
 export async function apiPost(endpoint: string, body: unknown, opts?: ApiOpts): Promise<unknown> {
   const q = [
-    ...(opts?.envelope ? ['envelope=1'] : []),
+    ...(opts?.envelope ? ['envelope=1.1'] : []),
     ...(opts?.legacySource ? ['legacy_source=1'] : []),
   ].join('&');
   const url = `${BASE_URL}/${endpoint}${q ? '?' + q : ''}`;

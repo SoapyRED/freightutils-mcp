@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.15.0 — 2026-08-11
+
+### Added
+
+- **Envelope v1.1 — the freshness revision (additive, minor bump: a contract addition, not a
+  patch).** On editioned reference datasets, `structuredContent._source` now carries three new
+  optional fields: `dataset_edition` (the edition this response is served from, e.g.
+  "UN/LOCODE 2025-1"), `authority_current_edition` (the authority's current in-force edition
+  at last check), and `checked_at` (when served-vs-authority was last compared). A new
+  advisory warning code, `EDITION_LAG`, fires whenever the served edition trails the
+  authority's — advisory, never blocking. Continuous datasets (live UK duty, airport
+  snapshots) legitimately omit the three fields: absence means "no edition concept", not
+  staleness. The package now requests `?envelope=1.1` from the REST API and its declared
+  output schema accepts envelope_version "1" or "1.1". Every v1 field is unchanged and the
+  flat legacy text channel is untouched — nothing existing breaks; agents that read
+  `_source` simply see more truth. Hosted schema: freightutils.com/schemas/response-envelope.v1.1.json.
+
 ## 2.14.3 — 2026-08-10
 
 ### Changed
