@@ -249,7 +249,7 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
 
 const adrExemptionCalculator: ToolDef = {
   name: 'adr_exemption_calculator',
-  description: `Calculate ADR 1.1.3.6 "small load" exemption points for a dangerous-goods load. Each substance's transport category (0-4) sets a points multiplier (category 1 x50, 2 x3, 3 x1, 4 x0); points = quantity x multiplier, and a load totalling 1,000 points or less qualifies for reduced ADR requirements. Transport category 0 substances can NEVER use this exemption — has_category_zero flags them.
+  description: `Calculate ADR 1.1.3.6 "small load" exemption points for a dangerous-goods load. Each substance's transport category (0-4) sets a points multiplier (category 1 x50, 2 x3, 3 x1, 4 x0; the nine ADR 1.1.3.6.3 note-a entries UN 0081/0082/0084/0241/0331/0332/0482/1005/1017 are x20 with a 50 kg per-transport-unit cap); points = quantity x multiplier, and a load totalling 1,000 points or less qualifies for reduced ADR requirements. Transport category 0 substances can NEVER use this exemption — has_category_zero flags them.
 
 Provide un_number + quantity for a single substance, or items[] for a mixed load (items takes precedence if both are given). Quantities are in kg or litres per the substance's ADR unit.
 

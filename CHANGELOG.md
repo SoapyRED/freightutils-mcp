@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.17.2 — 2026-08-19
+
+### Fixed
+
+- **`adr_exemption_calculator` description now states the ADR 1.1.3.6.3 note-a branch.**
+  Nine category-1 entries — UN 0081, 0082, 0084, 0241, 0331, 0332, 0482, 1005 (anhydrous
+  ammonia) and 1017 (chlorine) — score x20 per 1.1.3.6.4 with a 50 kg per-transport-unit
+  cap per note a, not the generic category-1 x50 / 20 kg the description implied. The
+  server-side computation was corrected on freightutils.com the same day (found by the
+  new practitioner-scenarios suite deriving expected answers from the purchased ADR 2025
+  text); this release aligns the tool description that agents read for intent-matching.
+
 ## 2.17.1 — 2026-08-19
 
 ### Fixed
