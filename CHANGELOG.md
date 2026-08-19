@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.16.0 — 2026-08-19
+
+### Changed
+
+- **ADR scope verdicts — dry ice no longer gets a 1.1.3.6 answer.** 28 ADR 2025 Table A rows
+  carry a scope remark instead of a packing group, and the API now models them as flags the
+  three ADR tools pass through. `adr_lookup` returns `packing_group: null` plus
+  `not_subject_to_adr` (with `conditions_ref`, e.g. `"5.5.3"` for UN 1845 dry ice) or
+  `carriage_prohibited`, with the verbatim cell preserved in `table_a_remark`.
+  `adr_exemption_calculator` short-circuits those rows out of the points math: an
+  all-not-subject load returns a dedicated verdict — "Not subject to ADR (road).
+  Section 5.5.3 applies: …" — with `conditions[]` quoting the ADR 2025 section 5.5.3
+  requirements verbatim (ventilation, package marking, warning mark, documentation,
+  training), and a load containing a CARRIAGE PROHIBITED entry returns `exempt: false`
+  with `carriage_prohibited: true` (previously both came back "1.1.3.6 exemption applies"
+  via the null-transport-category fall-through). `adr_lq_eq_check` gains item status
+  `not_subject` and overall status `not_applicable` for out-of-scope rows instead of
+  framing them "not permitted". Tool descriptions and declared output schemas document
+  all of it; every new field is additive and optional, so existing integrations keep
+  working unchanged.
+
 ## 2.15.0 — 2026-08-11
 
 ### Added

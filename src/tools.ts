@@ -196,9 +196,9 @@ const adrLookup: ToolDef = {
 
 Provide exactly ONE of: un_number (exact lookup — returns every packing-group variant of that UN number), search (case-insensitive partial match on the proper shipping name), or hazard_class (all entries in a class or division). un_number is normalised — "1203", "UN1203" and "un 1203" are equivalent, and normalized_input reports the correction; explosives keep their leading zero ("0004").
 
-Behavior: read-only reference lookup; name searches return up to 50 entries, class filters up to 100. An unknown UN number or a search with no hits errors with the API's NOT_FOUND body and a retry hint. ${RATE}
+Behavior: read-only reference lookup; name searches return up to 50 entries, class filters up to 100. An unknown UN number or a search with no hits errors with the API's NOT_FOUND body and a retry hint. 28 Table A rows carry a scope remark instead of a packing group: those return packing_group null plus not_subject_to_adr (with conditions_ref, e.g. "5.5.3" for UN 1845 dry ice) or carriage_prohibited, and table_a_remark preserves the verbatim Table A text. ${RATE}
 
-Returns: count and results[] — per entry: un_number, proper_shipping_name, class, classification_code, packing_group, labels, special_provisions, limited_quantity, excepted_quantity, transport_category, tunnel_restriction_code, hazard_identification_number and variant_index/variant_count — under result, ${ENV}
+Returns: count and results[] — per entry: un_number, proper_shipping_name, class, classification_code, packing_group, labels, special_provisions, limited_quantity, excepted_quantity, transport_category, tunnel_restriction_code, hazard_identification_number, variant_index/variant_count and, on scope-flagged rows, not_subject_to_adr/carriage_prohibited/conditions_ref/table_a_remark — under result, ${ENV}
 
 Limitations: a factual compilation of the ADR table, not legal or compliance advice; classification remains the consignor's responsibility — verify against the current UNECE ADR text.
 
@@ -218,6 +218,12 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
       class: z.string(),
       classification_code: z.string(),
       packing_group: z.string(),
+      // Scope flags (28 Table A rows, present only when true): the row is
+      // outside ADR scope / banned from carriage — never a packing group.
+      not_subject_to_adr: z.boolean(),
+      carriage_prohibited: z.boolean(),
+      conditions_ref: z.string(),
+      table_a_remark: z.string(),
       labels: z.string(),
       special_provisions: z.string(),
       limited_quantity: z.string(),
@@ -249,9 +255,11 @@ Provide un_number + quantity for a single substance, or items[] for a mixed load
 
 Multi-variant UNs: a UN number with more than one ADR Table A row (packing group / concentration variant — e.g. UN 1789 PG II vs PG III have different transport categories) needs packing_group (I|II|III) or variant_index (from adr_lookup) to pin one row. Without a disambiguator the tool returns blocking_errors[AMBIGUOUS_UN_VARIANT] + human_review_required + candidates[] (each candidate's variant_index, packing_group, proper_shipping_name, transport_category, multiplier) and NO verdict, rather than silently guessing a row. Single-row UNs are unchanged.
 
+Scope verdicts: Table A rows listed "NOT SUBJECT TO ADR" or "CARRIAGE PROHIBITED" never enter the points math. An all-not-subject load (e.g. UN 1845 dry ice) returns not_subject_to_adr true with a dedicated message ("Not subject to ADR (road). Section 5.5.3 applies: ...") and, for dry ice, conditions[] quoting the ADR 2025 section 5.5.3 requirements verbatim (ventilation, package marking, warning mark, documentation, training). A load containing a CARRIAGE PROHIBITED entry returns exempt false with carriage_prohibited true. In a mixed load, not-subject items are excluded from the points and the exclusion is stated in warnings.
+
 Behavior: deterministic points arithmetic over ADR 2025 reference data; a UN that cannot be found returns blocking_errors (NOT_FOUND); exempt is the overall verdict. ${RATE}
 
-Returns: items[] (each with packing_group, variant_index, transport_category, multiplier, points), total_points, threshold (1000), exempt, has_category_zero, has_quantity_exceedance, warnings and message under result — or, when a UN is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
+Returns: items[] (each with packing_group, variant_index, transport_category, multiplier, points, and scope flags where applicable), total_points, threshold (1000), exempt, has_category_zero, has_quantity_exceedance, warnings, message and — on scope verdicts — not_subject_to_adr/conditions_ref/conditions[]/carriage_prohibited under result — or, when a UN is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
 
 Limitations: a deterministic calculation over reference data, not legal advice — even exempt loads keep core duties (packaging, marking, documentation), and mixed-packing rules still apply; verify against the current UNECE ADR text.
 
@@ -281,6 +289,9 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
       quantity: z.number(),
       multiplier: z.number(),
       points: z.number(),
+      not_subject_to_adr: z.boolean(),
+      carriage_prohibited: z.boolean(),
+      conditions_ref: z.string(),
     })),
     total_points: z.number(),
     threshold: z.number(),
@@ -289,6 +300,18 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
     has_quantity_exceedance: z.boolean(),
     warnings: z.array(z.unknown()),
     message: z.string(),
+    // Scope-verdict path (Table A "NOT SUBJECT TO ADR" / "CARRIAGE PROHIBITED"):
+    // the 1.1.3.6 math is short-circuited; conditions[] quotes ADR 2025
+    // carriage conditions verbatim (e.g. section 5.5.3 for UN 1845 dry ice).
+    not_subject_to_adr: z.boolean(),
+    conditions_ref: z.string(),
+    conditions: z.array(loose({
+      ref: z.string(),
+      heading: z.string(),
+      requirement: z.string(),
+      note: z.string(),
+    })),
+    carriage_prohibited: z.boolean(),
     // Ambiguous-UN path: no verdict, candidates to disambiguate.
     human_review_required: z.boolean(),
     candidates: z.array(loose({
@@ -969,9 +992,9 @@ Provide mode ("lq" or "eq") and 1-20 items, each with un_number, quantity and un
 
 Multi-variant UNs: a UN number with more than one ADR Table A row (packing group / concentration variant — e.g. UN 1789 PG II LQ 1 L vs PG III LQ 5 L) needs packing_group (I|II|III) or variant_index (from adr_lookup) on that item to pin one row. Without a disambiguator the tool returns blocking_errors[AMBIGUOUS_UN_VARIANT] + human_review_required + candidates[] (each candidate's variant_index, packing_group, proper_shipping_name, limited_quantity, excepted_quantity) and NO verdict, rather than silently checking the wrong packing group. Single-row UNs are unchanged.
 
-Behavior: deterministic reference check; each item gets a status and reason (an LQ value of "0" or code E0 means the relief is not permitted for that substance), with overall_status and summary counts across the batch. ${RATE}
+Behavior: deterministic reference check; each item gets a status and reason (an LQ value of "0" or code E0 means the relief is not permitted for that substance), with overall_status and summary counts across the batch. Table A rows listed "NOT SUBJECT TO ADR" (e.g. UN 1845 dry ice) get item status not_subject — outside ADR scope, neither a pass nor a fail — and an all-not-subject batch returns overall_status not_applicable; "CARRIAGE PROHIBITED" rows are not_permitted with the prohibition stated in reason. ${RATE}
 
-Returns: mode, overall_status, items[] (un_number, variant_index, substance, class, packing_group, lq_limit or eq_code, quantity_entered, status, reason), summary {total_items, qualifying, exceeding, not_permitted} and the ADR chapter references under result — or, when a UN is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
+Returns: mode, overall_status (qualifies | does_not_qualify | partial | not_applicable), items[] (un_number, variant_index, substance, class, packing_group, lq_limit or eq_code, quantity_entered, status, reason, and scope flags where applicable), summary {total_items, qualifying, exceeding, not_permitted, not_subject?} and the ADR chapter references under result — or, when a UN is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
 
 Limitations: a quantity-threshold check only — LQ/EQ relief also requires packaging, marking and documentation conformity that this tool does not assess; not legal advice, verify against the current UNECE ADR text.
 
@@ -1006,12 +1029,16 @@ Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exempt
       unit_entered: z.string(),
       status: z.string(),
       reason: z.string(),
+      not_subject_to_adr: z.boolean(),
+      carriage_prohibited: z.boolean(),
+      conditions_ref: z.string(),
     })),
     summary: loose({
       total_items: z.number(),
       qualifying: z.number(),
       exceeding: z.number(),
       not_permitted: z.number(),
+      not_subject: z.number(),
     }),
     references: z.record(z.string(), z.unknown()),
     // Ambiguous-UN path: no verdict, candidates to disambiguate.
