@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.17.0 — 2026-08-19
+
+### Added
+
+- **`resolve_reference` — the 25th tool, and the agent front door.** One opaque freight
+  identifier in ("176", "UN1845", "NLRTM", "FOB", "22G1", "MSKU1100810", "D/E"), typed and
+  cited candidates out — so an agent no longer needs to know which of the lookup tools fits
+  a string before calling. Thirteen grammars all run on every query (UN numbers, AWB
+  prefixes, airline IATA/ICAO, airport IATA/ICAO, UN/LOCODE, ISO 6346 container numbers
+  with the check digit computed, HS codes, Incoterms, ADR tunnel codes, ULD serials, ISO
+  container size/type codes); collisions return multiple ranked candidates rather than a
+  silent guess, every candidate carries `rank_basis`, `verification_status` +
+  `verification_basis`, `canonical_url`, `api_url` and its own dataset citation, a failed
+  container check digit is returned with `valid: false` rather than dropped, and zero
+  candidates is a valid `count: 0` result, never an error. Backed by the new
+  `GET /api/resolve` REST endpoint (envelope v1.1 native). v1 is single-token resolution
+  by design — free-text extraction is a later revision.
+
 ## 2.16.0 — 2026-08-19
 
 ### Changed

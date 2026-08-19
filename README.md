@@ -10,7 +10,7 @@
 
 FreightUtils is the neutral freight reference layer for AI agents — source-backed dangerous-goods, customs, location and freight-calculation data an agent can call and cite, from primary sources (ADR 2025 / UNECE, HS 2022 / WCO, IATA-regulated airline prefixes). Neutral by design: no freight to sell and no carrier to push — a lookup returns what the named source says, with the citation attached so an agent can inspect it rather than take our word for it, regardless of who carries the load.
 
-This [Model Context Protocol](https://modelcontextprotocol.io/) server gives AI agents access to 24 freight calculation and reference tools, covering road, air, and sea freight. Built by a UK ADR-certified freight transport planner.
+This [Model Context Protocol](https://modelcontextprotocol.io/) server gives AI agents access to 25 freight calculation and reference tools, covering road, air, and sea freight. Built by a UK ADR-certified freight transport planner.
 
 Every response cites its source — a `_source` block with the authority, edition, licence where held, and a verification status an agent can read — and the tools are deterministic, not generated answers. Reference only: never filing, booking, or legal advice, and results state when human review is required (`validate` is structural check-digit validation only; a clean `ics2_check` is not ENS acceptance; emissions figures are estimates, not audited reports).
 
@@ -21,7 +21,7 @@ Since **2.11.0**, every tool also declares a typed `outputSchema` and returns `s
 
 ---
 
-## Tools (24)
+## Tools (25)
 
 ### Calculators
 | Tool | Description |
@@ -53,6 +53,7 @@ Since **2.11.0**, every tool also declares a typed `outputSchema` and returns `s
 ### Reference Data
 | Tool | Description |
 |------|-------------|
+| `resolve_reference` | Resolve any freight identifier ("176", "UN1845", "NLRTM", "FOB") to typed, ranked, cited candidates — the agent front door |
 | `airline_lookup` | 6,357 airlines with IATA/ICAO codes and AWB prefixes |
 | `unlocode_lookup` | 116,232+ UN/LOCODE transport locations |
 | `airport_lookup` | 85,555 airports by IATA/ICAO code, name or city (OurAirports) |

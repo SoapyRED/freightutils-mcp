@@ -1384,6 +1384,50 @@ Related: airport_lookup (exact code or name lookup, no distance), unlocode_looku
 };
 
 // ─────────────────────────────────────────────────────────────
+//  25. Resolve Reference
+// ─────────────────────────────────────────────────────────────
+
+const resolveReference: ToolDef = {
+  name: 'resolve_reference',
+  description: `Resolve an arbitrary freight identifier — one opaque string in, typed and cited candidates out. The agent front door: when you hold an identifier-ish token ("176", "UN1845", "NLRTM", "FOB", "22G1", "MSKU1100810", "D/E") and do not know which lookup tool fits, call this FIRST and follow the candidate's api_url / canonical_url (or the matching sibling tool) for depth.
+
+Provide q: ONE identifier (single token, max 32 chars). Thirteen grammars all run — UN numbers, AWB prefixes, airline IATA/ICAO, airport IATA/ICAO, UN/LOCODE, ISO 6346 container numbers (check digit computed), HS codes (6-10 digits; national lines resolve at their 6-digit international parent), Incoterms, ADR tunnel codes, ULD serials, ISO container size/type codes. Ambiguity is the product: colliding grammars return MULTIPLE ranked candidates ("LHR" is Heathrow AND an Egyptian carrier's ICAO), never a silent guess.
+
+Behavior: deterministic — normalize (trim, uppercase, collapse spaces/dashes, strip a UN prefix), match ALL grammars, rank by record-hit > verification status > static dataset prior (airlines/adr/unlocode first) > stable tiebreak; every candidate carries rank_basis so the ordering is inspectable. Zero candidates is a VALID result (count 0 + note), never an error. A failed container check digit returns a candidate with valid:false rather than dropping it. ${RATE}
+
+Returns: query, normalized, count and candidates[] — each with entity_type, identifier_type, value_normalized, summary, record (the core fields the matching dataset holds), verification_status + verification_basis, rank_basis, canonical_url, api_url and a per-candidate dataset citation — under result, ${ENV}
+
+Limitations: v1 is SINGLE-TOKEN resolution, not free-text extraction — pass one identifier, not a manifest line; SCAC/BIC codes are not yet covered; a match asserts the identifier is known/well-formed, not that a shipment exists.
+
+Related: every lookup tool this resolves into — adr_lookup, airline_lookup, airport_lookup, unlocode_lookup, hs_code_lookup, incoterms_lookup, container_lookup, uld_lookup, validate.`,
+  schema: z.object({
+    q: z.string().min(1).max(32).describe('One freight identifier — e.g. "176", "UN1845", "NLRTM", "FOB", "LHR", "22G1", "MSKU1100810", "090111", "AKE12345AB", "D/E".'),
+  }).strict(),
+  resultSchema: resultShape({
+    query: z.string(),
+    normalized: z.string(),
+    count: z.number(),
+    note: z.string(),
+    candidates: z.array(loose({
+      entity_type: z.string(),
+      identifier_type: z.string(),
+      value_normalized: z.string(),
+      summary: z.string(),
+      record: z.record(z.string(), z.unknown()),
+      verification_status: z.string(),
+      verification_basis: z.string(),
+      rank_basis: z.string(),
+      canonical_url: z.string(),
+      api_url: z.string(),
+      citation: loose({ text: z.string(), qualifier: z.string() }),
+    })),
+  }),
+  richText: true,
+  annotations: readOnlyAnnotations('Resolve Freight Reference'),
+  handler: async (args, opts) => apiGet('resolve', { q: args.q }, opts),
+};
+
+// ─────────────────────────────────────────────────────────────
 //  Export all tools
 // ─────────────────────────────────────────────────────────────
 
@@ -1411,5 +1455,6 @@ export const ALL_TOOLS: ToolDef[] = [
   ics2Check,
   airportLookup,
   nearestAirport,
+  resolveReference,
   getSubscribeLink,
 ];
