@@ -1,5 +1,17 @@
 # Changelog
 
+## 2.17.1 — 2026-08-19
+
+### Fixed
+
+- **`resolve_reference` now emits its citation line on the stdio text channel.** 2.17.0
+  registered the tool with the pre-2.11 `richText` layout, whose citation slot expects a
+  tool-local citation function this tool deliberately does not have (per-candidate dataset
+  citations live inside the result) — so stdio callers got the flat JSON with no citation
+  line while the hosted `/api/mcp` surface appended one. Caught by the release's
+  adversarial review. The tool now uses the standard layout: flat result JSON +
+  the envelope's citation line, byte-matching hosted.
+
 ## 2.17.0 — 2026-08-19
 
 ### Added

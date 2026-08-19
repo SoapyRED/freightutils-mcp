@@ -1422,7 +1422,11 @@ Related: every lookup tool this resolves into — adr_lookup, airline_lookup, ai
       citation: loose({ text: z.string(), qualifier: z.string() }),
     })),
   }),
-  richText: true,
+  // Deliberately NOT richText: the non-richText path appends the ENVELOPE's
+  // citation.text as content[1], byte-matching the hosted /api/mcp surface.
+  // richText would look for a tool-local citation fn this tool does not have
+  // (per-candidate citations live inside the result), silently dropping the
+  // citation line (caught by the 2.17.0 adversarial review; fixed in 2.17.1).
   annotations: readOnlyAnnotations('Resolve Freight Reference'),
   handler: async (args, opts) => apiGet('resolve', { q: args.q }, opts),
 };
