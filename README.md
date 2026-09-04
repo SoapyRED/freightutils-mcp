@@ -146,14 +146,14 @@ You should see three ticks and `All checks passed`:
 ```
 FreightUtils MCP Diagnostic
 ───────────────────────────
-package: freightutils-mcp@2.10.0
+package: freightutils-mcp@<installed version>
 health:  https://www.freightutils.com/api/mcp/health
 
 [1/3] Backend health (https://www.freightutils.com/api/mcp/health)
-      ✓ status=ok mcp_version=2.10.0 tools_registered=24 (143ms)
+      ✓ status=ok mcp_version=<current> tools_registered=<current> (143ms)
 
 [2/3] MCP handshake (in-process via InMemoryTransport)
-      ✓ server freightutils-mcp@2.10.0 initialized; tools/list returned 24 tools
+      ✓ server freightutils-mcp@<installed version> initialized; tools/list returned <n> tools
 
 [3/3] End-to-end tool call (cbm_calculator l=120 w=80 h=100)
       ✓ cbm_calculator → total=0.96 m³ (expected 0.96) (218ms)

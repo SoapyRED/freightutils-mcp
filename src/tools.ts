@@ -259,7 +259,7 @@ Scope verdicts: Table A rows listed "NOT SUBJECT TO ADR" or "CARRIAGE PROHIBITED
 
 Behavior: deterministic points arithmetic over ADR 2025 reference data; a UN that cannot be found returns blocking_errors (NOT_FOUND); exempt is the overall verdict. ${RATE}
 
-Returns: items[] (each with packing_group, variant_index, transport_category, multiplier, points, and scope flags where applicable), total_points, threshold (1000), exempt, has_category_zero, has_quantity_exceedance, warnings, message and — on scope verdicts — not_subject_to_adr/conditions_ref/conditions[]/carriage_prohibited under result — or, when a UN is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
+Returns: items[] (each with packing_group, variant_index, transport_category, multiplier, points, quantity_unit/quantity_basis/expected_unit when a unit or basis was declared, and scope flags where applicable), total_points (NULL when no verdict was reached), threshold (1000), exempt (NULL when no verdict was reached — never false as a stand-in), has_category_zero, has_quantity_exceedance, warnings, message and — on scope verdicts — not_subject_to_adr/conditions_ref/conditions[]/carriage_prohibited under result — or, when a UN is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
 
 Limitations: a deterministic calculation over reference data, not legal advice — even exempt loads keep core duties (packaging, marking, documentation), and mixed-packing rules still apply; verify against the current UNECE ADR text.
 
@@ -270,11 +270,15 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
     quantity: z.number().positive().optional().describe('Quantity for the single-substance check, in kg or litres per the substance\'s ADR unit. Example: 100.'),
     packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group (I, II or III) — only needed to disambiguate a UN with more than one ADR Table A row (e.g. UN 1789). Ignored for single-row UNs. Single-substance form only.'),
     variant_index: z.number().int().nonnegative().optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants that share a packing group (concentration bands). Ignored for single-row UNs. Single-substance form only.'),
+    unit: z.enum(['L', 'kg']).optional().describe("OPTIONAL. The dimension `quantity` is stated in. Omit it and the number is taken as already on the ADR 1.1.3.6.3 basis (unchanged behaviour). Supply it and it is CHECKED against the dimension 1.1.3.6.3 counts for that Table A row — litres for liquids and for compressed or adsorbed gases, kilograms for solids, liquefied/refrigerated/dissolved gases and articles. A mismatch returns total_points null, exempt null and items[].basis_mismatch true, naming the dimension the entry is counted in."),
+    basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging, so a quantity declared 'gross' returns no points in ANY unit — send the net figure instead."),
     items: z.array(z.object({
       un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN"').describe('UN number — 4 digits, optionally "UN"-prefixed. Example: "1263".'),
       quantity: z.number().positive().describe('Quantity in kg or litres per the substance\'s ADR unit.'),
       packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group for a multi-variant UN.'),
       variant_index: z.number().int().nonnegative().optional().describe('ADR Table A variant index for a multi-variant UN.'),
+      unit: z.enum(['L', 'kg']).optional().describe("OPTIONAL. The dimension `quantity` is stated in. Omit it and the number is taken as already on the ADR 1.1.3.6.3 basis (unchanged behaviour). Supply it and it is CHECKED against the dimension 1.1.3.6.3 counts for that Table A row — litres for liquids and for compressed or adsorbed gases, kilograms for solids, liquefied/refrigerated/dissolved gases and articles. A mismatch returns total_points null, exempt null and items[].basis_mismatch true, naming the dimension the entry is counted in."),
+      basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging, so a quantity declared 'gross' returns no points in ANY unit — send the net figure instead."),
     })).optional().describe('Mixed-load items (use INSTEAD of un_number/quantity).'),
   }).strict(),
 
@@ -334,6 +338,9 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
     return apiGet('adr-calculator', {
       un: args.un_number, qty: args.quantity,
       packing_group: args.packing_group, variant_index: args.variant_index,
+      // The 1.1.3.6.3 declaration. Dropping these silently made the schema a lie:
+      // the tool accepted unit/basis and the API never saw them.
+      unit: args.unit, basis: args.basis,
     }, opts);
   },
 };
@@ -849,6 +856,8 @@ Related: consignment_calculator (canonical snake_case lines[] shape with advisor
       pallet_type: z.enum(['euro', 'uk', 'us', 'custom', 'none']).optional().describe('Pallet standard the item sits on, if any.'),
       hs_code: z.string().optional().describe('HS code — enables the duty section together with customs_value.'),
       un_number: z.string().optional().describe('UN number — enables the dangerous-goods section.'),
+      adr_quantity: z.number().positive().optional().describe("OPTIONAL ADR 1.1.3.6.3 quantity for this dangerous-goods line, in adr_quantity_unit. SEPARATE from weight, which is gross package mass — 1.1.3.6.3 counts none of its four categories that way. Supply both on EVERY dangerous-goods line and adrFlags.totalPoints is calculated; omit either and it stays null."),
+      adr_quantity_unit: z.enum(['L', 'kg']).optional().describe("Dimension of adr_quantity. CHECKED against the dimension 1.1.3.6.3 counts for the row — a litres entry given kilograms still withholds the total."),
       customs_value: z.number().optional().describe('Customs value per item in GBP — enables the duty section.'),
     })).describe('Shipment items with dimensions, weight and optional HS/UN codes.'),
     origin: z.object({ country: z.string(), locode: z.string().optional() }).optional().describe('Origin — ISO country code and optional UN/LOCODE.'),
@@ -896,6 +905,10 @@ Related: consignment_calculator (canonical snake_case lines[] shape with advisor
         palletType: i.pallet_type,
         hsCode: i.hs_code,
         unNumber: i.un_number,
+        // ADR 1.1.3.6.3 quantity for this line — camelCase on the wire like the
+        // rest of this mapper. Omitted here, the field was declarable and inert.
+        adrQuantity: i.adr_quantity,
+        adrQuantityUnit: i.adr_quantity_unit,
         customsValue: i.customs_value,
       })),
       origin: args.origin,
@@ -990,11 +1003,11 @@ const adrLqEqCheck: ToolDef = {
 
 Provide mode ("lq" or "eq") and 1-20 items, each with un_number, quantity and unit — ml or L for liquids, g or kg for solids; quantity is per INNER packaging, not the whole load.
 
-Multi-variant UNs: a UN number with more than one ADR Table A row (packing group / concentration variant — e.g. UN 1789 PG II LQ 1 L vs PG III LQ 5 L) needs packing_group (I|II|III) or variant_index (from adr_lookup) on that item to pin one row. Without a disambiguator the tool returns blocking_errors[AMBIGUOUS_UN_VARIANT] + human_review_required + candidates[] (each candidate's variant_index, packing_group, proper_shipping_name, limited_quantity, excepted_quantity) and NO verdict, rather than silently checking the wrong packing group. Single-row UNs are unchanged.
+Unit families: column (7a) states the limit in ONE dimension — a mass for some entries, a volume for others — and ADR supplies no density, so a mass quantity against a volume limit (or the reverse) CANNOT be compared. Those items return status 'inconclusive' with the dimension named, never a pass or a fail, and a batch holding any inconclusive item never reads overall_status 'qualifies'. Send the quantity in the unit given by lq_limit_unit to get a verdict. Multi-variant UNs: a UN number with more than one ADR Table A row (packing group / concentration variant — e.g. UN 1789 PG II LQ 1 L vs PG III LQ 5 L) needs packing_group (I|II|III) or variant_index (from adr_lookup) on that item to pin one row. Without a disambiguator the tool returns blocking_errors[AMBIGUOUS_UN_VARIANT] + human_review_required + candidates[] (each candidate's variant_index, packing_group, proper_shipping_name, limited_quantity, excepted_quantity) and NO verdict, rather than silently checking the wrong packing group. Single-row UNs are unchanged.
 
 Behavior: deterministic reference check; each item gets a status and reason (an LQ value of "0" or code E0 means the relief is not permitted for that substance), with overall_status and summary counts across the batch. Table A rows listed "NOT SUBJECT TO ADR" (e.g. UN 1845 dry ice) get item status not_subject — outside ADR scope, neither a pass nor a fail — and an all-not-subject batch returns overall_status not_applicable; "CARRIAGE PROHIBITED" rows are not_permitted with the prohibition stated in reason. ${RATE}
 
-Returns: mode, overall_status (qualifies | does_not_qualify | partial | not_applicable), items[] (un_number, variant_index, substance, class, packing_group, lq_limit or eq_code, quantity_entered, status, reason, and scope flags where applicable), summary {total_items, qualifying, exceeding, not_permitted, not_subject?} and the ADR chapter references under result — or, when a UN is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
+Returns: mode, overall_status (qualifies | does_not_qualify | partial | not_applicable | inconclusive), items[] (un_number, variant_index, substance, class, packing_group, lq_limit or eq_code, quantity_entered, status, reason, and scope flags where applicable), summary {total_items, qualifying, exceeding, not_permitted, not_subject?, inconclusive?} and the ADR chapter references under result — or, when a UN is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
 
 Limitations: a quantity-threshold check only — LQ/EQ relief also requires packaging, marking and documentation conformity that this tool does not assess; not legal advice, verify against the current UNECE ADR text.
 

@@ -1,5 +1,51 @@
 # Changelog
 
+## 2.18.0 — 2026-09-04
+
+### Added
+
+- **`adr_exemption_calculator` accepts `unit` and `basis`.** ADR 1.1.3.6.3 counts a specific
+  quantity per transport category — litres for liquids and for compressed or adsorbed gases,
+  kilograms for solids, liquefied/refrigerated/dissolved gases and articles — and the tool
+  previously took a bare number and multiplied it whatever it was. Declaring the unit now gets
+  it CHECKED against the dimension that Table A row is counted in; declaring `basis: 'gross'`
+  is refused in any unit, because 1.1.3.6.3 counts the goods and not their packaging. A
+  mismatch returns `total_points: null`, `exempt: null` and `items[].basis_mismatch: true`
+  rather than a total computed from the wrong quantity. **Declaring nothing is unchanged**, so
+  every existing caller keeps its behaviour exactly.
+- **`shipment_summary` accepts `adr_quantity` + `adr_quantity_unit` per item.** Separate from
+  `weight`, which is gross package mass and is not a 1.1.3.6.3 quantity for any row. Supply
+  both on every dangerous-goods line and `adrFlags.totalPoints` is calculated; omit either and
+  it stays null, as it has since 2026-09-04. The declared unit is validated on the same rule as
+  the exemption tool.
+
+### Changed
+
+- **`adr_lq_eq_check` can now answer `inconclusive`.** Column (7a) states the limited-quantity
+  limit in one dimension, and ADR supplies no density, so a mass quantity against a volume limit
+  (or the reverse) cannot be compared. Those items previously came back as a hard pass or fail
+  from a bare numeric comparison — UN 1340 (limit `500 g`) returned `within_limit` for `2 L`
+  and `exceeds_limit` for the identical `2000 ml`. The server now withholds the verdict and
+  names the dimension; `overall_status` gains `inconclusive`, and a batch holding any
+  inconclusive item never reads `qualifies`. Descriptions updated to match.
+- **Tool descriptions state the nullable verdict fields** on `adr_exemption_calculator`
+  (`total_points` and `exempt` are null when no verdict was reached — never `false` as a
+  stand-in for "not computed").
+- **The README diagnostic example no longer freezes a version or a tool count.** It printed
+  `mcp_version=2.10.0 tools_registered=24` as literal output, which was wrong the moment either
+  moved (live: 2.17.2 and 25). The example now shows placeholders; the command itself reports
+  the current figures.
+
+### Fixed
+
+- **Two new inputs were accepted by the schema and then dropped on the wire.** The
+  `adr_exemption_calculator` single-substance path forwarded a fixed field list, so a declared
+  `unit` never reached the API (UN 1203 at 300 with `unit: 'kg'` still returned 900 points and
+  `exempt: true` against a litres row); the `shipment_summary` item mapper likewise omitted the
+  ADR quantity. Caught by running the built package against production before publishing rather
+  than trusting the schema — a declarable-but-inert parameter is worse than an absent one.
+
+
 ## 2.17.2 — 2026-08-19
 
 ### Fixed
