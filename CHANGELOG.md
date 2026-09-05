@@ -26,10 +26,17 @@
   `adr_exemption_calculator` returns it with `withheld: true` and null points while every other
   line keeps its points, and `total_points` / `exempt` stay null because 1.1.3.6.4 sums every
   line and one term is unknown (a warning states the partial sum from the resolved lines, and
-  says so when it is already over the threshold). Both carry `human_review_required` +
-  `candidates[]` tagged by `item_index`, and the envelope carries one `AMBIGUOUS_UN_VARIANT`
-  warning per withheld line (not `blocking_errors` — `ok` stays true, a verdict exists for the
-  rest). A batch in which EVERY line is ambiguous keeps the blocking shape exactly as before.
+  says so when it is already over the threshold). Where the resolved lines alone already
+  disqualify the load — a CARRIAGE PROHIBITED entry, a transport category 0 entry, a
+  per-substance maximum exceeded, or a partial sum already over 1,000 — `exempt` is `false`
+  with the usual message (and `carriage_prohibited: true` where that is the reason), because
+  no packing group can undo those; the total stays null. Exemption `candidates[]` now carry
+  `expected_unit`, the 1.1.3.6.3 counted dimension, so a collision on state alone (UN 3375
+  PG II: liquid in litres, solid in kilograms) shows what differs. Both tools carry
+  `human_review_required` + `candidates[]` tagged by `item_index`, and the envelope carries one
+  `AMBIGUOUS_UN_VARIANT` warning per withheld line (not `blocking_errors` — `ok` stays true, a
+  verdict exists for the rest). A batch in which EVERY line is ambiguous keeps the blocking shape
+  exactly as before.
   This is a JSON-contract change on the server (additive fields, one new item status); the
   package passes the response through unchanged, and the descriptions here now say so.
 
