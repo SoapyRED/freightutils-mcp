@@ -1,5 +1,38 @@
 # Changelog
 
+## 2.19.0 — unreleased
+
+### Changed
+
+- **`adr_exemption_calculator` and `adr_lq_eq_check` answer a packing group whose rows agree.**
+  A UN number can carry several ADR Table A rows in ONE packing group that differ only by
+  concentration band or shipping name (UN 1790 PG I: more than 85 % HF, and more than 60 %
+  but not more than 85 % HF). Both tools used to treat that as unresolvable — they returned
+  `AMBIGUOUS_UN_VARIANT` with every row of the UN as a candidate, PG II included, and asked
+  for a `variant_index` that could not have changed the answer. When the rows a supplied
+  `packing_group` leaves agree on every field the verdict is computed from (class, column
+  (7a), column (7b) and scope for the LQ/EQ check; class, transport category, scope and the
+  1.1.3.6.3 counted dimension for the exemption), the verdict is now returned, with
+  `items[].equivalent_variants` listing the rows it holds for and a `variant_note` saying
+  which row's fields are displayed. Rows that DISAGREE (UN 2215 PG III: MOLTEN is category
+  0, the solid is category 3) still withhold, and `candidates[]` now lists only that packing
+  group's rows. A bare UN number (no packing group) is unchanged: still withheld.
+- **One ambiguous line no longer blanks the whole batch.** A call mixing a single-row UN with
+  an unpinned multi-row UN (UN 1203 + bare UN 1789) used to return the no-items
+  `human_review_required` + `candidates[]` shape, so the petrol line got no answer at all.
+  Now the resolvable lines are answered and only the ambiguous line is withheld:
+  `adr_lq_eq_check` returns it as `status: 'withheld'` with null row fields, `summary.withheld`
+  counts it, and `overall_status` can never read `qualifies` while a line is withheld;
+  `adr_exemption_calculator` returns it with `withheld: true` and null points while every other
+  line keeps its points, and `total_points` / `exempt` stay null because 1.1.3.6.4 sums every
+  line and one term is unknown (a warning states the partial sum from the resolved lines, and
+  says so when it is already over the threshold). Both carry `human_review_required` +
+  `candidates[]` tagged by `item_index`, and the envelope carries one `AMBIGUOUS_UN_VARIANT`
+  warning per withheld line (not `blocking_errors` — `ok` stays true, a verdict exists for the
+  rest). A batch in which EVERY line is ambiguous keeps the blocking shape exactly as before.
+  This is a JSON-contract change on the server (additive fields, one new item status); the
+  package passes the response through unchanged, and the descriptions here now say so.
+
 ## 2.18.0 — 2026-09-04
 
 ### Added
