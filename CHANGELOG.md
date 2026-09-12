@@ -1,6 +1,43 @@
 # Changelog
 
-## 2.19.0 — unreleased
+## Unreleased
+
+### Changed
+
+- **README provenance corrected to the free authority, and its inline changelog removed.**
+  Docs only — no tool, schema or wire change, and nothing here alters a response.
+  - **ADR 2025 is no longer cited as "UNECE (licensed from Labeline.com)".** The wording is
+    now copied from the FreightUtils provenance doc: UNECE, ECE/TRANS/352, applicable
+    1 Jan 2025, given legal effect by EU Directive 2008/68/EC (consolidated); a factual
+    compilation, best-effort, not legal advice and not a regulatory authority. That
+    re-attribution was made on 2026-06-22 — Labeline is a commercial reseller of the
+    official UN text and is retained only as an internal QA baseline — but it had never
+    reached this README, which is the copy Glama and Smithery render.
+  - **The retired airline wording went with it.** "public IATA/ICAO data, cross-referenced"
+    is replaced by the IATA / ICAO registries as the authority, with no licence or
+    open-data claim, because that dataset carries no per-record provenance. The provenance
+    doc records this wording as already removed from every public surface including the
+    README; it was still here.
+  - **The emissions sources are stated at last**, since `emissions_calculator` was listed
+    without them: open DEFRA / EPA / ADEME factors (DEFRA 2026 + EPA 2025 + ADEME Base
+    Carbone v23.11) by the ISO 14083 / GLEC distance-based method, estimates rather than
+    audited reports. UN/LOCODE now names its 2025-1 edition.
+  - **The README's own copy of the changelog is gone**, replaced by one line pointing at
+    this file and GitHub Releases. Its newest entry was 2.4.0 while the package was on
+    2.19.0 — fifteen releases stale, and the reason three directories showed 2.4.0 as the
+    latest release for three months.
+  - **Counts are sourced or removed.** REST endpoints 23 → 24, from the FreightUtils
+    registry's own figure. "Tools (25)" stays because a new test asserts it against the
+    registered tool list.
+  - **Pinned:** `src/readme.test.ts` fails if the README names Labeline, restates the
+    retired airline wording, drops an ADR qualifier, grows a `### <semver>` heading, claims
+    a tool count that differs from `ALL_TOOLS`, leaves a registered tool undocumented, or
+    if `server.json` / `package.json` grow a tool count to drift. Each assertion was
+    negative-tested. The test script also had to change from naming one file to a glob —
+    it was running `api.test.js` only, so a new test file would have been silently
+    ignored.
+
+## 2.19.0 — 2026-09-08
 
 ### Changed
 
