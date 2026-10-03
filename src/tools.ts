@@ -53,6 +53,13 @@ const RATE = 'Rate-limited (anonymous use: 25 requests/day per IP): a 429 error 
 // Shared envelope tail — what every REST-backed tool returns around its result.
 const ENV = 'plus confidence, _source and citation (the FreightUtils v1 response envelope).';
 
+// adr_exemption_calculator's identifier (2.20.0): a UN number exactly as before (4 digits,
+// optionally "UN"-prefixed) OR an ID-prefixed air-only number ("ID8000", "ID 8000", "ID-8000"), which
+// the API routes AIR_ONLY_ID. A copy of the website's EXEMPTION_IDENTIFIER_PATTERN
+// (lib/calculations/adr-identifier.ts) — the two must match.
+const EXEMPTION_IDENTIFIER_PATTERN = /^(?:(?:UN)?\d{4}|\s*ID\s*[-:.]?\s*\d{4}\s*)$/i;
+const EXEMPTION_IDENTIFIER_MESSAGE = 'UN number must be 4 digits, optionally prefixed with "UN" — or an ID-prefixed air-only number such as "ID8000"';
+
 // ─────────────────────────────────────────────────────────────
 //  1. CBM Calculator
 // ─────────────────────────────────────────────────────────────
@@ -249,31 +256,33 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
 
 const adrExemptionCalculator: ToolDef = {
   name: 'adr_exemption_calculator',
-  description: `Calculate ADR 1.1.3.6 "small load" exemption points for a dangerous-goods load. Each substance's transport category (0-4) sets a points multiplier (category 1 x50, 2 x3, 3 x1, 4 x0; the nine ADR 1.1.3.6.3 note-a entries UN 0081/0082/0084/0241/0331/0332/0482/1005/1017 are x20 with a 50 kg per-transport-unit cap); points = quantity x multiplier, and a load totalling 1,000 points or less qualifies for reduced ADR requirements. Transport category 0 substances can NEVER use this exemption — has_category_zero flags them.
+  description: `Calculate ADR 1.1.3.6 "small load" exemption points for a dangerous-goods load and say whether it qualifies. Each substance's transport category (Table A column (15), 0-4) sets a points multiplier (1.1.3.6.4: category 1 x50, 2 x3, 3 x1, 4 x0; the nine ADR 1.1.3.6.3 note-a entries UN 0081/0082/0084/0241/0331/0332/0482/1005/1017 are x20); points = quantity x multiplier. The rule (1.1.3.6.2), for dangerous goods carried in packages: goods of ONE transport category qualify when their TOTAL on the transport unit stays within that category's 1.1.3.6.3 column (3) maximum — category 1: 20, 2: 333, 3: 1,000 (kg or L); note-a entries 50 kg; category 4 unlimited; category 0: 0 — however it is split across lines; goods of DIFFERENT categories qualify when the 1.1.3.6.4 points sum does not exceed 1,000. This calculator also holds every line, and every substance summed across its lines, to its category maximum — on a mixed load that is stricter than 1.1.3.6.4 (the conservative side). Transport category 0 substances can NEVER use this exemption — has_category_zero flags them.
 
-Provide un_number + quantity for a single substance, or items[] for a mixed load (items takes precedence if both are given). Quantities are in kg or litres per the substance's ADR unit.
+Provide un_number + quantity for a single substance, OR items[] for a load — never both: every field of the single-substance form (un_number, quantity, packing_group, variant_index, unit, basis) sent beside items[] is refused (the API answers 400 naming the field), never dropped — put it on the item it belongs to, a substance as an item of its own. Quantities are in kg or litres per the substance's ADR unit. un_number also takes an ID-prefixed air-only number (e.g. "ID8000") — see Routing.
 
-Multi-variant UNs: a UN number with more than one ADR Table A row (packing group / concentration variant — e.g. UN 1789 PG II vs PG III have different transport categories) needs packing_group (I|II|III) or variant_index (from adr_lookup) to pin one row. A packing_group that still leaves several rows is enough when those rows agree on class, transport category, scope and the 1.1.3.6.3 counted dimension (UN 1790 PG I: two concentration bands, both category 1) — the verdict is returned with items[].equivalent_variants + variant_note naming the rows it holds for; only when the rows DISAGREE (UN 2215 PG III: MOLTEN is category 0, the solid category 3) does it still ask for variant_index, and candidates[] then lists only that packing group's rows. With no disambiguator at all: a single-line call, or a load where EVERY line is ambiguous, returns blocking_errors[AMBIGUOUS_UN_VARIANT] + human_review_required + candidates[] (each candidate's item_index, un_number, variant_index, packing_group, proper_shipping_name, transport_category, multiplier) and NO verdict; a MIXED load withholds only the ambiguous line (items[].withheld true, points null, row fields null) while every other line keeps its points; total_points is null (1.1.3.6.4 sums every line, one term is unknown) and exempt is null UNLESS the resolved lines alone already disqualify the load — a CARRIAGE PROHIBITED entry, a category 0 entry, a per-substance maximum exceeded, or a partial sum already over 1,000 — in which case exempt is false with the ladder message (and carriage_prohibited true where that is the reason), because no packing group can undo those. warnings state the resolved lines' partial sum, candidates[] carry expected_unit (the 1.1.3.6.3 counted dimension — the only difference for UN 3375 PG II, liquid in L vs solid in kg), and the envelope carries human_review_required + candidates[] plus one AMBIGUOUS_UN_VARIANT warning per withheld line. Never a silently guessed row. Single-row UNs are unchanged.
+Multi-variant UNs: a UN number with more than one ADR Table A row (packing group / concentration variant — e.g. UN 1789 PG II vs PG III have different transport categories) needs packing_group (I|II|III) or variant_index (from adr_lookup) to pin one row. A packing_group that still leaves several rows is enough when those rows agree on class, transport category, scope and the 1.1.3.6.3 counted dimension (UN 1790 PG I: two concentration bands, both category 1) — the verdict is returned with items[].equivalent_variants + variant_note naming the rows it holds for; only when the rows DISAGREE (UN 2215 PG III: MOLTEN is category 0, the solid category 3) does it still ask for variant_index, and candidates[] then lists only that packing group's rows. With no disambiguator at all: a single-line call, or a load where EVERY line is ambiguous, returns blocking_errors[AMBIGUOUS_UN_VARIANT] + human_review_required + candidates[] (each candidate's item_index, un_number, variant_index, packing_group, proper_shipping_name, transport_category, multiplier) and NO verdict — blocking_errors is in the text content as well as structuredContent; a MIXED load withholds only the ambiguous line (items[].withheld true, points null, row fields null) while every other line keeps its points; total_points is null (1.1.3.6.4 sums every line, one term is unknown) and exempt is null UNLESS the resolved lines alone already disqualify the load — a CARRIAGE PROHIBITED entry, a category 0 entry, a per-substance maximum exceeded, or a partial sum already over 1,000 — in which case exempt is false with the ladder message (and carriage_prohibited true where that is the reason), because no packing group can undo those. warnings state the resolved lines' partial sum, candidates[] carry expected_unit (the 1.1.3.6.3 counted dimension — the only difference for UN 3375 PG II, liquid in L vs solid in kg), and the envelope carries human_review_required + candidates[] plus one AMBIGUOUS_UN_VARIANT warning per withheld line. Never a silently guessed row. Single-row UNs are unchanged.
 
 Scope verdicts: Table A rows listed "NOT SUBJECT TO ADR" or "CARRIAGE PROHIBITED" never enter the points math. An all-not-subject load (e.g. UN 1845 dry ice) returns not_subject_to_adr true with a dedicated message ("Not subject to ADR (road). Section 5.5.3 applies: ...") and, for dry ice, conditions[] quoting the ADR 2025 section 5.5.3 requirements verbatim (ventilation, package marking, warning mark, documentation, training). A load containing a CARRIAGE PROHIBITED entry returns exempt false with carriage_prohibited true. In a mixed load, not-subject items are excluded from the points and the exclusion is stated in warnings.
 
+Routing: every returned line carries state, in the words the FreightUtils document check uses — COUNTED (evaluated on one Table A row: its points, or a category 0 / CARRIAGE PROHIBITED row that settles the load), AIR_ONLY_ID, NOT_SUBJECT_TO_ADR, or BLOCKED (no points from the line as sent — withheld, basis_mismatch or category_unresolved; the line's own flag says which). AIR_ONLY_ID: an ID-prefixed number such as ID 8000 (consumer commodity) is an air-only identifier with no ADR Table A entry, so it gives no transport category and nothing is counted for it (items[].air_only_id true, row fields null). Each such line carries a warning stating the condition that 0 rests on: it is the ADR answer when the packages are limited quantities to the ICAO Technical Instructions (3.4.9 and 3.4.10 deem them to meet 3.4.1-3.4.4; goods exempted under 1.1.3.4.2 are not taken into account by 1.1.3.6.5) — goods not in such packages must be entered under their own UN numbers. Only the ID prefix makes a line air-only — an ID number is never read as the UN number with the same digits — and an all-air-only load returns total_points 0, exempt true with its own message, never "1.1.3.6 exemption applies" and never not_subject_to_adr.
+
 Behavior: deterministic points arithmetic over ADR 2025 reference data; a UN that cannot be found returns blocking_errors (NOT_FOUND); exempt is the overall verdict. ${RATE}
 
-Returns: items[] (each with packing_group, variant_index, transport_category, multiplier, points, quantity_unit/quantity_basis/expected_unit when a unit or basis was declared, scope flags where applicable, withheld + ambiguity_reason on an unpinned multi-variant line, and equivalent_variants + variant_note when a packing group resolved by equivalence), total_points (NULL when no verdict was reached), threshold (1000), exempt (NULL when no verdict was reached — never false as a stand-in), has_category_zero, has_quantity_exceedance, warnings, message, human_review_required + candidates[] when any line is withheld, and — on scope verdicts — not_subject_to_adr/conditions_ref/conditions[]/carriage_prohibited under result — or, when every line is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
+Returns: items[] (each with state, packing_group, variant_index, transport_category, multiplier, points, air_only_id on an ID-prefixed line, quantity_unit/quantity_basis/expected_unit when a unit or basis was declared, scope flags where applicable, withheld + ambiguity_reason on an unpinned multi-variant line, and equivalent_variants + variant_note when a packing group resolved by equivalence), total_points (NULL when no verdict was reached), threshold (1000), exempt (NULL when no verdict was reached — never false as a stand-in), has_category_zero, has_quantity_exceedance, warnings, message, human_review_required + candidates[] when any line is withheld, and — on scope verdicts — not_subject_to_adr/conditions_ref/conditions[]/carriage_prohibited under result — or, when every line is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
 
-Limitations: a deterministic calculation over reference data, not legal advice — even exempt loads keep core duties (packaging, marking, documentation), and mixed-packing rules still apply; verify against the current UNECE ADR text.
+Limitations: a deterministic calculation over reference data, not legal advice — 1.1.3.6 relieves goods carried in packages only (not in bulk or in tanks), and this calculator takes no packaging input; even exempt loads keep core duties (packaging, marking, documentation), and mixed-packing rules still apply; verify against the current UNECE ADR text.
 
 Related: adr_lookup (per-substance data incl. transport category + variant_index), adr_lq_eq_check (the LQ/EQ relief routes instead of 1.1.3.6).`,
 
   schema: z.object({
-    un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN"').optional().describe('UN number for a single-substance check — 4 digits, optionally "UN"-prefixed. Example: "1203".'),
-    quantity: z.number().positive().optional().describe('Quantity for the single-substance check, in kg or litres per the substance\'s ADR unit. Example: 100.'),
-    packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group (I, II or III) — only needed to disambiguate a UN with more than one ADR Table A row (e.g. UN 1789). Ignored for single-row UNs. Single-substance form only.'),
-    variant_index: z.number().int().nonnegative().optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants that share a packing group (concentration bands). Ignored for single-row UNs. Single-substance form only.'),
-    unit: z.enum(['L', 'kg']).optional().describe("OPTIONAL. The dimension `quantity` is stated in. Omit it and the number is taken as already on the ADR 1.1.3.6.3 basis (unchanged behaviour). Supply it and it is CHECKED against the dimension 1.1.3.6.3 counts for that Table A row — litres for liquids and for compressed or adsorbed gases, kilograms for solids, liquefied/refrigerated/dissolved gases and articles. A mismatch returns total_points null, exempt null and items[].basis_mismatch true, naming the dimension the entry is counted in."),
-    basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging, so a quantity declared 'gross' returns no points in ANY unit — send the net figure instead."),
+    un_number: z.string().regex(EXEMPTION_IDENTIFIER_PATTERN, EXEMPTION_IDENTIFIER_MESSAGE).optional().describe('UN number for a single-substance check — 4 digits, optionally "UN"-prefixed — or an ID-prefixed air-only number such as "ID8000" (routed AIR_ONLY_ID, nothing counted — the warning on that line states the limited-quantity condition). Single-substance form only — sent beside items[] it is refused; send the substance as an item. Example: "1203".'),
+    quantity: z.number().positive().optional().describe('Quantity for the single-substance check, in kg or litres per the substance\'s ADR unit. Single-substance form only — sent beside items[] it is refused. Example: 100.'),
+    packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group (I, II or III) — only needed to disambiguate a UN with more than one ADR Table A row (e.g. UN 1789). Ignored for single-row UNs. Single-substance form only — sent beside items[] it is refused; set it on each item.'),
+    variant_index: z.number().int().nonnegative().optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants that share a packing group (concentration bands). Ignored for single-row UNs. Single-substance form only — sent beside items[] it is refused; set it on each item.'),
+    unit: z.enum(['L', 'kg']).optional().describe("OPTIONAL. The dimension `quantity` is stated in. Omit it and the number is taken as already on the ADR 1.1.3.6.3 basis (unchanged behaviour). Supply it and it is CHECKED against the dimension 1.1.3.6.3 counts for that Table A row — litres for liquids and for compressed or adsorbed gases, kilograms for solids, liquefied/refrigerated/dissolved gases and articles. A mismatch returns total_points null, exempt null and items[].basis_mismatch true, naming the dimension the entry is counted in. Single-substance form only — sent beside items[] it is refused; set it on each item."),
+    basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging, so a quantity declared 'gross' returns no points in ANY unit — send the net figure instead. Single-substance form only — sent beside items[] it is refused; set it on each item."),
     items: z.array(z.object({
-      un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN"').describe('UN number — 4 digits, optionally "UN"-prefixed. Example: "1263".'),
+      un_number: z.string().regex(EXEMPTION_IDENTIFIER_PATTERN, EXEMPTION_IDENTIFIER_MESSAGE).describe('UN number — 4 digits, optionally "UN"-prefixed — or an ID-prefixed air-only number such as "ID8000" (routed AIR_ONLY_ID; the warning on that line states the limited-quantity condition the 0 rests on). Example: "1263".'),
       quantity: z.number().positive().describe('Quantity in kg or litres per the substance\'s ADR unit.'),
       packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group for a multi-variant UN.'),
       variant_index: z.number().int().nonnegative().optional().describe('ADR Table A variant index for a multi-variant UN.'),
@@ -285,6 +294,8 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
   resultSchema: resultShape({
     items: z.array(loose({
       un_number: z.string(),
+      // The line's route (2.20.0) — the FreightUtils document check's own words.
+      state: z.enum(['COUNTED', 'AIR_ONLY_ID', 'NOT_SUBJECT_TO_ADR', 'BLOCKED']),
       proper_shipping_name: z.string(),
       class: z.string(),
       packing_group: z.string(),
@@ -296,6 +307,8 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
       not_subject_to_adr: z.boolean(),
       carriage_prohibited: z.boolean(),
       conditions_ref: z.string(),
+      // An ID-prefixed air-only line (2.20.0): no Table A entry, never in the points.
+      air_only_id: z.boolean(),
     })),
     total_points: z.number(),
     threshold: z.number(),
@@ -333,7 +346,17 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
 
   handler: async (args, opts) => {
     if (args.items) {
-      return apiPost('adr-calculator', { items: args.items }, opts);
+      // Every single-substance field beside items[] is FORWARDED, not dropped (2.20.0): the
+      // API refuses them by name, so the caller learns the field reached no line. Dropping
+      // them here is what turned "UN 1263 + PG III" into all six UN 1263 rows, a top-level
+      // unit "kg" into a petrol load scored as litres, and a top-level category 0 substance
+      // into a load that read exempt. JSON.stringify leaves out the ones that were not sent.
+      return apiPost('adr-calculator', {
+        items: args.items,
+        un_number: args.un_number, quantity: args.quantity,
+        packing_group: args.packing_group, variant_index: args.variant_index,
+        unit: args.unit, basis: args.basis,
+      }, opts);
     }
     return apiGet('adr-calculator', {
       un: args.un_number, qty: args.quantity,

@@ -1,6 +1,47 @@
 # Changelog
 
-## Unreleased
+## 2.20.0 — 2026-10-03
+
+### Fixed
+
+- **`adr_exemption_calculator` no longer drops a field sent beside `items[]`.** `un_number`, `quantity`,
+  `packing_group`, `variant_index`, `unit` and `basis` belong to the single-substance form at the top
+  level; sent beside `items[]` this package forwarded only `{ items }`, so the field reached no line.
+  Reproduced on production with 2.19.0: `items: [UN 1263, 100]` + `packing_group: "III"` came back with
+  all six UN 1263 rows as candidates — the packing group I row (transport category 1, ×50) among them —
+  and `items: [UN 1203, 300]` + `unit: "kg"` read **exempt at 900 points**, a figure in kilograms counted
+  as litres. A whole substance went the same way: `un_number` + `quantity` beside `items[]` were dropped
+  under the documented "items takes precedence", so a transport category 0 substance sent that way
+  vanished and the load read exempt. The handler now forwards every one of them and the API refuses
+  them by name (HTTP 400) — never dropped, never applied to a line by guess. The calculator's own
+  packing-group filter was right throughout.
+- **The description no longer states the bare 1,000-point rule.** "A load totalling 1,000 points or
+  less qualifies" is not ADR 1.1.3.6.2: for dangerous goods carried in packages, goods of ONE transport
+  category qualify when their TOTAL stays within the 1.1.3.6.3 column (3) maximum (category 2: 333 —
+  200 L + 133.2 L of category-2 liquids is 999.6 points and NOT exempt); goods of different categories
+  qualify when the 1.1.3.6.4 sum does not exceed 1,000. The description now says exactly that, from the
+  ADR 2025 text, that the calculator also holds every line and substance to its category maximum
+  (stricter than 1.1.3.6.4 on a mixed load), and under Limitations that 1.1.3.6 relieves goods in
+  packages only — not in bulk or in tanks.
+- **`blocking_errors[AMBIGUOUS_UN_VARIANT]` reaches the text content.** For a call whose every line is
+  ambiguous, the code was in `structuredContent` only; the text channel — the API's plain body, which
+  this package reads for that response — carried the candidates without it. Fixed in the API
+  (2026-10-03), so already-installed versions get it too; the description now says so.
+
+### Added
+
+- **Every returned line carries `state`** — `COUNTED`, `AIR_ONLY_ID`, `NOT_SUBJECT_TO_ADR` or
+  `BLOCKED`, the words the FreightUtils document check uses — documented in the description and the
+  result schema.
+- **`un_number` takes an ID-prefixed air-only number** ("ID8000", "ID 8000", "ID-8000"). ADR Table A has no such
+  entry, so the API routes the line `AIR_ONLY_ID`: no transport category, nothing counted, and a warning
+  on every such line stating the condition the 0 rests on — the ADR answer when the packages are limited
+  quantities to the ICAO Technical Instructions (3.4.9 and 3.4.10 deem them to meet 3.4.1–3.4.4; goods
+  exempted under 1.1.3.4.2 are not taken into account by 1.1.3.6.5); goods not in such packages must be entered
+  under their own UN numbers. Only the ID prefix makes a line air-only; an all-air-only load is never
+  answered "1.1.3.6 exemption applies". The UN form of the input pattern is unchanged.
+- `src/adr-exemption.test.ts` pins the description, the input pattern and the forwarding; each
+  assertion was negative-tested.
 
 ### Changed
 
