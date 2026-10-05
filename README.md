@@ -53,7 +53,7 @@ Since **2.11.0**, every tool also declares a typed `outputSchema` and returns `s
 ### Reference Data
 | Tool | Description |
 |------|-------------|
-| `resolve_reference` | Resolve any freight identifier ("176", "UN1845", "NLRTM", "FOB") to typed, ranked, cited candidates — the agent front door |
+| `resolve_reference` | Resolve any freight identifier ("176", "UN1845", "NLRTM", "FOB") to typed, ranked, cited candidates when its type is unknown |
 | `airline_lookup` | 6,357 airlines with IATA/ICAO codes and AWB prefixes |
 | `unlocode_lookup` | 116,232+ UN/LOCODE transport locations |
 | `airport_lookup` | 85,555 airports by IATA/ICAO code, name or city (OurAirports) |
@@ -71,10 +71,10 @@ Since **2.11.0**, every tool also declares a typed `outputSchema` and returns `s
 |------|-------------|
 | `shipment_summary` | Chains CBM + weight + LDM + ADR + duty in one call |
 
-### Subscription
+### Plans
 | Tool | Description |
 |------|-------------|
-| `get_subscribe_link` | URL to upgrade to FreightUtils Pro (50,000/month at £19/mo) |
+| `get_subscribe_link` | The pricing page URL with the Pro plan's limit and price (50,000/month at £19/mo) |
 
 ---
 

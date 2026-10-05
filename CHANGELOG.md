@@ -1,5 +1,29 @@
 # Changelog
 
+## 2.20.1 — 2026-10-05
+
+### Changed
+
+- **Tool descriptions state facts, never instructions to call another tool or offers.** The hosted
+  endpoint at `https://www.freightutils.com/api/mcp` serves these same descriptions and is the
+  FreightUtils connector in Anthropic's directory, whose pre-submission checklist rejects a
+  description that tells Claude to call a tool the user did not ask for or that promotes a product.
+  Every REST-backed tool ended with "back off and retry, or call get_subscribe_link for higher
+  limits"; the shared sentence is now *"Rate-limited: a limit error carries reset_at, the UTC time the
+  allowance resets."* — `reset_at` is on every limit error a tool call returns, the REST 429 body this
+  package surfaces and the hosted endpoint's JSON-RPC error data alike.
+- **`get_subscribe_link` is a neutral pricing lookup.** It no longer tells Claude to call it "after
+  any other tool errors with a 429" or to "subscribe … for higher API limits": it returns the pricing
+  page URL with the Pro plan's limit and price when the user asks about plans, pricing or API limits.
+  Title: "FreightUtils Plans & Pricing". Its output is unchanged.
+- **`resolve_reference`** says what each candidate carries (its entity type, `api_url` and
+  `canonical_url`) instead of "call this FIRST and follow the candidate's api_url"; **`ics2_check`**
+  drops its audience line.
+- No tool, name, input schema, output schema or result changed. A new test
+  (`src/directory.test.ts`) pins every tool's title, `readOnlyHint: true`, `destructiveHint: false`,
+  names of 64 characters or fewer, no description outside its own naming `get_subscribe_link`, and
+  no upsell or call-first wording.
+
 ## 2.20.0 — 2026-10-03
 
 ### Fixed

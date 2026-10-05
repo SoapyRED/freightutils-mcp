@@ -49,7 +49,11 @@ const readOnlyAnnotations = (title: string): ToolAnnotationShape => ({
 });
 
 // Shared rate-limit sentence (Behavior: error signaling — every REST-backed tool).
-const RATE = 'Rate-limited (anonymous use: 25 requests/day per IP): a 429 error body carries retry_after_seconds and a Retry-After header — back off and retry, or call get_subscribe_link for higher limits.';
+// A fact about the tool, nothing else: no instruction to call another tool and no upsell
+// (Anthropic's connector checklist rejects both — 2.20.1). reset_at is on every limit error
+// a tool call can return: the REST 429 body (anonymous and keyed) this package surfaces, and
+// the hosted endpoint's JSON-RPC error data.
+const RATE = 'Rate-limited: a limit error carries reset_at, the UTC time the allowance resets.';
 // Shared envelope tail — what every REST-backed tool returns around its result.
 const ENV = 'plus confidence, _source and citation (the FreightUtils v1 response envelope).';
 
@@ -1102,11 +1106,11 @@ Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exempt
 
 const getSubscribeLink: ToolDef = {
   name: 'get_subscribe_link',
-  description: `Get the URL where the user can subscribe to FreightUtils Pro for higher API limits (50,000 requests/month). Use when the user asks how to upgrade or about pricing, or after any other tool errors with a 429 rate_limited body.
+  description: `Return the FreightUtils pricing page URL with the Pro plan's request limit (50,000 per month) and price. Use when the user asks about FreightUtils plans, pricing or API limits.
 
-Behavior: static local response — no API call, never rate-limited.
+Behavior: static local response — no API call, never rate-limited, no account or payment action; the user opens the URL in a browser.
 
-Returns: url, tier, monthly_limit, monthly_price, currency and note under result. Hand the URL to the USER to open in a browser — agents must NOT attempt to complete the subscription themselves.`,
+Returns: url, tier, monthly_limit, monthly_price, currency and note under result.`,
 
   schema: z.object({
     tier: z.enum(['pro']).optional().describe('Tier to surface. Only "pro" is supported today.'),
@@ -1121,7 +1125,7 @@ Returns: url, tier, monthly_limit, monthly_price, currency and note under result
     note: z.string(),
   }),
 
-  annotations: readOnlyAnnotations('FreightUtils Subscribe Link'),
+  annotations: readOnlyAnnotations('FreightUtils Plans & Pricing'),
 
   // Pure static response — no upstream API call. The pricing page is the
   // canonical surface for subscription; this tool just hands the URL back.
@@ -1304,7 +1308,7 @@ Returns: the description echo, flagged[] (term + note), clean, caveat and discla
 
 Limitations: STRICTLY a reference check — not an ENS filing, not a customs-compliance determination, not legal advice; the EU list is non-exhaustive and updated periodically.
 
-Related: hs_code_lookup (commodity codes — a different field of the ENS), uk_duty_calculator (duty/VAT, unrelated to ENS screening). Use BEFORE filing an ENS — for customs/documentation teams, brokers and agents building filing pipelines.`,
+Related: hs_code_lookup (commodity codes — a different field of the ENS), uk_duty_calculator (duty/VAT, unrelated to ENS screening). Intended for checking a goods description before an ENS is filed.`,
 
   schema: z.object({
     description: z.string().describe('The goods description to check. Example: "gifts" (flagged) vs "wooden toys for retail" (specific).'),
@@ -1425,7 +1429,7 @@ Related: airport_lookup (exact code or name lookup, no distance), unlocode_looku
 
 const resolveReference: ToolDef = {
   name: 'resolve_reference',
-  description: `Resolve an arbitrary freight identifier — one opaque string in, typed and cited candidates out. The agent front door: when you hold an identifier-ish token ("176", "UN1845", "NLRTM", "FOB", "22G1", "MSKU1100810", "D/E") and do not know which lookup tool fits, call this FIRST and follow the candidate's api_url / canonical_url (or the matching sibling tool) for depth.
+  description: `Resolve an arbitrary freight identifier — one opaque string in, typed and cited candidates out. Use when you hold one identifier-ish token ("176", "UN1845", "NLRTM", "FOB", "22G1", "MSKU1100810", "D/E") and do not know what kind of identifier it is: each candidate names its entity type and carries the api_url and canonical_url of its full record.
 
 Provide q: ONE identifier (single token, max 32 chars). Thirteen grammars all run — UN numbers, AWB prefixes, airline IATA/ICAO, airport IATA/ICAO, UN/LOCODE, ISO 6346 container numbers (check digit computed), HS codes (6-10 digits; national lines resolve at their 6-digit international parent), Incoterms, ADR tunnel codes, ULD serials, ISO container size/type codes. Ambiguity is the product: colliding grammars return MULTIPLE ranked candidates ("LHR" is Heathrow AND an Egyptian carrier's ICAO), never a silent guess.
 
