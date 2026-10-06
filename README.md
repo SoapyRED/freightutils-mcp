@@ -80,6 +80,10 @@ Since **2.11.0**, every tool also declares a typed `outputSchema` and returns `s
 
 ## Installation
 
+### Claude (claude.ai, desktop and mobile apps, Cowork)
+
+Add FreightUtils from Claude's connector directory: <https://claude.ai/directory/connectors/freightutils>. Or add it as a custom connector — **Customize → Connectors → Add custom connector** — with the URL `https://www.freightutils.com/api/mcp`. No API key, no sign-in. Setup, limits and privacy: [freightutils.com/mcp#use-in-claude](https://www.freightutils.com/mcp#use-in-claude).
+
 ### Claude Desktop / Claude Code (stdio)
 
 Add to your MCP config (`claude_desktop_config.json` or `.claude/settings.json`):
