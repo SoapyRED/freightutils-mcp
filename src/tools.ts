@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { apiGet, apiPost, type ApiOpts } from './api.js';
 import { loose, resultShape } from './envelope.js';
+import { normaliseKey, strictInput } from './strict-input.js';
 
 // ─────────────────────────────────────────────────────────────
 //  Tool type
@@ -20,6 +21,10 @@ export interface ToolDef {
   // Allow any ZodObject (including .strict() variants) so individual tools
   // can opt into strict-key enforcement without breaking the shared type.
   schema: z.AnyZodObject;
+  /** Register `schema` ITSELF, so an unknown key is a tool error naming it (2.21.0). Without
+   *  this, server.ts registers `schema.shape` and the SDK strips unknown keys — a tool's own
+   *  `.strict()` is then inert. Set on the three ADR-answer tools; the rest are a BACKLOG item. */
+  strictKeys?: true;
   annotations: ToolAnnotationShape;
   /** Calls the REST API. opts.envelope=true adds ?envelope=1 (the
    *  structuredContent channel); the flat default feeds the legacy text
@@ -63,6 +68,18 @@ const ENV = 'plus confidence, _source and citation (the FreightUtils v1 response
 // (lib/calculations/adr-identifier.ts) — the two must match.
 const EXEMPTION_IDENTIFIER_PATTERN = /^(?:(?:UN)?\d{4}|\s*ID\s*[-:.]?\s*\d{4}\s*)$/i;
 const EXEMPTION_IDENTIFIER_MESSAGE = 'UN number must be 4 digits, optionally prefixed with "UN" — or an ID-prefixed air-only number such as "ID8000"';
+
+// The refusal for an unknown key (2.21.0) — the hints, labels and notes the hosted endpoint
+// uses for the same tools (the website's MCP_KEY_RULES in lib/calculations/request-keys.ts).
+// A hint maps a normalised key to the name to suggest: the API's own response names
+// (quantity_unit, quantity_basis), the GET spellings (un, qty), and the per-line fields a
+// caller sends at the top level by mistake (→ items[n].<field>).
+const toItemPath = (fields: readonly string[], extra: Record<string, string> = {}) =>
+  ({ ...Object.fromEntries(fields.map((f) => [normaliseKey(f), `items[n].${f}`])), ...extra });
+const EXEMPTION_KEY_HINTS = { quantityunit: 'unit', quantitybasis: 'basis', un: 'un_number', qty: 'quantity' };
+const LQ_ITEM_FIELDS = ['un_number', 'quantity', 'unit', 'inner_packaging_qty', 'packing_group', 'variant_index'];
+const SHIPMENT_ITEM_FIELDS = ['description', 'length', 'width', 'height', 'weight', 'quantity', 'stackable', 'pallet_type', 'hs_code', 'un_number', 'adr_quantity', 'adr_quantity_unit', 'customs_value'];
+const UNKNOWN_FIELDS_REFUSED = 'Fields are checked by name: a field the tool does not read is refused with a tool error naming it and listing the accepted ones, never ignored.';
 
 // ─────────────────────────────────────────────────────────────
 //  1. CBM Calculator
@@ -270,7 +287,7 @@ Scope verdicts: Table A rows listed "NOT SUBJECT TO ADR" or "CARRIAGE PROHIBITED
 
 Routing: every returned line carries state, in the words the FreightUtils document check uses — COUNTED (evaluated on one Table A row: its points, or a category 0 / CARRIAGE PROHIBITED row that settles the load), AIR_ONLY_ID, NOT_SUBJECT_TO_ADR, or BLOCKED (no points from the line as sent — withheld, basis_mismatch or category_unresolved; the line's own flag says which). AIR_ONLY_ID: an ID-prefixed number such as ID 8000 (consumer commodity) is an air-only identifier with no ADR Table A entry, so it gives no transport category and nothing is counted for it (items[].air_only_id true, row fields null). Each such line carries a warning stating the condition that 0 rests on: it is the ADR answer when the packages are limited quantities to the ICAO Technical Instructions (3.4.9 and 3.4.10 deem them to meet 3.4.1-3.4.4; goods exempted under 1.1.3.4.2 are not taken into account by 1.1.3.6.5) — goods not in such packages must be entered under their own UN numbers. Only the ID prefix makes a line air-only — an ID number is never read as the UN number with the same digits — and an all-air-only load returns total_points 0, exempt true with its own message, never "1.1.3.6 exemption applies" and never not_subject_to_adr.
 
-Behavior: deterministic points arithmetic over ADR 2025 reference data; a UN that cannot be found returns blocking_errors (NOT_FOUND); exempt is the overall verdict. ${RATE}
+Behavior: deterministic points arithmetic over ADR 2025 reference data; a UN that cannot be found returns blocking_errors (NOT_FOUND); exempt is the overall verdict. ${UNKNOWN_FIELDS_REFUSED} ${RATE}
 
 Returns: items[] (each with state, packing_group, variant_index, transport_category, multiplier, points, air_only_id on an ID-prefixed line, quantity_unit/quantity_basis/expected_unit when a unit or basis was declared, scope flags where applicable, withheld + ambiguity_reason on an unpinned multi-variant line, and equivalent_variants + variant_note when a packing group resolved by equivalence), total_points (NULL when no verdict was reached), threshold (1000), exempt (NULL when no verdict was reached — never false as a stand-in), has_category_zero, has_quantity_exceedance, warnings, message, human_review_required + candidates[] when any line is withheld, and — on scope verdicts — not_subject_to_adr/conditions_ref/conditions[]/carriage_prohibited under result — or, when every line is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
 
@@ -278,22 +295,27 @@ Limitations: a deterministic calculation over reference data, not legal advice �
 
 Related: adr_lookup (per-substance data incl. transport category + variant_index), adr_lq_eq_check (the LQ/EQ relief routes instead of 1.1.3.6).`,
 
-  schema: z.object({
+  strictKeys: true,
+  schema: strictInput({
     un_number: z.string().regex(EXEMPTION_IDENTIFIER_PATTERN, EXEMPTION_IDENTIFIER_MESSAGE).optional().describe('UN number for a single-substance check — 4 digits, optionally "UN"-prefixed — or an ID-prefixed air-only number such as "ID8000" (routed AIR_ONLY_ID, nothing counted — the warning on that line states the limited-quantity condition). Single-substance form only — sent beside items[] it is refused; send the substance as an item. Example: "1203".'),
     quantity: z.number().positive().optional().describe('Quantity for the single-substance check, in kg or litres per the substance\'s ADR unit. Single-substance form only — sent beside items[] it is refused. Example: 100.'),
     packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group (I, II or III) — only needed to disambiguate a UN with more than one ADR Table A row (e.g. UN 1789). Ignored for single-row UNs. Single-substance form only — sent beside items[] it is refused; set it on each item.'),
     variant_index: z.number().int().nonnegative().optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants that share a packing group (concentration bands). Ignored for single-row UNs. Single-substance form only — sent beside items[] it is refused; set it on each item.'),
     unit: z.enum(['L', 'kg']).optional().describe("OPTIONAL. The dimension `quantity` is stated in. Omit it and the number is taken as already on the ADR 1.1.3.6.3 basis (unchanged behaviour). Supply it and it is CHECKED against the dimension 1.1.3.6.3 counts for that Table A row — litres for liquids and for compressed or adsorbed gases, kilograms for solids, liquefied/refrigerated/dissolved gases and articles. A mismatch returns total_points null, exempt null and items[].basis_mismatch true, naming the dimension the entry is counted in. Single-substance form only — sent beside items[] it is refused; set it on each item."),
     basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging, so a quantity declared 'gross' returns no points in ANY unit — send the net figure instead. Single-substance form only — sent beside items[] it is refused; set it on each item."),
-    items: z.array(z.object({
+    items: z.array(strictInput({
       un_number: z.string().regex(EXEMPTION_IDENTIFIER_PATTERN, EXEMPTION_IDENTIFIER_MESSAGE).describe('UN number — 4 digits, optionally "UN"-prefixed — or an ID-prefixed air-only number such as "ID8000" (routed AIR_ONLY_ID; the warning on that line states the limited-quantity condition the 0 rests on). Example: "1263".'),
       quantity: z.number().positive().describe('Quantity in kg or litres per the substance\'s ADR unit.'),
       packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group for a multi-variant UN.'),
       variant_index: z.number().int().nonnegative().optional().describe('ADR Table A variant index for a multi-variant UN.'),
       unit: z.enum(['L', 'kg']).optional().describe("OPTIONAL. The dimension `quantity` is stated in. Omit it and the number is taken as already on the ADR 1.1.3.6.3 basis (unchanged behaviour). Supply it and it is CHECKED against the dimension 1.1.3.6.3 counts for that Table A row — litres for liquids and for compressed or adsorbed gases, kilograms for solids, liquefied/refrigerated/dissolved gases and articles. A mismatch returns total_points null, exempt null and items[].basis_mismatch true, naming the dimension the entry is counted in."),
       basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging, so a quantity declared 'gross' returns no points in ANY unit — send the net figure instead."),
-    })).optional().describe('Mixed-load items (use INSTEAD of un_number/quantity).'),
-  }).strict(),
+    }, { hints: EXEMPTION_KEY_HINTS, acceptedLabel: 'Accepted on each item' })).optional().describe('Mixed-load items (use INSTEAD of un_number/quantity).'),
+  }, {
+    hints: EXEMPTION_KEY_HINTS,
+    acceptedLabel: 'Accepted arguments',
+    note: 'Send un_number + quantity for one substance, or items[] for a load; with items[], every field goes on the item it belongs to.',
+  }),
 
   resultSchema: resultShape({
     items: z.array(loose({
@@ -862,7 +884,7 @@ const shipmentSummary: ToolDef = {
 
 Provide mode (road | air | sea | multimodal) and items[] (dims in cm, weight in kg, quantity; optional stackable, pallet_type, hs_code, un_number, customs_value); origin/destination and incoterm refine the duty leg.
 
-Behavior: calls the ldm_calculator, adr_lookup and uk_duty_calculator engines directly; CBM, volumetric weight and revenue tonnes are the same arithmetic inline rather than a call out. Road LDM uses the 2.40 m loading-metre convention divisor and, like ldm_calculator, treats an item with no stackable flag as NOT stacked. modeSpecific.palletSpaces is pallet FLOOR POSITIONS (the figure ldm_calculator reports); palletRows is the separate row count. Sections that cannot run (e.g. duty without a customs value) surface in warnings instead of failing the whole call. ${RATE}
+Behavior: calls the ldm_calculator, adr_lookup and uk_duty_calculator engines directly; CBM, volumetric weight and revenue tonnes are the same arithmetic inline rather than a call out. Road LDM uses the 2.40 m loading-metre convention divisor and, like ldm_calculator, treats an item with no stackable flag as NOT stacked. modeSpecific.palletSpaces is pallet FLOOR POSITIONS (the figure ldm_calculator reports); palletRows is the separate row count. Sections that cannot run (e.g. duty without a customs value) surface in warnings instead of failing the whole call. ${UNKNOWN_FIELDS_REFUSED} ${RATE}
 
 Returns: mode, itemCount, totals {pieces, grossWeight, volumeCBM, chargeableWeight, billingBasis}, modeSpecific (LDM / pallet floor positions / pallet rows / suggested vehicle, or revenue tonnes / container), warnings and dataVersion (road mode attributes the vehicle dataset and the LDM divisor) under result — note this composite's result uses camelCase field names (legacy shape); ${ENV}
 
@@ -870,9 +892,10 @@ Limitations: a planning summary, not a quotation or compliance determination.
 
 Related: consignment_calculator (canonical snake_case lines[] shape with advisory flags), cbm_calculator, chargeable_weight_calculator, ldm_calculator, adr_lookup, uk_duty_calculator. ldm_calculator, adr_lookup and uk_duty_calculator are the engines this actually calls; the rest are the single-purpose equivalents of arithmetic it does inline.`,
 
-  schema: z.object({
+  strictKeys: true,
+  schema: strictInput({
     mode: z.enum(['road', 'air', 'sea', 'multimodal']).describe('Transport mode — selects the mode-specific section of the result.'),
-    items: z.array(z.object({
+    items: z.array(strictInput({
       description: z.string().optional().describe('Optional item label.'),
       length: z.number().positive().describe('Length in cm.'),
       width: z.number().positive().describe('Width in cm.'),
@@ -886,13 +909,13 @@ Related: consignment_calculator (canonical snake_case lines[] shape with advisor
       adr_quantity: z.number().positive().optional().describe("OPTIONAL ADR 1.1.3.6.3 quantity for this dangerous-goods line, in adr_quantity_unit. SEPARATE from weight, which is gross package mass — 1.1.3.6.3 counts none of its four categories that way. Supply both on EVERY dangerous-goods line and adrFlags.totalPoints is calculated; omit either and it stays null."),
       adr_quantity_unit: z.enum(['L', 'kg']).optional().describe("Dimension of adr_quantity. CHECKED against the dimension 1.1.3.6.3 counts for the row — a litres entry given kilograms still withholds the total."),
       customs_value: z.number().optional().describe('Customs value per item in GBP — enables the duty section.'),
-    })).describe('Shipment items with dimensions, weight and optional HS/UN codes.'),
-    origin: z.object({ country: z.string(), locode: z.string().optional() }).optional().describe('Origin — ISO country code and optional UN/LOCODE.'),
-    destination: z.object({ country: z.string(), locode: z.string().optional() }).optional().describe('Destination — ISO country code and optional UN/LOCODE.'),
+    }, { hints: { un: 'un_number' }, acceptedLabel: 'Accepted on each item' })).describe('Shipment items with dimensions, weight and optional HS/UN codes.'),
+    origin: strictInput({ country: z.string(), locode: z.string().optional() }, { acceptedLabel: 'Accepted in origin and destination' }).optional().describe('Origin — ISO country code and optional UN/LOCODE.'),
+    destination: strictInput({ country: z.string(), locode: z.string().optional() }, { acceptedLabel: 'Accepted in origin and destination' }).optional().describe('Destination — ISO country code and optional UN/LOCODE.'),
     incoterm: z.string().optional().describe('Incoterms 2020 three-letter code. Examples: "DAP", "EXW", "FOB".'),
     freight_cost: z.number().optional().describe('Freight cost in GBP for the duty calculation.'),
     insurance_cost: z.number().optional().describe('Insurance cost in GBP for the duty calculation.'),
-  }).strict(),
+  }, { hints: toItemPath(SHIPMENT_ITEM_FIELDS), acceptedLabel: 'Accepted arguments' }),
 
   resultSchema: resultShape({
     mode: z.string(),
@@ -1032,7 +1055,7 @@ Provide mode ("lq" or "eq") and 1-20 items, each with un_number, quantity and un
 
 Unit families: column (7a) states the limit in ONE dimension — a mass for some entries, a volume for others — and ADR supplies no density, so a mass quantity against a volume limit (or the reverse) CANNOT be compared. Those items return status 'inconclusive' with the dimension named, never a pass or a fail, and a batch holding any inconclusive item never reads overall_status 'qualifies'. Send the quantity in the unit given by lq_limit_unit to get a verdict. Multi-variant UNs: a UN number with more than one ADR Table A row (packing group / concentration variant — e.g. UN 1789 PG II LQ 1 L vs PG III LQ 5 L) needs packing_group (I|II|III) or variant_index (from adr_lookup) on that item to pin one row. A packing_group that still leaves several rows is enough when those rows agree on class, column (7a), column (7b) and scope (UN 1790 PG I: two concentration bands, both LQ 0 / E0) — the item is answered with equivalent_variants + variant_note naming the rows it holds for; only when the rows DISAGREE does it still ask for variant_index, and candidates[] then lists only that packing group's rows. With no disambiguator at all: a single-item call, or a batch where EVERY item is ambiguous, returns blocking_errors[AMBIGUOUS_UN_VARIANT] + human_review_required + candidates[] (each candidate's item_index, un_number, variant_index, packing_group, proper_shipping_name, limited_quantity, excepted_quantity) and NO verdict; a MIXED batch withholds only the ambiguous item (status 'withheld', withheld true, row fields null) while the other items are answered, overall_status never reads 'qualifies' while an item is withheld, summary carries withheld, and the envelope carries human_review_required + candidates[] plus one AMBIGUOUS_UN_VARIANT warning per withheld item. Never a silently checked packing group. Single-row UNs are unchanged.
 
-Behavior: deterministic reference check; each item gets a status and reason (an LQ value of "0" or code E0 means the relief is not permitted for that substance), with overall_status and summary counts across the batch. Table A rows listed "NOT SUBJECT TO ADR" (e.g. UN 1845 dry ice) get item status not_subject — outside ADR scope, neither a pass nor a fail — and an all-not-subject batch returns overall_status not_applicable; "CARRIAGE PROHIBITED" rows are not_permitted with the prohibition stated in reason. ${RATE}
+Behavior: deterministic reference check; each item gets a status and reason (an LQ value of "0" or code E0 means the relief is not permitted for that substance), with overall_status and summary counts across the batch. Table A rows listed "NOT SUBJECT TO ADR" (e.g. UN 1845 dry ice) get item status not_subject — outside ADR scope, neither a pass nor a fail — and an all-not-subject batch returns overall_status not_applicable; "CARRIAGE PROHIBITED" rows are not_permitted with the prohibition stated in reason. ${UNKNOWN_FIELDS_REFUSED} ${RATE}
 
 Returns: mode, overall_status (qualifies | does_not_qualify | partial | not_applicable | inconclusive), items[] (un_number, variant_index, substance, class, packing_group, lq_limit or eq_code, quantity_entered, status — within_limit | exceeds_limit | not_permitted | not_subject | inconclusive | withheld — reason, scope flags where applicable, withheld + ambiguity_reason on a withheld item, and equivalent_variants + variant_note when a packing group resolved by equivalence), summary {total_items, qualifying, exceeding, not_permitted, not_subject?, inconclusive?, withheld?}, the ADR chapter references, and human_review_required + candidates[] when any item is withheld — all under result — or, when every item is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
 
@@ -1040,17 +1063,22 @@ Limitations: a quantity-threshold check only — LQ/EQ relief also requires pack
 
 Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exemption_calculator (the 1.1.3.6 load-points route instead).`,
 
-  schema: z.object({
+  strictKeys: true,
+  schema: strictInput({
     mode: z.enum(['lq', 'eq']).describe('Check mode: "lq" (Limited Quantity, ADR 3.4) or "eq" (Excepted Quantity, ADR 3.5).'),
-    items: z.array(z.object({
+    items: z.array(strictInput({
       un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN"').describe('UN number — 4 digits, optionally "UN"-prefixed; explosives keep the leading zero. Examples: "1203", "UN1263".'),
       quantity: z.number().positive().describe('Quantity per INNER packaging, in the chosen unit. Example: 0.5.'),
       unit: z.enum(['ml', 'L', 'g', 'kg']).describe('Unit: "ml" or "L" for liquids, "g" or "kg" for solids.'),
       inner_packaging_qty: z.number().int().positive().optional().describe('EQ mode only: number of inner packagings per outer package, for the per-outer limit check. Example: 10.'),
       packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group (I, II or III) — only needed to disambiguate a UN with more than one ADR Table A row (e.g. UN 1789). Ignored for single-row UNs.'),
       variant_index: z.number().int().nonnegative().optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants sharing a packing group (concentration bands). Ignored for single-row UNs.'),
-    })).min(1).max(20).describe('Items to check (1-20 per call).'),
-  }).strict(),
+    }, { hints: { innerpackagings: 'inner_packaging_qty', un: 'un_number', qty: 'quantity' }, acceptedLabel: 'Accepted on each item' })).min(1).max(20).describe('Items to check (1-20 per call).'),
+  }, {
+    hints: toItemPath(LQ_ITEM_FIELDS, { innerpackagings: 'items[n].inner_packaging_qty' }),
+    acceptedLabel: 'Accepted arguments',
+    note: 'Each item carries its own un_number, quantity, unit, inner_packaging_qty, packing_group and variant_index.',
+  }),
 
   resultSchema: resultShape({
     mode: z.string(),
