@@ -84,7 +84,11 @@ export function createServer(): McpServer {
       tool.name,
       {
         description: tool.description,
-        inputSchema: tool.schema.shape,
+        // The schema ITSELF for a strictKeys tool, so an unknown key is refused with a tool
+        // error naming it (2.21.0). `.shape` makes the SDK rebuild a plain z.object, which
+        // strips unknown keys before the handler — that is what dropped quantity_basis
+        // "gross" on an adr_exemption_calculator item and read the load "exempt" at 900 points.
+        inputSchema: tool.strictKeys ? tool.schema : tool.schema.shape,
         outputSchema: envelopeShape(tool.resultSchema),
         annotations: tool.annotations,
       },

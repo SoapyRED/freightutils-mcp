@@ -1,5 +1,30 @@
 # Changelog
 
+## 2.21.0 — 2026-10-06
+
+### Fixed
+
+- **`adr_exemption_calculator`, `adr_lq_eq_check` and `shipment_summary` refuse a field they do not
+  read, instead of dropping it.** Every tool declared `.strict()`, but the server registered
+  `schema.shape`, so the MCP SDK rebuilt each schema as a plain object that **strips** unknown keys
+  before the tool runs — and `tools/list` advertised `additionalProperties: false` all the while.
+  A declaration sent under any other name vanished, the API's own response names included.
+  Reproduced on production with 2.20.1:
+  - an item `{ un_number: "1203", quantity: 300, quantity_basis: "gross" }` read **exempt at
+    900 points**, where `basis: "gross"` withholds (ADR 1.1.3.6.3 counts the goods, never the
+    packaging) — `quantity_basis` is the name the API's answer uses for the same declaration;
+  - `un: "1051", qty: 1` (or `UN_NUMBER` / `QUANTITY`) beside `items[]` vanished, so a transport
+    category 0 substance left the load reading exempt;
+  - an EQ check of 0.03 L of UN 1203 with `inner_packagings: 20` checked one inner packaging per
+    outer and read **qualifies** — 20 × 30 ml = 600 ml is over E2's 500 ml (ADR 3.5.1.2);
+  - a `shipment_summary` line with `un: "1051"` was not a dangerous-goods line at all.
+
+  These three tools now register their schemas as they are: an unknown field — on the call, on an
+  item, or in `origin` / `destination` — is a tool error that names it, suggests the accepted name it
+  most likely meant ("Did you mean \"basis\"?") and lists the accepted fields, and the call never
+  reaches the API. Each description says so. Documented fields are unchanged.
+- The other tools keep their current behaviour (unknown keys stripped) — a separate change.
+
 ## 2.20.1 — 2026-10-05
 
 ### Changed
