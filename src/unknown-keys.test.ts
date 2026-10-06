@@ -41,13 +41,20 @@ async function withNoFetch<T>(fn: () => Promise<T>): Promise<T> {
 const textOf = (r: unknown) => (((r as { content?: Array<{ text?: string }> }).content) ?? []).map((c) => c.text ?? '').join('\n');
 
 /** The SDK reports a schema refusal as "MCP error -32602: Input validation error: Invalid
- *  arguments for tool <name>: <the zod issues as JSON>". The issue messages, decoded. */
+ *  arguments for tool <name>: …" followed by the zod issues as JSON (SDK 1.29) or by the issue
+ *  messages as plain text (SDK 1.32, what a fresh install resolves to today). The messages,
+ *  either way — the refusal's words are ours in both. */
 function issueMessages(text: string): string[] {
-  const at = text.indexOf('[');
-  assert.ok(text.includes('Input validation error') && at > 0, `not a schema refusal: ${text.slice(0, 300)}`);
-  const issues = JSON.parse(text.slice(at)) as Array<{ code: string; message: string }>;
-  assert.ok(issues.some((i) => i.code === 'unrecognized_keys'), `no unrecognized_keys issue: ${text.slice(0, 300)}`);
-  return issues.map((i) => i.message);
+  const marker = text.match(/Invalid arguments for tool [a-z_]+: /);
+  assert.ok(text.includes('Input validation error') && marker, `not a schema refusal: ${text.slice(0, 300)}`);
+  const rest = text.slice((marker!.index ?? 0) + marker![0].length).trim();
+  if (rest.startsWith('[')) {
+    const issues = JSON.parse(rest) as Array<{ code: string; message: string }>;
+    assert.ok(issues.some((i) => i.code === 'unrecognized_keys'), `no unrecognized_keys issue: ${text.slice(0, 300)}`);
+    return issues.map((i) => i.message);
+  }
+  assert.ok(rest.includes('Unknown field'), `no unknown-field refusal in: ${text.slice(0, 300)}`);
+  return [rest];
 }
 
 test('the refusal text is the website\'s, word for word (lib/calculations/request-keys.ts; lint:adr-variants (10a) pins the same sentence)', () => {
