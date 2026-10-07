@@ -73,7 +73,12 @@ jobs:
             echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $VERSION — refusing to publish a mismatched tree."
             exit 1
           fi
-          if npm view "freightutils-mcp@$VERSION" version > /dev/null 2>&1; then
+          # Ask the per-version endpoint, not `npm view`: npm now processes a new version for a few
+          # minutes before the package listing (what `npm view` reads) shows it, while the version
+          # endpoint answers 200 at once. On 2.21.1 `npm view` said "not found" for a version
+          # published from a laptop minutes earlier, this job tried to publish it again, and the
+          # cascade stopped.
+          if curl -sf -o /dev/null "https://registry.npmjs.org/freightutils-mcp/$VERSION"; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
             echo "::notice::freightutils-mcp@$VERSION is already on npm (published outside this workflow) — not publishing again; it carries no provenance attestation from this run."
           else
@@ -260,11 +265,17 @@ jobs:
           # If this tag is the current MCP Registry isLatest, mark as
           # the GitHub latest too. Otherwise create as a historical
           # Release (--latest=false).
+          # The Registry flips isLatest a little after the publish above; reading it once left the
+          # 2.21.0 and 2.21.1 Releases unmarked. Wait up to 2 minutes for it.
           LATEST_FLAG="--latest=false"
-          REGISTRY_LATEST=$(curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=freightutils" | jq -r '.servers[] | select(._meta["io.modelcontextprotocol.registry/official"].isLatest == true) | .server.version')
-          if [ "$REGISTRY_LATEST" = "$VERSION" ]; then
-            LATEST_FLAG="--latest=true"
-          fi
+          for i in $(seq 1 12); do
+            REGISTRY_LATEST=$(curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=io.github.SoapyRED/freightutils&version=latest" | jq -r '.servers[] | select(._meta["io.modelcontextprotocol.registry/official"].isLatest == true) | .server.version' | head -1)
+            if [ "$REGISTRY_LATEST" = "$VERSION" ]; then
+              LATEST_FLAG="--latest=true"
+              break
+            fi
+            sleep 10
+          done
           gh release create "$TAG" \
             --repo "$GITHUB_REPOSITORY" \
             --title "$TAG" \
