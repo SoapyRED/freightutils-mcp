@@ -1,5 +1,33 @@
 # Changelog
 
+## 2.21.2 — 2026-10-07
+
+### Fixed
+
+- **A count above 9,007,199,254,740,991 is refused before the call.** A count reaches the API as
+  `String(n)`, and `String(1e21)` is `"1e+21"`, which the API read as 1: `cbm_calculator`,
+  `chargeable_weight_calculator`, `ldm_calculator` and `container_lookup` answered for one piece,
+  pallet or item, and a volumetric divisor of 1e21 became 1 (120 × 80 × 100 cm read as 960,000 kg).
+  `pieces`, `factor`, `quantity`, `item_quantity` and `inner_packaging_qty` now stop at 2^53 − 1,
+  the largest whole number JSON reads exactly (RFC 8259 §6) — as the hosted endpoint already did.
+  The API refuses such a value too since the same day, so earlier versions of this package get a
+  refusal, not a wrong answer.
+- **`uk_duty_calculator`: `freight_cost` and `insurance_cost` are 0 or more.** -1000 freight took
+  1,000 off the dutiable value (CIF 4,000 instead of 5,000) here, on the API and on the hosted
+  endpoint alike; all three refuse it now.
+- **`adr_lookup` takes "UN 1203"**, the form a transport document prints and the one this tool's
+  description already called equivalent to "1203"; the pattern refused the space while the API
+  answered it.
+- **`adr_lookup`'s `hazard_class` examples all answer.** "1.4" was offered as an explosives division
+  and answered not found: Table A gives every explosive the class "1", and the division and
+  compatibility group are its classification code (e.g. "1.4S").
+
+Found reproducing the 7 Oct REST inventory on production through the API, the hosted endpoint and
+2.21.1 over stdio. The same day's API changes need nothing from this package: a custom vehicle on
+`ldm_calculator` is measured against its own length, and `adr_lq_eq_check`'s `inner_packaging_qty`,
+`unlocode_lookup`'s `limit` and `uk_duty_calculator`'s values are checked as this package's schemas
+already checked them.
+
 ## 2.21.1 — 2026-10-07
 
 ### Security

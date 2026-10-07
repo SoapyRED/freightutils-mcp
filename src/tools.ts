@@ -81,6 +81,13 @@ const LQ_ITEM_FIELDS = ['un_number', 'quantity', 'unit', 'inner_packaging_qty', 
 const SHIPMENT_ITEM_FIELDS = ['description', 'length', 'width', 'height', 'weight', 'quantity', 'stackable', 'pallet_type', 'hs_code', 'un_number', 'adr_quantity', 'adr_quantity_unit', 'customs_value'];
 const UNKNOWN_FIELDS_REFUSED = 'Fields are checked by name: a field the tool does not read is refused with a tool error naming it and listing the accepted ones, never ignored.';
 
+// A count sent to a GET endpoint travels as String(n) — and String(1e21) is "1e+21", which the API
+// used to read as 1 (parseInt stops at the "e"). 2^53 − 1 is the largest whole number JSON
+// implementations read exactly (RFC 8259 §6); the API and the hosted endpoint refuse anything larger
+// (2.21.2), so the schema refuses it before the call.
+const WHOLE_MAX = Number.MAX_SAFE_INTEGER;
+const wholeMax = (field: string) => [WHOLE_MAX, `${field} must be at most 9007199254740991 — a larger whole number is not exact in JSON, and the API refuses it`] as const;
+
 // ─────────────────────────────────────────────────────────────
 //  1. CBM Calculator
 // ─────────────────────────────────────────────────────────────
@@ -99,7 +106,7 @@ Related: chargeable_weight_calculator (air billing weight from the same dims), c
     length_cm: z.number().positive().describe('Length of one piece in centimetres (> 0). Example: 120.'),
     width_cm: z.number().positive().describe('Width of one piece in centimetres (> 0). Example: 80.'),
     height_cm: z.number().positive().describe('Height of one piece in centimetres (> 0). Example: 100.'),
-    pieces: z.number().int().positive().optional().describe('Number of identical pieces — total volume scales linearly. Default: 1.'),
+    pieces: z.number().int().positive().max(...wholeMax('pieces')).optional().describe('Number of identical pieces — total volume scales linearly. Default: 1.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -138,8 +145,8 @@ Related: cbm_calculator (volume only), consignment_calculator (multi-line, all m
     width_cm: z.number().positive().describe('Width of one piece in centimetres (> 0). Example: 80.'),
     height_cm: z.number().positive().describe('Height of one piece in centimetres (> 0). Example: 100.'),
     gross_weight_kg: z.number().positive().describe('Actual gross weight of the WHOLE shipment (all pieces) in kilograms. Example: 500.'),
-    pieces: z.number().int().positive().optional().describe('Number of identical pieces. Default: 1.'),
-    factor: z.number().int().positive().optional().describe('Volumetric divisor in cm³/kg. Default: 6000 (IATA standard); express carriers typically 5000.'),
+    pieces: z.number().int().positive().max(...wholeMax('pieces')).optional().describe('Number of identical pieces. Default: 1.'),
+    factor: z.number().int().positive().max(...wholeMax('factor')).optional().describe('Volumetric divisor in cm³/kg. Default: 6000 (IATA standard); express carriers typically 5000.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -183,7 +190,7 @@ Related: vehicle_lookup (the trailer specs behind the vehicle presets), pallet_f
       .describe('Pallet preset: euro=1200x800mm, uk=1200x1000mm, half=800x600mm, quarter=600x400mm. Provide this OR length_mm + width_mm.'),
     length_mm: z.number().positive().optional().describe('Custom pallet length in millimetres (use with width_mm instead of a preset). Example: 1140.'),
     width_mm: z.number().positive().optional().describe('Custom pallet width in millimetres. Example: 980.'),
-    quantity: z.number().int().positive().optional().describe('Number of pallets. Default: 1.'),
+    quantity: z.number().int().positive().max(...wholeMax('quantity')).optional().describe('Number of pallets. Default: 1.'),
     stackable: z.boolean().optional().describe('Whether pallets can be double/triple-stacked — halves (or thirds) the floor footprint. Default: false.'),
     stack_height: z.number().int().min(2).max(3).optional().describe('Stack height when stackable: 2 or 3. Default: 2.'),
     weight_kg: z.number().positive().optional().describe('Weight per pallet in kg — enables the payload side of the fits check.'),
@@ -233,9 +240,14 @@ Limitations: a factual compilation of the ADR table, not legal or compliance adv
 Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned here), adr_exemption_calculator (1.1.3.6 small-load points), consignment_calculator (flags dangerous-goods lines by UN number).`,
 
   schema: z.object({
-    un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN" (e.g., "1203" or "UN1203")').optional().describe('Exact UN number — 4 digits, optionally "UN"-prefixed; explosives keep their leading zero. Examples: "1203", "UN1203", "0004".'),
+    // "UN 1203" — the form a transport document prints (ADR 5.4.1.1.1 (a)) — is accepted, as this
+    // tool's description promises and the API always did; the pattern refused the space until 2.21.2.
+    // The same pattern as the hosted adr_lookup (the website's app/api/mcp route) — the two must match.
+    un_number: z.string().regex(/^(?:UN\s*)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN" (e.g., "1203", "UN1203" or "UN 1203")').optional().describe('Exact UN number — 4 digits, optionally "UN"-prefixed; explosives keep their leading zero. Examples: "1203", "UN1203", "UN 1203", "0004".'),
     search: z.string().min(2, 'Search term must be at least 2 characters').optional().describe('Case-insensitive partial match on the proper shipping name (min 2 characters). Example: "acetone".'),
-    hazard_class: z.string().optional().describe('All entries in an ADR class or division. Examples: "3" (flammable liquids), "6.1" (toxic), "1.4" (an explosives division).'),
+    // Table A column (3a) gives every explosive the class "1"; the division is part of the
+    // classification code (column (3b), e.g. "1.4S"), so the old example "1.4" answered not found.
+    hazard_class: z.string().optional().describe('All entries in an ADR class (Table A column (3a)). Examples: "3" (flammable liquids), "6.1" (toxic), "1" (explosives — the division and compatibility group are in classification_code, e.g. "1.4S").'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -472,7 +484,7 @@ Related: validate (checks a container NUMBER's ISO 6346 check digit — not spec
     item_width_cm: z.number().positive().optional().describe('Item width in cm.'),
     item_height_cm: z.number().positive().optional().describe('Item height in cm.'),
     item_weight_kg: z.number().positive().optional().describe('Item weight in kg — caps the fit by max payload.'),
-    item_quantity: z.number().int().positive().optional().describe('Number of items to check against the container.'),
+    item_quantity: z.number().int().positive().max(...wholeMax('item_quantity')).optional().describe('Number of items to check against the container.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -843,8 +855,10 @@ Related: hs_code_lookup (find the 6-digit code first), incoterms_lookup (who act
     commodity_code: z.string().regex(/^\d{6,10}$/, 'Commodity code must be 6–10 digits').describe('HS/UK tariff code, 6-10 digits. Example: "8471300000" (portable computers). 6-digit codes may need the declarable 8/10-digit line.'),
     origin_country: z.string().regex(/^[A-Za-z]{2}$/, 'Origin country must be a 2-letter ISO code (e.g., "CN", "DE")').describe('ISO 2-letter country of origin. Examples: "CN", "DE", "US".'),
     customs_value: z.number().positive().describe('Goods value in GBP. Example: 1000.'),
-    freight_cost: z.number().optional().describe('Freight cost in GBP — added to the CIF value. Default: 0.'),
-    insurance_cost: z.number().optional().describe('Insurance cost in GBP — added to the CIF value. Default: 0.'),
+    // A cost is 0 or more: -1000 took 1,000 off the dutiable value until 2.21.2, here, on the API
+    // and on the hosted endpoint alike. The API now refuses a negative cost too.
+    freight_cost: z.number().nonnegative('freight_cost must be 0 or more — a cost is never negative').optional().describe('Freight cost in GBP, 0 or more — added to the CIF value. Default: 0.'),
+    insurance_cost: z.number().nonnegative('insurance_cost must be 0 or more — a cost is never negative').optional().describe('Insurance cost in GBP, 0 or more — added to the CIF value. Default: 0.'),
     incoterm: z.enum(['EXW','FCA','FAS','FOB','CFR','CIF','CPT','CIP','DAP','DPU','DDP']).optional().describe('Incoterms 2020 basis of the customs_value — documents which costs are already included.'),
   }).strict(),
 
@@ -1070,7 +1084,7 @@ Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exempt
       un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN"').describe('UN number — 4 digits, optionally "UN"-prefixed; explosives keep the leading zero. Examples: "1203", "UN1263".'),
       quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').describe('Quantity per INNER packaging, in the chosen unit. Example: 0.5.'),
       unit: z.enum(['ml', 'L', 'g', 'kg']).describe('Unit: "ml" or "L" for liquids, "g" or "kg" for solids.'),
-      inner_packaging_qty: z.number().int().positive().optional().describe('EQ mode only: number of inner packagings per outer package, for the per-outer limit check. Example: 10.'),
+      inner_packaging_qty: z.number().int().positive().max(...wholeMax('inner_packaging_qty')).optional().describe('EQ mode only: number of inner packagings per outer package, for the per-outer limit check. Example: 10.'),
       packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group (I, II or III) — only needed to disambiguate a UN with more than one ADR Table A row (e.g. UN 1789). Ignored for single-row UNs.'),
       variant_index: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER, 'variant_index must be a safe integer').optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants sharing a packing group (concentration bands). Ignored for single-row UNs.'),
     }, { hints: { innerpackagings: 'inner_packaging_qty', un: 'un_number', qty: 'quantity' }, acceptedLabel: 'Accepted on each item' })).min(1).max(20).describe('Items to check (1-20 per call).'),

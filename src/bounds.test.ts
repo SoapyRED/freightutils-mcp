@@ -105,6 +105,55 @@ test('ics2_check, resolve_reference, airline_lookup: blank input refused as the 
   await accepted('airline_lookup', { query: 'em' });
 });
 
+// 2.21.2 — the 2026-10-07 production reproduction. A count crosses to the API as String(n), and
+// String(1e21) is "1e+21", which the API read as 1 (parseInt): cbm, chargeable weight, ldm and the
+// container fit answered for ONE piece, pallet or item, and a divisor of 1e21 became 1. The hosted
+// endpoint already refused anything above 2^53 − 1, and the API refuses it now.
+const WHOLE_MAX = Number.MAX_SAFE_INTEGER;
+test('counts sent to GET endpoints are whole numbers ≤ 2^53 − 1 (2.21.2: "1e+21" was read as 1)', async () => {
+  await refused('cbm_calculator', { length_cm: 120, width_cm: 80, height_cm: 100, pieces: 1e21 }, /pieces must be at most 9007199254740991/);
+  await accepted('cbm_calculator', { length_cm: 120, width_cm: 80, height_cm: 100, pieces: WHOLE_MAX });
+  await refused('chargeable_weight_calculator', { length_cm: 120, width_cm: 80, height_cm: 100, gross_weight_kg: 500, factor: 1e21 }, /factor must be at most 9007199254740991/);
+  await refused('chargeable_weight_calculator', { length_cm: 120, width_cm: 80, height_cm: 100, gross_weight_kg: 500, pieces: 1e21 }, /pieces must be at most 9007199254740991/);
+  await accepted('chargeable_weight_calculator', { length_cm: 120, width_cm: 80, height_cm: 100, gross_weight_kg: 500, pieces: WHOLE_MAX, factor: WHOLE_MAX });
+  await refused('ldm_calculator', { pallet: 'euro', quantity: 1e21 }, /quantity must be at most 9007199254740991/);
+  await accepted('ldm_calculator', { pallet: 'euro', quantity: WHOLE_MAX });
+  await refused('container_lookup', { type: '40ft-high-cube', item_length_cm: 120, item_width_cm: 80, item_height_cm: 100, item_quantity: 1e21 }, /item_quantity must be at most 9007199254740991/);
+  await accepted('container_lookup', { type: '40ft-high-cube', item_length_cm: 120, item_width_cm: 80, item_height_cm: 100, item_quantity: WHOLE_MAX });
+  await refused('adr_lq_eq_check', { mode: 'eq', items: [{ un_number: '1203', quantity: 0.03, unit: 'L', inner_packaging_qty: 1e21 }] }, /inner_packaging_qty must be at most 9007199254740991/);
+  await accepted('adr_lq_eq_check', { mode: 'eq', items: [{ un_number: '1203', quantity: 0.03, unit: 'L', inner_packaging_qty: 20 }] });
+});
+
+test('uk_duty_calculator: freight_cost and insurance_cost are 0 or more (2.21.2: -1000 took 1,000 off the dutiable value)', async () => {
+  const base = { commodity_code: '0901210000', origin_country: 'BR', customs_value: 5000 };
+  await refused('uk_duty_calculator', { ...base, freight_cost: -1000 }, /freight_cost must be 0 or more/);
+  await refused('uk_duty_calculator', { ...base, insurance_cost: -0.01 }, /insurance_cost must be 0 or more/);
+  await accepted('uk_duty_calculator', { ...base, freight_cost: 0, insurance_cost: 0 });
+  await accepted('uk_duty_calculator', { ...base, freight_cost: 500, insurance_cost: 50 });
+});
+
+test('adr_lookup: "UN 1203" is accepted, as the description promises (2.21.2: the space was refused)', async () => {
+  await accepted('adr_lookup', { un_number: 'UN 1203' });
+  await accepted('adr_lookup', { un_number: 'un 1203' });
+  await accepted('adr_lookup', { un_number: 'UN1203' });
+  await accepted('adr_lookup', { un_number: '0004' });
+  await refused('adr_lookup', { un_number: 'UN 12034' }, /UN number must be 4 digits/);
+  await refused('adr_lookup', { un_number: '1203 ' }, /UN number must be 4 digits/);
+});
+
+test('tools/list: adr_lookup offers only answerable hazard_class examples (2.21.2: "1.4" answered not found)', async () => {
+  const { client, close } = await connect();
+  try {
+    const adr = (await client.listTools()).tools.find((t) => t.name === 'adr_lookup');
+    const hc = JSON.stringify((adr?.inputSchema as { properties?: Record<string, unknown> })?.properties?.hazard_class);
+    assert.doesNotMatch(hc, /"1\.4" \(an explosives division\)/);
+    assert.match(hc, /1\.4S/);
+    assert.match(adr?.description ?? '', /"un 1203" are equivalent/);
+  } finally {
+    await close();
+  }
+});
+
 test('tools/list advertises the bounds, so an agent can see them before it calls', async () => {
   const { client, close } = await connect();
   try {
@@ -114,6 +163,8 @@ test('tools/list advertises the bounds, so an agent can see them before it calls
     assert.match(schema('shipment_summary'), /"maxItems":50/);
     assert.match(schema('shipment_summary'), /"minItems":1/);
     assert.match(schema('consignment_calculator'), /"maxLength":200/);
+    assert.match(schema('cbm_calculator'), /"maximum":9007199254740991/);
+    assert.match(schema('uk_duty_calculator'), /"freight_cost":\{[^}]*"minimum":0/);
   } finally {
     await close();
   }
