@@ -39,6 +39,14 @@ const BASE_URL = process.env.FREIGHTUTILS_API_URL ?? 'https://www.freightutils.c
  * problem and resolves relative to this file at runtime.
  */
 import { createRequire } from 'node:module';
+import {
+  FreightUtilsBadResponseError,
+  FreightUtilsHttpError,
+  FreightUtilsNetworkError,
+  FreightUtilsRateLimitError,
+  FreightUtilsServerError,
+  FreightUtilsTimeoutError,
+} from './errors.js';
 const pkg = createRequire(import.meta.url)('../package.json') as { name: string; version: string };
 const USER_AGENT = `${pkg.name}/${pkg.version}`;
 
@@ -61,6 +69,47 @@ export function buildHeaders(extra?: Record<string, string>): Record<string, str
  *  from the SAME response — one request per successful call instead of two. */
 export interface ApiOpts { envelope?: boolean; legacySource?: boolean }
 
+/** How long one call may take, end to end (connect, headers and body). A stalled connection used
+ *  to hang a tool call for ever. Override with FREIGHTUTILS_TIMEOUT_MS. */
+export const DEFAULT_TIMEOUT_MS = 30_000;
+function timeoutMs(): number {
+  const v = Number(process.env.FREIGHTUTILS_TIMEOUT_MS);
+  return Number.isFinite(v) && v > 0 ? v : DEFAULT_TIMEOUT_MS;
+}
+
+/** The host only — never the path, the query (it can hold inputs) or any userinfo. */
+function hostOf(url: string): string {
+  try { return new URL(url).host; } catch { return 'the configured FREIGHTUTILS_API_URL'; }
+}
+
+const isTimeout = (err: unknown) =>
+  err instanceof Error && (err.name === 'TimeoutError' || err.name === 'AbortError');
+
+/** One call, every failure mapped to its class (errors.ts). Nothing is swallowed: each path
+ *  either returns the parsed body or throws a FreightUtilsError with the original as `cause`. */
+async function call(url: string, init: RequestInit): Promise<unknown> {
+  const host = hostOf(url);
+  const ms = timeoutMs();
+  let res: Response;
+  let text: string;
+  try {
+    res = await fetch(url, { ...init, signal: AbortSignal.timeout(ms) });
+    text = await res.text();
+  } catch (err) {
+    throw isTimeout(err) ? new FreightUtilsTimeoutError(host, ms, err) : new FreightUtilsNetworkError(host, err);
+  }
+  if (!res.ok) {
+    if (res.status === 429) throw new FreightUtilsRateLimitError(text, res.headers);
+    if (res.status >= 500) throw new FreightUtilsServerError(res.status, text);
+    throw new FreightUtilsHttpError(res.status, text);
+  }
+  try {
+    return JSON.parse(text);
+  } catch (err) {
+    throw new FreightUtilsBadResponseError(host, res.status, err);
+  }
+}
+
 export async function apiGet(endpoint: string, params: Record<string, unknown>, opts?: ApiOpts): Promise<unknown> {
   const url = new URL(`${BASE_URL}/${endpoint}`);
   for (const [k, v] of Object.entries(params)) {
@@ -70,16 +119,7 @@ export async function apiGet(endpoint: string, params: Record<string, unknown>, 
   if (opts?.envelope) url.searchParams.set('envelope', '1.1');
   if (opts?.legacySource) url.searchParams.set('legacy_source', '1');
 
-  const res = await fetch(url.toString(), {
-    headers: buildHeaders(),
-  });
-
-  if (!res.ok) {
-    const body = await res.text();
-    throw new Error(`FreightUtils API error ${res.status}: ${body}`);
-  }
-
-  return res.json();
+  return call(url.toString(), { headers: buildHeaders() });
 }
 
 export async function apiPost(endpoint: string, body: unknown, opts?: ApiOpts): Promise<unknown> {
@@ -88,16 +128,9 @@ export async function apiPost(endpoint: string, body: unknown, opts?: ApiOpts): 
     ...(opts?.legacySource ? ['legacy_source=1'] : []),
   ].join('&');
   const url = `${BASE_URL}/${endpoint}${q ? '?' + q : ''}`;
-  const res = await fetch(url, {
+  return call(url, {
     method: 'POST',
     headers: buildHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(body),
   });
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`FreightUtils API error ${res.status}: ${text}`);
-  }
-
-  return res.json();
 }

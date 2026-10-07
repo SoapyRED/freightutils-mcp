@@ -24,6 +24,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createServer } from './server.js';
 import { ALL_TOOLS } from './tools.js';
+import { ANONYMOUS_DAILY_LIMIT } from './notices.js';
 
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json') as { version: string };
@@ -336,7 +337,7 @@ async function reportAuthStatus(): Promise<AuthLine> {
   if (!key) {
     return {
       symbol: WARN,
-      text: 'Anonymous (25/day cap) — set FREIGHTUTILS_API_KEY in your environment to lift the cap. See https://www.freightutils.com/pricing.',
+      text: `Anonymous (${ANONYMOUS_DAILY_LIMIT}/day cap) — set FREIGHTUTILS_API_KEY in your environment to lift the cap. See https://www.freightutils.com/pricing.`,
     };
   }
 
@@ -402,7 +403,12 @@ export async function runPing(): Promise<number> {
   let r3: CheckResult;
   if (client) {
     r3 = await checkToolCall(client);
-    try { await client.close(); } catch { /* ignore */ }
+    try {
+      await client.close();
+    } catch (err) {
+      // Not a check failure (the result above stands) — but said, never swallowed.
+      console.log(dim(`(closing the in-process MCP client failed: ${err instanceof Error ? err.message : String(err)})`));
+    }
   } else {
     r3 = {
       ok: false,

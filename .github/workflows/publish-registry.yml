@@ -37,8 +37,67 @@ permissions:
   contents: write      # to commit the updated server.json back to main
   id-token: write      # required for GitHub OIDC authentication to the MCP Registry
 
+# One release at a time per tag: a UI release fires both push:tags and release:published, and two
+# runs must not both try to publish the same version to npm.
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
 jobs:
+  # npm WITH PROVENANCE (2.21.1). Publishes from this workflow through npm trusted publishing (OIDC):
+  # no npm token is stored anywhere, and npm attaches a signed provenance statement linking the
+  # tarball to this repository, this workflow and the release commit. It needs a one-time setting on
+  # npmjs.com — package → Settings → Trusted Publisher → GitHub Actions, user SoapyRED, repository
+  # freightutils-mcp, workflow publish-registry.yml. Until that setting exists, a release published
+  # from a laptop (`npm publish`) is already on npm when its tag arrives, and this job skips: that
+  # version then carries no provenance attestation. Either way the registry job below runs after it.
+  npm:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write      # OIDC for npm trusted publishing and the provenance signature
+    steps:
+      - name: Checkout the release commit
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24   # npm 11.5.1+ is needed for trusted publishing
+          registry-url: https://registry.npmjs.org
+
+      - name: Is this version already on npm?
+        id: check
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          if [ "$GITHUB_REF_TYPE" = "tag" ] && [ "${GITHUB_REF_NAME#v}" != "$VERSION" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $VERSION — refusing to publish a mismatched tree."
+            exit 1
+          fi
+          if npm view "freightutils-mcp@$VERSION" version > /dev/null 2>&1; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::freightutils-mcp@$VERSION is already on npm (published outside this workflow) — not publishing again; it carries no provenance attestation from this run."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "freightutils-mcp@$VERSION is not on npm yet — publishing with provenance."
+          fi
+
+      - name: Install, build and test
+        if: steps.check.outputs.skip == 'false'
+        run: |
+          npm ci
+          npm run build
+          npm test
+
+      - name: No high or critical advisory in production dependencies
+        if: steps.check.outputs.skip == 'false'
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Publish with provenance (trusted publishing, OIDC)
+        if: steps.check.outputs.skip == 'false'
+        run: npm publish --provenance --access public
+
   publish:
+    needs: npm
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -72,13 +131,21 @@ jobs:
 
       - name: Sanity-check that npm has this version
         run: |
+          # Waits up to 10 minutes: a version published moments ago (by the npm job above, or from a
+          # laptop just before the tag push) can take a while to show in `npm view … versions`. The
+          # immediate check this replaced failed the cascade on that race.
           VERSION="${{ steps.version.outputs.version }}"
-          NPM_VERSIONS=$(npm view freightutils-mcp versions --json)
-          if ! echo "$NPM_VERSIONS" | jq -e --arg v "$VERSION" 'index($v)' > /dev/null; then
-            echo "::error::Version $VERSION is not published to npm yet. Publish to npm first, then run this workflow."
-            exit 1
-          fi
-          echo "Confirmed: freightutils-mcp@$VERSION exists on npm."
+          for i in $(seq 1 60); do
+            NPM_VERSIONS=$(npm view freightutils-mcp versions --json 2>/dev/null || echo '[]')
+            if echo "$NPM_VERSIONS" | jq -e --arg v "$VERSION" 'index($v)' > /dev/null; then
+              echo "Confirmed: freightutils-mcp@$VERSION exists on npm."
+              exit 0
+            fi
+            echo "freightutils-mcp@$VERSION not visible on npm yet (attempt $i/60) — waiting 10 s."
+            sleep 10
+          done
+          echo "::error::Version $VERSION is not published to npm. Publish to npm first, then run this workflow."
+          exit 1
 
       - name: Update server.json version fields
         run: |

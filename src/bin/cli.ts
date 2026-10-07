@@ -2,6 +2,7 @@
 
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { createServer } from '../server.js';
+import { ANONYMOUS_DAILY_LIMIT, startupNotice } from '../notices.js';
 
 function printHelp(): void {
   process.stdout.write(
@@ -17,8 +18,12 @@ function printHelp(): void {
       '  npx freightutils-mcp --version    Print the package version',
       '',
       'ENV',
+      '  FREIGHTUTILS_API_KEY=<key>        Your API key, sent as Authorization: Bearer.',
+      `                                    Unset = the anonymous tier (${ANONYMOUS_DAILY_LIMIT} requests/day`,
+      '                                    per IP); the server says so once, on stderr',
       '  FREIGHTUTILS_API_URL=<base>       Override the website API base (default:',
       '                                    https://www.freightutils.com/api)',
+      '  FREIGHTUTILS_TIMEOUT_MS=<ms>      Per-call timeout (default 30000)',
       '  NO_COLOR=1                        Disable ANSI colour in `ping` output',
       '',
       'DOCS  https://www.freightutils.com/api-docs#mcp-setup',
@@ -53,7 +58,10 @@ async function main() {
     process.exit(0);
   }
 
-  // Default — start the stdio MCP server. MCP clients communicate via stdin/stdout.
+  // Default — start the stdio MCP server. MCP clients communicate via stdin/stdout, so the
+  // anonymous-tier notice goes to stderr, once, before the transport starts.
+  const notice = startupNotice();
+  if (notice) process.stderr.write(notice + '\n');
   const server = createServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
