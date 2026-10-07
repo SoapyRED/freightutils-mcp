@@ -42,6 +42,8 @@ Since **2.11.0**, every tool also declares a typed `outputSchema` and returns `s
 | `adr_exemption_calculator` | ADR 1.1.3.6 small load exemption check |
 | `adr_lq_eq_check` | Limited and Excepted Quantity eligibility |
 
+Some UN numbers have more than one ADR Table A row (packing groups, concentration bands). When a bare UN number matches rows that give different answers, the ADR tools never pick one: they withhold the verdict and return the candidate rows, and you pin one with `packing_group` or `variant_index`. The rules, with worked cases (UN 1789, UN 1790 PG I, UN 2215 PG III): [the ADR 1.1.3.6 calculator in the API docs](https://www.freightutils.com/api-docs#adr-calculator).
+
 ### Customs & Tariff
 | Tool | Description |
 |------|-------------|
@@ -133,6 +135,12 @@ stdio config example with the env var wired through:
 
 Get a key at [freightutils.com/api-docs](https://www.freightutils.com/api-docs) (free, 100/day) or [freightutils.com/pricing](https://www.freightutils.com/pricing) (Pro, 50,000/month). Backwards compatible — unset env var preserves the existing anonymous behaviour.
 
+With no key set, the server says so once at start-up, on stderr (stdout carries only the MCP protocol), so a key you meant to set and missed shows up in your client's MCP log rather than at the first 429:
+
+```
+freightutils-mcp: FREIGHTUTILS_API_KEY is not set, so calls use the anonymous tier — 25 requests per day per IP address. Set the key to use your plan's limit: https://www.freightutils.com/pricing
+```
+
 ---
 
 ## Verify your setup
@@ -191,6 +199,20 @@ All tools call the free FreightUtils API:
 - **Anonymous:** 25 requests/day per IP
 - **Free API key:** 100 requests/day (register at https://www.freightutils.com)
 - **Pro:** 50,000 requests/month at £19/month
+
+---
+
+## Security and data
+
+- **Read-only.** Every tool is a lookup or a calculation, declared `readOnlyHint: true` and `destructiveHint: false`. The server changes nothing, anywhere.
+- **No file system, no shell.** The server reads no file except its own `package.json`, starts no process and opens no port — it talks over stdio only.
+- **One destination.** Tool inputs go only to `https://www.freightutils.com/api` (or the base you set in `FREIGHTUTILS_API_URL`), over HTTPS. `get_subscribe_link` answers locally and sends nothing.
+- **The key stays in the environment.** `FREIGHTUTILS_API_KEY` is read from the environment and sent only as an `Authorization: Bearer` header to that host — never logged, never written to disk, never put in an error message.
+- **stdout is the protocol.** Nothing but MCP JSON-RPC goes to stdout; the one start-up notice goes to stderr.
+- **Two validation layers.** Each tool's Zod schema checks types, formats and the API's own limits before any call is made (the three ADR tools — `adr_exemption_calculator`, `adr_lq_eq_check`, `shipment_summary` — also refuse, by name, a field they do not read). The API then validates every request again on the server and refuses what it cannot answer with a 400 naming the field.
+- **Errors keep their meaning.** A failed call is reported by kind: network failure, timeout (30 s, or `FREIGHTUTILS_TIMEOUT_MS`), the API's own 4xx refusal, a 429 with its `reset_at`, or a 5xx — never with a stack trace, a request header or the contents of a server error page.
+- **Two direct runtime dependencies:** `@modelcontextprotocol/sdk` and `zod`. CI fails on any high or critical advisory in the production dependency tree, and Dependabot watches it.
+- **Reporting a vulnerability:** see [SECURITY.md](SECURITY.md).
 
 ---
 

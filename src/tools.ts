@@ -298,19 +298,19 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
   strictKeys: true,
   schema: strictInput({
     un_number: z.string().regex(EXEMPTION_IDENTIFIER_PATTERN, EXEMPTION_IDENTIFIER_MESSAGE).optional().describe('UN number for a single-substance check — 4 digits, optionally "UN"-prefixed — or an ID-prefixed air-only number such as "ID8000" (routed AIR_ONLY_ID, nothing counted — the warning on that line states the limited-quantity condition). Single-substance form only — sent beside items[] it is refused; send the substance as an item. Example: "1203".'),
-    quantity: z.number().positive().optional().describe('Quantity for the single-substance check, in kg or litres per the substance\'s ADR unit. Single-substance form only — sent beside items[] it is refused. Example: 100.'),
+    quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').optional().describe('Quantity for the single-substance check, in kg or litres per the substance\'s ADR unit. Single-substance form only — sent beside items[] it is refused. Example: 100.'),
     packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group (I, II or III) — only needed to disambiguate a UN with more than one ADR Table A row (e.g. UN 1789). Ignored for single-row UNs. Single-substance form only — sent beside items[] it is refused; set it on each item.'),
-    variant_index: z.number().int().nonnegative().optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants that share a packing group (concentration bands). Ignored for single-row UNs. Single-substance form only — sent beside items[] it is refused; set it on each item.'),
+    variant_index: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER, 'variant_index must be a safe integer').optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants that share a packing group (concentration bands). Ignored for single-row UNs. Single-substance form only — sent beside items[] it is refused; set it on each item.'),
     unit: z.enum(['L', 'kg']).optional().describe("OPTIONAL. The dimension `quantity` is stated in. Omit it and the number is taken as already on the ADR 1.1.3.6.3 basis (unchanged behaviour). Supply it and it is CHECKED against the dimension 1.1.3.6.3 counts for that Table A row — litres for liquids and for compressed or adsorbed gases, kilograms for solids, liquefied/refrigerated/dissolved gases and articles. A mismatch returns total_points null, exempt null and items[].basis_mismatch true, naming the dimension the entry is counted in. Single-substance form only — sent beside items[] it is refused; set it on each item."),
     basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging, so a quantity declared 'gross' returns no points in ANY unit — send the net figure instead. Single-substance form only — sent beside items[] it is refused; set it on each item."),
     items: z.array(strictInput({
       un_number: z.string().regex(EXEMPTION_IDENTIFIER_PATTERN, EXEMPTION_IDENTIFIER_MESSAGE).describe('UN number — 4 digits, optionally "UN"-prefixed — or an ID-prefixed air-only number such as "ID8000" (routed AIR_ONLY_ID; the warning on that line states the limited-quantity condition the 0 rests on). Example: "1263".'),
-      quantity: z.number().positive().describe('Quantity in kg or litres per the substance\'s ADR unit.'),
+      quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').describe('Quantity in kg or litres per the substance\'s ADR unit.'),
       packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group for a multi-variant UN.'),
-      variant_index: z.number().int().nonnegative().optional().describe('ADR Table A variant index for a multi-variant UN.'),
+      variant_index: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER, 'variant_index must be a safe integer').optional().describe('ADR Table A variant index for a multi-variant UN.'),
       unit: z.enum(['L', 'kg']).optional().describe("OPTIONAL. The dimension `quantity` is stated in. Omit it and the number is taken as already on the ADR 1.1.3.6.3 basis (unchanged behaviour). Supply it and it is CHECKED against the dimension 1.1.3.6.3 counts for that Table A row — litres for liquids and for compressed or adsorbed gases, kilograms for solids, liquefied/refrigerated/dissolved gases and articles. A mismatch returns total_points null, exempt null and items[].basis_mismatch true, naming the dimension the entry is counted in."),
       basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging, so a quantity declared 'gross' returns no points in ANY unit — send the net figure instead."),
-    }, { hints: EXEMPTION_KEY_HINTS, acceptedLabel: 'Accepted on each item' })).optional().describe('Mixed-load items (use INSTEAD of un_number/quantity).'),
+    }, { hints: EXEMPTION_KEY_HINTS, acceptedLabel: 'Accepted on each item' })).min(1, 'items must hold at least one item').optional().describe('Mixed-load items (use INSTEAD of un_number/quantity).'),
   }, {
     hints: EXEMPTION_KEY_HINTS,
     acceptedLabel: 'Accepted arguments',
@@ -413,7 +413,7 @@ Limitations: this dataset's provenance is pending independent verification (the 
 Related: airport_lookup (searches AIRPORTS, not carriers), validate (checks an AWB number's check digit and names its airline from this dataset).`,
 
   schema: z.object({
-    query: z.string().min(2, 'Query must be at least 2 characters').optional().describe('Ranked fuzzy search across name, codes, prefix and country (min 2 chars). Example: "emirates".'),
+    query: z.string().min(2, 'Query must be at least 2 characters').refine((s) => s.trim().length >= 2, 'Query must be at least 2 characters, not counting spaces').optional().describe('Ranked fuzzy search across name, codes, prefix and country (min 2 chars). Example: "emirates".'),
     iata: z.string().regex(/^[A-Za-z0-9]{2}$/, 'IATA code must be 2 letters or digits (e.g., "EK", "U2")').optional().describe('Exact IATA code — 2 alphanumeric characters. Examples: "EK", "U2".'),
     icao: z.string().regex(/^[A-Za-z]{3}$/, 'ICAO code must be 3 letters (e.g., "UAE", "BAW")').optional().describe('Exact ICAO code — 3 letters. Examples: "UAE", "BAW".'),
     prefix: z.string().regex(/^\d{3}$/, 'AWB prefix must be exactly 3 digits').optional().describe('Exact AWB prefix — the first 3 digits of an air waybill. Example: "176".'),
@@ -708,8 +708,8 @@ Related: cbm_calculator / chargeable_weight_calculator / ldm_calculator (single-
   schema: z.object({
     mode: z.enum(['sea', 'air', 'road']).optional().describe('Transport mode: sea | air | road. Default: road.'),
     lines: z.array(z.object({
-      description: z.string().optional().describe('Optional item label.'),
-      quantity: z.number().int().positive().describe('Number of identical pieces on this line.'),
+      description: z.string().max(200, 'description must be at most 200 characters').optional().describe('Optional item label.'),
+      quantity: z.number().int().positive().max(100_000, 'quantity must be at most 100,000 per line — the API refuses more').describe('Number of identical pieces on this line.'),
       dims: z.object({
         l: z.number().positive().describe('Length in the given unit.'),
         w: z.number().positive().describe('Width in the given unit.'),
@@ -720,8 +720,8 @@ Related: cbm_calculator / chargeable_weight_calculator / ldm_calculator (single-
         value: z.number().positive().describe('Gross weight per piece.'),
         unit: z.enum(['kg', 'g', 't', 'lb']).describe('Weight unit.'),
       }).describe('Per-piece weight with unit.'),
-      hs_code: z.string().optional().describe('Optional HS commodity code (6-10 digits).'),
-      un_number: z.string().optional().describe('Optional UN number — triggers the dangerous-goods advisory flag.'),
+      hs_code: z.string().regex(/^\d{6,10}$/, 'HS code must be 6–10 digits').optional().describe('Optional HS commodity code (6-10 digits).'),
+      un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN"').optional().describe('Optional UN number — triggers the dangerous-goods advisory flag.'),
       stackable: z.boolean().optional().describe('Stack two-high (halves the loading-metre footprint).'),
     })).min(1).max(50).optional().describe('Canonical consignment lines (preferred, 1-50). Provide lines OR items.'),
     items: z.array(z.object({
@@ -735,9 +735,9 @@ Related: cbm_calculator / chargeable_weight_calculator / ldm_calculator (single-
       pallet_type: z.enum(['none', 'euro', 'uk', 'us', 'custom']).optional().describe('Pallet type (informational).'),
     })).min(1).max(50).optional().describe('Legacy flat alias — dimensions in cm, weight in kg. Prefer lines.'),
     options: z.object({
-      air_volumetric_divisor: z.number().positive().optional().describe('IATA volumetric divisor in cm³/kg. Default: 6000. Air mode only.'),
-      container_number: z.string().optional().describe('ISO 6346 container number — check-digit validated into flags.'),
-      awb_number: z.string().optional().describe('IATA 11-digit air waybill number — check-digit validated into flags.'),
+      air_volumetric_divisor: z.number().positive().max(10_000, 'air_volumetric_divisor must be at most 10,000').optional().describe('IATA volumetric divisor in cm³/kg. Default: 6000. Air mode only.'),
+      container_number: z.string().max(20, 'container_number must be at most 20 characters').optional().describe('ISO 6346 container number — check-digit validated into flags.'),
+      awb_number: z.string().max(20, 'awb_number must be at most 20 characters').optional().describe('IATA 11-digit air waybill number — check-digit validated into flags.'),
     }).optional().describe('Optional settings.'),
   }).strict(),
 
@@ -900,16 +900,16 @@ Related: consignment_calculator (canonical snake_case lines[] shape with advisor
       length: z.number().positive().describe('Length in cm.'),
       width: z.number().positive().describe('Width in cm.'),
       height: z.number().positive().describe('Height in cm.'),
-      weight: z.number().describe('Gross weight per item in kg.'),
-      quantity: z.number().int().positive().describe('Number of items.'),
+      weight: z.number().nonnegative('weight must be 0 or more').describe('Gross weight per item in kg.'),
+      quantity: z.number().int().positive().max(1_000_000, 'quantity must be at most 1,000,000 — the API refuses more').describe('Number of items.'),
       stackable: z.boolean().optional().describe('Whether this item can be stacked (affects pallet fitting).'),
       pallet_type: z.enum(['euro', 'uk', 'us', 'custom', 'none']).optional().describe('Pallet standard the item sits on, if any.'),
       hs_code: z.string().optional().describe('HS code — enables the duty section together with customs_value.'),
       un_number: z.string().optional().describe('UN number — enables the dangerous-goods section.'),
-      adr_quantity: z.number().positive().optional().describe("OPTIONAL ADR 1.1.3.6.3 quantity for this dangerous-goods line, in adr_quantity_unit. SEPARATE from weight, which is gross package mass — 1.1.3.6.3 counts none of its four categories that way. Supply both on EVERY dangerous-goods line and adrFlags.totalPoints is calculated; omit either and it stays null."),
+      adr_quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').optional().describe("OPTIONAL ADR 1.1.3.6.3 quantity for this dangerous-goods line, in adr_quantity_unit. SEPARATE from weight, which is gross package mass — 1.1.3.6.3 counts none of its four categories that way. Supply both on EVERY dangerous-goods line and adrFlags.totalPoints is calculated; omit either and it stays null."),
       adr_quantity_unit: z.enum(['L', 'kg']).optional().describe("Dimension of adr_quantity. CHECKED against the dimension 1.1.3.6.3 counts for the row — a litres entry given kilograms still withholds the total."),
       customs_value: z.number().optional().describe('Customs value per item in GBP — enables the duty section.'),
-    }, { hints: { un: 'un_number' }, acceptedLabel: 'Accepted on each item' })).describe('Shipment items with dimensions, weight and optional HS/UN codes.'),
+    }, { hints: { un: 'un_number' }, acceptedLabel: 'Accepted on each item' })).min(1, 'items must hold at least one item').max(50, 'at most 50 items — the API refuses more').describe('Shipment items with dimensions, weight and optional HS/UN codes.'),
     origin: strictInput({ country: z.string(), locode: z.string().optional() }, { acceptedLabel: 'Accepted in origin and destination' }).optional().describe('Origin — ISO country code and optional UN/LOCODE.'),
     destination: strictInput({ country: z.string(), locode: z.string().optional() }, { acceptedLabel: 'Accepted in origin and destination' }).optional().describe('Destination — ISO country code and optional UN/LOCODE.'),
     incoterm: z.string().optional().describe('Incoterms 2020 three-letter code. Examples: "DAP", "EXW", "FOB".'),
@@ -1068,11 +1068,11 @@ Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exempt
     mode: z.enum(['lq', 'eq']).describe('Check mode: "lq" (Limited Quantity, ADR 3.4) or "eq" (Excepted Quantity, ADR 3.5).'),
     items: z.array(strictInput({
       un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN"').describe('UN number — 4 digits, optionally "UN"-prefixed; explosives keep the leading zero. Examples: "1203", "UN1263".'),
-      quantity: z.number().positive().describe('Quantity per INNER packaging, in the chosen unit. Example: 0.5.'),
+      quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').describe('Quantity per INNER packaging, in the chosen unit. Example: 0.5.'),
       unit: z.enum(['ml', 'L', 'g', 'kg']).describe('Unit: "ml" or "L" for liquids, "g" or "kg" for solids.'),
       inner_packaging_qty: z.number().int().positive().optional().describe('EQ mode only: number of inner packagings per outer package, for the per-outer limit check. Example: 10.'),
       packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group (I, II or III) — only needed to disambiguate a UN with more than one ADR Table A row (e.g. UN 1789). Ignored for single-row UNs.'),
-      variant_index: z.number().int().nonnegative().optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants sharing a packing group (concentration bands). Ignored for single-row UNs.'),
+      variant_index: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER, 'variant_index must be a safe integer').optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants sharing a packing group (concentration bands). Ignored for single-row UNs.'),
     }, { hints: { innerpackagings: 'inner_packaging_qty', un: 'un_number', qty: 'quantity' }, acceptedLabel: 'Accepted on each item' })).min(1).max(20).describe('Items to check (1-20 per call).'),
   }, {
     hints: toItemPath(LQ_ITEM_FIELDS, { innerpackagings: 'items[n].inner_packaging_qty' }),
@@ -1339,7 +1339,7 @@ Limitations: STRICTLY a reference check — not an ENS filing, not a customs-com
 Related: hs_code_lookup (commodity codes — a different field of the ENS), uk_duty_calculator (duty/VAT, unrelated to ENS screening). Intended for checking a goods description before an ENS is filed.`,
 
   schema: z.object({
-    description: z.string().describe('The goods description to check. Example: "gifts" (flagged) vs "wooden toys for retail" (specific).'),
+    description: z.string().min(1, 'description must not be empty').describe('The goods description to check. Example: "gifts" (flagged) vs "wooden toys for retail" (specific).'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -1469,7 +1469,7 @@ Limitations: v1 is SINGLE-TOKEN resolution, not free-text extraction — pass on
 
 Related: every lookup tool this resolves into — adr_lookup, airline_lookup, airport_lookup, unlocode_lookup, hs_code_lookup, incoterms_lookup, container_lookup, uld_lookup, validate.`,
   schema: z.object({
-    q: z.string().min(1).max(32).describe('One freight identifier — e.g. "176", "UN1845", "NLRTM", "FOB", "LHR", "22G1", "MSKU1100810", "090111", "AKE12345AB", "D/E".'),
+    q: z.string().min(1).max(32).refine((s) => s.trim().length > 0, 'q must not be blank').describe('One freight identifier — e.g. "176", "UN1845", "NLRTM", "FOB", "LHR", "22G1", "MSKU1100810", "090111", "AKE12345AB", "D/E".'),
   }).strict(),
   resultSchema: resultShape({
     query: z.string(),

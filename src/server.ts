@@ -7,6 +7,7 @@ import {
 import { createRequire } from 'node:module';
 import { ALL_TOOLS, type ToolDef } from './tools.js';
 import { envelopeShape } from './envelope.js';
+import { isHttpError } from './errors.js';
 
 // Read the version directly from package.json at runtime so the wire-level
 // serverInfo.version stays in sync with the npm-published release. Using
@@ -53,11 +54,9 @@ function stripBridge(env: Record<string, unknown>): Record<string, unknown> {
   return rest;
 }
 
-/** True for the HTTP error throw shape apiGet/apiPost produce (a definite
- *  upstream answer, e.g. 404/400/429) as opposed to a transient network
- *  failure, which is worth one retry before falling back to the flat call. */
-const isHttpError = (err: unknown) =>
-  err instanceof Error && err.message.startsWith('FreightUtils API error ');
+// isHttpError (errors.ts): a definite upstream answer (any non-2xx — 400, 404, 429, 5xx) as
+// opposed to a transient failure (network, timeout, a 2xx that is not JSON), which is worth one
+// retry. Decided by class since 2.21.1; it used to match the message prefix.
 
 export function createServer(): McpServer {
   const server = new McpServer(
@@ -93,7 +92,8 @@ export function createServer(): McpServer {
         annotations: tool.annotations,
       },
       async (args: Record<string, unknown>) => {
-        let env: Record<string, unknown>;
+        // Assigned on every path that reaches the text channel (each failure path returns).
+        let env!: Record<string, unknown>;
         let flat: unknown;
 
         if (tool.localEnvelope) {
@@ -107,31 +107,37 @@ export function createServer(): McpServer {
           env = tool.localEnvelope(flat);
         } else {
           // 1. Envelope-first — the ONLY request on the success path.
+          let failure: unknown;
           try {
             env = await tool.handler(args, { envelope: true, legacySource: true }) as Record<string, unknown>;
           } catch (envErr: unknown) {
-            // Transient (non-HTTP) failures get one retry before conceding.
-            if (!isHttpError(envErr)) {
-              try {
-                env = await tool.handler(args, { envelope: true, legacySource: true }) as Record<string, unknown>;
-              } catch {
-                return errResult(envErr);
-              }
-            } else {
-              // 2. Upstream said no (404/400/429…). Fall back to the flat
-              //    call so the error text keeps its exact pre-2.11 bytes
-              //    (the two channels' error bodies differ upstream).
-              try {
-                await tool.handler(args, { envelope: false });
-              } catch (flatErr: unknown) {
-                return errResult(flatErr);
-              }
-              // Flat succeeded while the envelope leg failed (e.g. the rate
-              // limit boundary fell between the calls). outputSchema requires
-              // structuredContent on success results, so surface the failure
-              // (same behaviour as the 2.11.0/2.11.1 dual-request loop).
-              return errResult(envErr);
+            failure = envErr;
+          }
+          // Transient (non-HTTP) failures get one retry before conceding. A failed retry is
+          // reported as itself — the latest state — not dropped in favour of the first error.
+          if (failure !== undefined && !isHttpError(failure)) {
+            try {
+              env = await tool.handler(args, { envelope: true, legacySource: true }) as Record<string, unknown>;
+              failure = undefined;
+            } catch (retryErr: unknown) {
+              failure = retryErr;
             }
+          }
+          if (failure !== undefined) {
+            if (!isHttpError(failure)) return errResult(failure);
+            // 2. Upstream said no (404/400/429…). Fall back to the flat
+            //    call so the error text keeps its exact pre-2.11 bytes
+            //    (the two channels' error bodies differ upstream).
+            try {
+              await tool.handler(args, { envelope: false });
+            } catch (flatErr: unknown) {
+              return errResult(flatErr);
+            }
+            // Flat succeeded while the envelope leg failed (e.g. the rate
+            // limit boundary fell between the calls). outputSchema requires
+            // structuredContent on success results, so surface the failure
+            // (same behaviour as the 2.11.0/2.11.1 dual-request loop).
+            return errResult(failure);
           }
           // Defensive: a 2xx envelope with ok:false does not occur upstream
           // (blocking_errors ride non-2xx statuses, which throw above), but

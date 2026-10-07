@@ -1,5 +1,63 @@
 # Changelog
 
+## 2.21.1 — 2026-10-07
+
+### Security
+
+- **`@modelcontextprotocol/sdk` ^1.32.1 (was ^1.26.0, locked 1.29.0).** The MCP Marketplace scan of
+  2.21.0 flagged GHSA-6qxp-vccf-f47h (CVE-2026-104850, high): the SDK's OAuth *client* could send
+  stored credentials to an authorization server the MCP server chose — affected 1.12.0 to 1.30.1,
+  fixed in 1.31.0. This package is a stdio *server* and never runs that client code (the advisory
+  itself says "Not affected: MCP servers built with the SDK; stdio clients"), and a fresh install
+  of 2.21.0 already resolved SDK 1.32.1 with `npm audit` clean. But the declared floor allowed a
+  vulnerable SDK and the repository's lockfile pinned one, together with high advisories in
+  fast-uri, hono, ip-address and a critical one in proxy-addr deeper in the SDK's tree. The floor
+  is now ^1.32.1 and the lockfile is clean: `npm audit --omit=dev` and osv-scanner both report 0.
+- `zod` ^3.25.76 (was ^3.24.4) — the SDK requires ^3.25, and a lower floor allowed two zod copies.
+- CI on every push and pull request (and weekly): build, tests on Node 22 and 24, and a gate that
+  fails on any high or critical advisory in production dependencies. Dependabot security updates
+  are on, with a weekly grouped update for the SDK and zod. Code scanning (CodeQL) is on.
+- `SECURITY.md`: supported versions, private reporting (GitHub's private vulnerability reporting,
+  now enabled, or contact@freightutils.com), and what to expect by when.
+- The release workflow can publish to npm **with provenance** through npm trusted publishing (no
+  stored token); it takes effect once the trusted publisher is configured on npmjs.com.
+
+### Changed
+
+- **Errors keep their class and HTTP status end to end.** A failed call is one of
+  `FreightUtilsNetworkError` (with the system code, e.g. ECONNREFUSED), `FreightUtilsTimeoutError`,
+  `FreightUtilsHttpError` (4xx — the API's own refusal, its text byte-identical to earlier
+  releases), `FreightUtilsRateLimitError` (429, with `resetAt` from the body's `reset_at` and
+  `retryAfterSeconds`), `FreightUtilsServerError` (5xx) or `FreightUtilsBadResponseError` (a 2xx
+  that is not JSON). A 5xx page — which can carry request ids and internal host names — is kept on
+  the error but no longer shown; no message carries a stack trace, a header or the API key.
+- **Calls time out after 30 s** (`FREIGHTUTILS_TIMEOUT_MS` to change it); a stalled connection used
+  to hang a tool call for ever. A transient failure is still retried once — and if the retry fails,
+  its error is the one reported, not dropped in favour of the first.
+- **Schemas carry the API's own limits**, and only those — each is a value the API already refuses
+  with a 400, so nothing it accepts is refused here: ADR quantities at most 1,000,000,000
+  (`adr_exemption_calculator`, `adr_lq_eq_check`, `shipment_summary.adr_quantity`); at least one
+  item on `adr_exemption_calculator`; 1–50 items, weight ≥ 0 and quantity ≤ 1,000,000 on
+  `shipment_summary`; on `consignment_calculator` lines, description ≤ 200 characters, quantity ≤
+  100,000, `hs_code` 6–10 digits, `un_number` 4 digits (optionally "UN"), and in options the air
+  divisor ≤ 10,000 and container / AWB numbers ≤ 20 characters; `variant_index` a safe integer;
+  no blank `ics2_check` description, `resolve_reference` q or `airline_lookup` query. An
+  out-of-range value is now refused before it crosses the network, with the limit named, and
+  `tools/list` shows each bound.
+- **The anonymous tier is said once, at start-up, on stderr** when `FREIGHTUTILS_API_KEY` is unset:
+  "calls use the anonymous tier — 25 requests per day per IP address". Never on stdout, which
+  carries only the protocol. `--help` lists the key and the timeout.
+- README: a **Security and data** section (read-only, no file system or shell, one destination, the
+  key from the environment, stdout for the protocol only, the two validation layers), the
+  start-up notice, and how multi-variant UN numbers are handled, linked to the method.
+
+### Fixed
+
+- `uld_lookup` returned an error on every call: the website's `/api/uld` refused the
+  `legacy_source` parameter this package sends with every envelope request (since 2026-08-03). The
+  fix is on the website, shipped in the same release cycle (2026-10-07); nothing changes here, and
+  every installed version of this package recovers when it deploys.
+
 ## 2.21.0 — 2026-10-06
 
 ### Fixed

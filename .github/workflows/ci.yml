@@ -1,0 +1,47 @@
+name: CI
+
+# Every push to main and every pull request: build, the full test suite, and the dependency-
+# advisory gate. Weekly as well, so an advisory published against a dependency we already ship
+# fails the gate without waiting for the next commit (2.21.1 — the MCP Marketplace scan of 2.21.0
+# found a high advisory in the SDK that nothing here had flagged).
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]   # `node --test` with a glob needs Node 21+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: No high or critical advisory in production dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Registry signatures and provenance of the installed tree
+        run: npm audit signatures

@@ -1,0 +1,30 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    # Security updates (switched on in the repository's settings) come for EVERY dependency in the
+    # lockfile, direct or transitive, whatever is set here: `update-types` limits an ignore rule to
+    # version updates — GitHub's docs: "update-types only affects version updates, not security
+    # updates". So the rules below shape the weekly version PRs only.
+    groups:
+      # The weekly grouped update the 2.21.1 release asked for: the SDK and zod move together.
+      mcp-sdk-and-zod:
+        patterns:
+          - '@modelcontextprotocol/sdk'
+          - zod
+      dev-tooling:
+        dependency-type: development
+    ignore:
+      # Majors are migrations, not weekly bumps: zod 4, and the SDK's v2 line (a new package set,
+      # @modelcontextprotocol/server). @types/node follows the oldest supported Node.
+      - dependency-name: zod
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@modelcontextprotocol/sdk'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+    commit-message:
+      prefix: chore(deps)
