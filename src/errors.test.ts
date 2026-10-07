@@ -81,8 +81,12 @@ test('causeCode reads an AggregateError and ignores free text', () => {
 
 test('timeout → FreightUtilsTimeoutError after FREIGHTUTILS_TIMEOUT_MS, never a hang', async () => {
   process.env.FREIGHTUTILS_TIMEOUT_MS = '40';
+  // A stalled connection. The ref'd timer stands in for the socket a real fetch holds open:
+  // AbortSignal.timeout() uses an unref'd timer, so without it Node 22 lets the event loop
+  // drain before the abort fires and cancels the test.
   mockFetch((_url, init) => new Promise((_resolve, reject) => {
-    init?.signal?.addEventListener('abort', () => reject(init.signal!.reason));
+    const socket = setTimeout(() => {}, 10_000);
+    init?.signal?.addEventListener('abort', () => { clearTimeout(socket); reject(init.signal!.reason); });
   }));
   const err = await caught(apiPost('adr-calculator', { items: [] }));
   assert.ok(err instanceof FreightUtilsTimeoutError);
