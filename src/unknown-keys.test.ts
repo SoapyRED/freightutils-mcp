@@ -143,3 +143,16 @@ test('documented keys still reach the API unchanged (the strict schema refuses n
     assert.equal(urls.length, 4, `expected one API request per call, got ${urls.length}`);
   } finally { globalThis.fetch = real; await close(); }
 });
+
+test('every tool refuses an argument it does not read (2.22.2): ldm_calculator { qty: 10 } is not one pallet', async () => {
+  const { client, close } = await connect();
+  try {
+    const res = await client.callTool({ name: 'ldm_calculator', arguments: { pallet: 'euro', qty: 10 } });
+    assert.equal(res.isError, true);
+    assert.match(JSON.stringify(res.content), /qty/);
+    const tools = (await client.listTools()).tools;
+    for (const t of tools) assert.equal((t.inputSchema as { additionalProperties?: unknown }).additionalProperties, false, `${t.name}: additionalProperties false`);
+  } finally {
+    await close();
+  }
+});

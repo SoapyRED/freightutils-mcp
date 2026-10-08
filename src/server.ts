@@ -87,7 +87,10 @@ export function createServer(): McpServer {
         // error naming it (2.21.0). `.shape` makes the SDK rebuild a plain z.object, which
         // strips unknown keys before the handler — that is what dropped quantity_basis
         // "gross" on an adr_exemption_calculator item and read the load "exempt" at 900 points.
-        inputSchema: tool.strictKeys ? tool.schema : tool.schema.shape,
+        // Every tool since 2.22.2 (sweep follow-ups Part C 1, 2026-10-08): the other tools declared
+        // .strict() too, but registering `.shape` stripped the key — ldm_calculator { qty: 10 }
+        // answered ONE pallet. The hosted endpoint refuses alike.
+        inputSchema: tool.schema,
         outputSchema: envelopeShape(tool.resultSchema),
         annotations: tool.annotations,
       },
