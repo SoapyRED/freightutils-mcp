@@ -39,13 +39,16 @@ test('description documents the routing states, the AIR_ONLY_ID basis and the be
   assert.equal(d.includes('items takes precedence'), false, 'un_number/quantity beside items[] are refused now, not overridden');
 });
 
-test('input schema: ID-prefixed numbers accepted, the UN form unchanged', () => {
+// 2.22.0 (all-tools sweep, probe row S36): "UN 1203" — the form a transport document prints —
+// moved from the refused list to the accepted one; the API always read it as UN 1203. Every
+// other refusal stays, plus the spacings that are not a UN number.
+test('input schema: ID-prefixed numbers accepted, "UN 1203" accepted, malformed numbers refused', () => {
   const ok = (v: Record<string, unknown>) => tool.schema.safeParse(v).success;
-  for (const un of ['1203', 'UN1203', 'un1203', 'ID8000', 'ID 8000', 'id8000', 'ID-8000', 'ID:8000']) {
+  for (const un of ['1203', 'UN1203', 'un1203', 'UN 1203', 'un 1203', 'ID8000', 'ID 8000', 'id8000', 'ID-8000', 'ID:8000']) {
     assert.ok(ok({ un_number: un, quantity: 10 }), `single form refused ${un}`);
     assert.ok(ok({ items: [{ un_number: un, quantity: 10 }] }), `items form refused ${un}`);
   }
-  for (const un of ['ID800', 'ID--8000', 'ID 1203A', '12030', 'UN 1203', 'Y841']) {
+  for (const un of ['ID800', 'ID--8000', 'ID 1203A', '12030', 'Y841', 'UN 12 03', 'U N1203', 'UN 120']) {
     assert.equal(ok({ un_number: un, quantity: 10 }), false, `single form accepted ${un}`);
   }
 });
