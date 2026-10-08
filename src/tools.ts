@@ -198,9 +198,9 @@ const ldmCalculator: ToolDef = {
   name: 'ldm_calculator',
   description: `Calculate loading metres (LDM) for European road freight — how much trailer length a pallet load occupies. 1 LDM = 1 linear metre of a 2.4m-wide trailer; a standard artic is 13.6 LDM.
 
-Provide a pallet preset OR custom length_mm + width_mm — omitting both errors with a usage hint. Behavior: deterministic; stackable=true with stack_height 2 or 3 divides the floor footprint accordingly; fits is false when the load exceeds the vehicle's LENGTH or needs more pallet floor positions than the vehicle record holds (Euro and UK pallets count as their own floor positions — pallet_spaces.basis says which — other footprints as Euro equivalents); give weight_kg to also see total_weight_kg against the vehicle's max payload; utilisation_percent is of the vehicle's length. ${RATE}
+Provide a pallet preset OR custom length_mm + width_mm — omitting both errors with a usage hint. Behavior: deterministic; stackable=true with stack_height 2 or 3 divides the floor footprint accordingly; fits is true only when the load fits the vehicle's LENGTH, its pallet FLOOR POSITIONS and — when weight_kg is given — its max PAYLOAD; each failed limit is named in warnings[] with its numbers. Euro and UK pallets count as their own floor positions (pallet_spaces.basis says which), other footprints as Euro equivalents. The vehicle's floor positions are its record's own count only when that count is a floor count; a weight-limited or unverified count (the 7.5t rigid stores 8, its 6.1 x 2.4 m deck holds 15) is not, and the positions come from the deck instead — pallet_spaces.floor_positions_basis says which, record_count is the stored figure. Without weight_kg the payload is not checked: payload_checked is false and an info warning gives the payload. utilisation_percent is of the vehicle's length. ${RATE}
 
-Returns: ldm, vehicle (name, length_m, max_payload_kg), utilisation_percent, pallet_spaces (used/available/basis), total_weight_kg, fits and warnings under result, ${ENV} ${CASING}
+Returns: ldm, vehicle (name, length_m, max_payload_kg), utilisation_percent, pallet_spaces (used, available, basis, floor_positions_basis, floor_positions_note, record_count, record_count_basis), total_weight_kg, payload_checked, fits and warnings under result, ${ENV} ${CASING}
 
 Related: vehicle_lookup (the trailer specs behind the vehicle presets), pallet_fitting_calculator (boxes onto one pallet), consignment_calculator (mixed lines including LDM).`,
 
@@ -223,8 +223,9 @@ Related: vehicle_lookup (the trailer specs behind the vehicle presets), pallet_f
     ldm: z.number(),
     vehicle: loose({ name: z.string(), length_m: z.number(), max_payload_kg: z.number() }),
     utilisation_percent: z.number(),
-    pallet_spaces: loose({ used: z.number(), available: z.number() }),
+    pallet_spaces: loose({ used: z.number(), available: z.number(), floor_positions_basis: z.string() }),
     total_weight_kg: z.number(),
+    payload_checked: z.boolean(),
     fits: z.boolean(),
     warnings: z.array(z.unknown()),
     meta: z.record(z.string(), z.unknown()),
@@ -563,7 +564,7 @@ const hsCodeLookup: ToolDef = {
 
 Provide ONE of: query (free-text description search, min 2 chars), code (2-6 digit lookup, written with or without dots or spaces — "8471.30" is 847130 — returns the code plus its hierarchy), or section (Roman numeral I-XXI to browse a section).
 
-Behavior: read-only; description search is keyword-based against official HS descriptions, so everyday product words can return zero rows — count 0 with an empty results[] is a valid answer (e.g. "laptop" and "computers" find nothing; "automatic data" matches the official phrasing "automatic data processing machines"); prefer the formal tariff wording. ${RATE}
+Behavior: read-only; description search runs first against the official WCO HS descriptions; when none contains the words, it falls back to the UK Trade Tariff search references (HMRC's index of everyday goods names), so "laptop" finds 847130 and "computers" finds heading 8471. A fallback match is medium confidence: matched_via names HMRC's index, the citation asks you to confirm the code, and the formal tariff wording ("automatic data processing machines") stays the surest search. count 0 with an empty results[] is still a valid answer when neither finds the words. ${RATE}
 
 Returns: the query/code echo, count and results[] (hscode, description and hierarchy context) under result, ${ENV}
 
@@ -572,7 +573,7 @@ Limitations: the 6-digit international level only — national tariff lines (8-1
 Related: uk_duty_calculator (duty/VAT for a code found here), ics2_check (EU ENS goods-description quality — a different check entirely).`,
 
   schema: z.object({
-    query: z.string().min(2, 'Search term must be at least 2 characters').optional().describe('Keyword search on official HS descriptions (min 2 chars). Formal tariff wording works best. Example: "automatic data" rather than "laptop".'),
+    query: z.string().min(2, 'Search term must be at least 2 characters').optional().describe('Search words (min 2 chars), matched against the official HS descriptions first, then HMRC everyday goods names (medium confidence). Examples: "automatic data", "laptop".'),
     // "8471.30" / "8471 30" — the written form — read as its digits (2.22.0, probe S14).
     code: z.string().refine((c) => /^\d{2,6}$/.test(c.trim().replace(/[\s.-]/g, '')), 'HS code must be 2–6 digits; dots, spaces and hyphens are ignored (e.g. "847130", "8471.30")').optional().describe('Exact HS code or prefix — 2, 4 or 6 digits, with or without dots or spaces. Examples: "8471", "8471.30".'),
     section: z.string().regex(/^[ivxIVX]{1,5}$/, 'Section must be a Roman numeral I–XXI').optional().describe('Browse a section by Roman numeral I-XXI. Example: "XVI" (machinery).'),
@@ -885,7 +886,8 @@ Limitations: an estimate, not a customs ruling — excise, quotas, anti-dumping 
 Related: hs_code_lookup (find the 6-digit code first), incoterms_lookup (who actually pays these costs).`,
 
   schema: z.object({
-    commodity_code: z.string().regex(/^\d{6,10}$/, 'Commodity code must be 6–10 digits').describe('UK tariff commodity code — the declarable 10 digits. Example: "8471300000" (portable computers). A 6- or 8-digit code is refused with the declarable codes beneath it.'),
+    // Spaces allowed, as the API and the hosted tool accept ("8471 30 00 00").
+    commodity_code: z.string().regex(/^[\d\s]{6,14}$/, 'Commodity code must be 6–10 digits (spaces allowed)').refine((c) => /^\d{6,10}$/.test(c.replace(/\s/g, '')), 'Commodity code must be 6–10 digits (spaces allowed)').describe('UK tariff commodity code — the declarable 10 digits. Example: "8471300000" (portable computers). A 6- or 8-digit code is refused with the declarable codes beneath it.'),
     origin_country: z.string().regex(/^[A-Za-z]{2}$/, 'Origin country must be a 2-letter ISO code (e.g., "CN", "DE")').describe('ISO 2-letter country of origin. Examples: "CN", "DE", "US".'),
     customs_value: z.number().positive().describe('Goods value in GBP. Example: 1000.'),
     // A cost is 0 or more: -1000 took 1,000 off the dutiable value until 2.21.2, here, on the API
@@ -931,7 +933,7 @@ const shipmentSummary: ToolDef = {
 
 Provide mode (road | air | sea | multimodal) and items[] (dims in cm, weight in kg PER ITEM, quantity; optional stackable, pallet_type, hs_code, un_number, customs_value PER ITEM, and adr_quantity — the TOTAL for the dangerous-goods line, all pieces together); origin/destination and incoterm refine the duty leg.
 
-Behavior: calls the ldm_calculator, adr_lookup and uk_duty_calculator engines directly; CBM, volumetric weight and revenue tonnes are the same arithmetic inline rather than a call out. Road LDM uses the 2.40 m loading-metre convention divisor and, like ldm_calculator, treats an item with no stackable flag as NOT stacked. modeSpecific.palletSpaces is pallet FLOOR POSITIONS (the figure ldm_calculator reports); palletRows is the separate row count. The suggested vehicle holds the load by its own record (length, payload, pallet capacity) and trailerUtilisation is of that vehicle (utilisationBasis names it); the suggested container is the smallest dry box whose record holds the volume and payload. Sections that cannot run (e.g. duty without a customs value) surface in warnings instead of failing the whole call. ${UNKNOWN_FIELDS_REFUSED} ${RATE}
+Behavior: calls the ldm_calculator, adr_lookup and uk_duty_calculator engines directly; CBM, volumetric weight and revenue tonnes are the same arithmetic inline rather than a call out. Road LDM uses the 2.40 m loading-metre convention divisor and, like ldm_calculator, treats an item with no stackable flag as NOT stacked. modeSpecific.palletSpaces is pallet FLOOR POSITIONS (the figure ldm_calculator reports); palletRows is the separate row count. The suggested vehicle is the smallest that holds the load by its length, its payload and its pallet floor positions — the record's own count when it is a floor count, otherwise worked from its deck (a 7.5t rigid holds 15 Euro pallets on the floor; modeSpecific.suggestedVehicleFloorPositions says which) — and trailerUtilisation is of that vehicle (utilisationBasis names it); the suggested container is the smallest dry box whose record holds the volume and payload. Sections that cannot run (e.g. duty without a customs value) surface in warnings instead of failing the whole call. ${UNKNOWN_FIELDS_REFUSED} ${RATE}
 
 Returns: mode, itemCount, totals {pieces, grossWeight, volumeCBM, chargeableWeight, billingBasis}, modeSpecific (LDM / pallet floor positions / pallet rows / suggested vehicle, or revenue tonnes / container), warnings and dataVersion (road mode attributes the vehicle dataset and the LDM divisor) under result — note this composite's result uses camelCase field names (legacy shape); ${ENV}
 
