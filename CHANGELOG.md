@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.22.2 — 2026-10-08
+
+### Fixed
+
+- **Every tool refuses an argument it does not read.** Each tool declared a strict schema, but all except
+  `adr_exemption_calculator`, `adr_lq_eq_check` and `shipment_summary` were registered in a way that stripped
+  unknown keys before the handler ran, so `ldm_calculator { pallet: "euro", qty: 10 }` answered for one pallet.
+  An unknown argument is now refused with a tool error naming it, and `tools/list` publishes
+  `additionalProperties: false` on every tool. The hosted endpoint refuses alike.
+
 ## 2.22.1 — 2026-10-08
 
 ### Fixed
