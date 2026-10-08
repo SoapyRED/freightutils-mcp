@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.22.1 — 2026-10-08
+
+### Fixed
+
+- **Descriptions match what the tools now do.** `ldm_calculator`: `fits` is true only when the load fits the
+  vehicle's length, its pallet floor positions and, when `weight_kg` is given, its payload; a vehicle's stored
+  pallet count is used as floor space only when its record says it is a floor count (the 7.5t rigid's 8 is a
+  payload figure; its deck holds 15), and the result says where its figure came from (`floor_positions_basis`,
+  `record_count`, `payload_checked`). `shipment_summary`: the suggested vehicle holds the load by length,
+  payload and floor positions worked the same way. `hs_code_lookup`: a word the WCO text does not contain is
+  looked up in HMRC's everyday goods names ("laptop" → 847130, "computers" → 8471), at medium confidence; the
+  description no longer says those words find nothing.
+- **`uk_duty_calculator` takes a commodity code written with spaces** ("8471 30 00 00"), as the API and the
+  hosted tool already do.
+
 ## 2.22.0 — 2026-10-08
 
 ### Added

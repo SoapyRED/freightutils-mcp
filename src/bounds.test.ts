@@ -169,3 +169,25 @@ test('tools/list advertises the bounds, so an agent can see them before it calls
     await close();
   }
 });
+
+test('uk_duty_calculator: a commodity code written with spaces is accepted, as the API and hosted tool accept it (2.22.0 refused it)', async () => {
+  await accepted('uk_duty_calculator', { commodity_code: '8471 30 00 00', origin_country: 'CN', customs_value: 1000 });
+  await refused('uk_duty_calculator', { commodity_code: '8471.30.00.00', origin_country: 'CN', customs_value: 1000 }, /6–10 digits/);
+  await refused('uk_duty_calculator', { commodity_code: '84713', origin_country: 'CN', customs_value: 1000 }, /6–10 digits/);
+});
+
+test('tools/list: descriptions say what the tools now do (2.22.1)', async () => {
+  const { client, close } = await connect();
+  try {
+    const tools = (await client.listTools()).tools;
+    const d = (name: string) => tools.find((t) => t.name === name)?.description ?? '';
+    assert.doesNotMatch(d('hs_code_lookup'), /find nothing/);
+    assert.match(d('hs_code_lookup'), /HMRC/);
+    assert.match(d('hs_code_lookup'), /medium confidence/);
+    assert.match(d('ldm_calculator'), /floor_positions_basis/);
+    assert.match(d('ldm_calculator'), /PAYLOAD/);
+    assert.match(d('shipment_summary'), /floor positions/);
+  } finally {
+    await close();
+  }
+});
