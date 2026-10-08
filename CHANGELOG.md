@@ -1,5 +1,36 @@
 # Changelog
 
+## 2.22.0 — 2026-10-08
+
+### Added
+
+- **Lists come back as pages an agent can read.** `vehicle_lookup`, `uld_lookup`, `container_lookup` and
+  `incoterms_lookup` with no single record asked for, and `airline_lookup` by query or country, return
+  summary rows (a subset of each record's own fields) with `total`, `truncated`, `next_offset` and a
+  `detail_hint`; new `full`, `offset` and `limit` parameters page the full records. The vehicle and
+  ULD lists were 461,558 and 607,111 characters, more than MCP clients will read. A single-record call
+  still returns the full record with its provenance.
+- **`adr_lookup` `offset` and `limit`** for a name search or class filter, which now report their total
+  instead of stopping silently.
+
+### Fixed
+
+- **Written forms are accepted:** `"UN 1203"` on `adr_lq_eq_check` and `adr_exemption_calculator`,
+  `"8471.30"` on `hs_code_lookup`, `"GB LHR"` on `unlocode_lookup`. Each was refused by this package's
+  schema while the API answered it.
+- **`unit_converter` refuses a negative value**; `container_lookup`'s `item_weight_kg` accepts 0.
+- **Descriptions match what the API now does:** totals are computed from unrounded figures;
+  `chargeable_weight_calculator`'s gross weight is the total for all pieces; `shipment_summary`'s
+  `adr_quantity` is the total for the line and `customs_value` is per item; `ldm_calculator` is not
+  "fits" when the vehicle has too few pallet floor positions; `pallet_fitting_calculator` reports
+  footprint and volume utilisation separately; `uk_duty_calculator` refuses a 6- or 8-digit code and
+  lists the declarable codes beneath it, never padding it; descriptions say where the hosted endpoint
+  uses camelCase field names.
+
+Found by the 8 Oct 2026 independent probe and all-tools sweep. Name and class searches in
+`adr_lookup` and ICAO lookups in `airport_lookup` failed output validation on 2.21.2; both were fixed on
+the API the same day and need no package update.
+
 ## 2.21.2 — 2026-10-07
 
 ### Fixed
