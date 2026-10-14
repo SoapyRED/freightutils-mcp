@@ -58,7 +58,7 @@ test('README does not restate the retired "public IATA/ICAO sources" airline wor
   assert.equal(
     /public IATA\/ICAO/i.test(r),
     false,
-    'that wording was removed from every public surface: the airline dataset has no per-record provenance, so the README states the IATA / ICAO registries as the authority and asserts no licence',
+    'that wording was removed from every public surface: the README says the airline dataset is a FreightUtils compilation of public sources, not published or endorsed by IATA or ICAO, and asserts no licence',
   );
 });
 

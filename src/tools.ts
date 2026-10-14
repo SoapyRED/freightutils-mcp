@@ -564,7 +564,7 @@ const hsCodeLookup: ToolDef = {
 
 Provide ONE of: query (free-text description search, min 2 chars), code (2-6 digit lookup, written with or without dots or spaces — "8471.30" is 847130 — returns the code plus its hierarchy), or section (Roman numeral I-XXI to browse a section).
 
-Behavior: read-only; description search runs first against the official WCO HS descriptions; when none contains the words, it falls back to the UK Trade Tariff search references (HMRC's index of everyday goods names), so "laptop" finds 847130 and "computers" finds heading 8471. A fallback match is medium confidence: matched_via names HMRC's index, the citation asks you to confirm the code, and the formal tariff wording ("automatic data processing machines") stays the surest search. count 0 with an empty results[] is still a valid answer when neither finds the words. ${RATE}
+Behavior: read-only; description search runs first against the HS 2022 descriptions (UN Comtrade H6); when none contains the words, it falls back to the UK Trade Tariff search references (HMRC's index of everyday goods names), so "laptop" finds 847130 and "computers" finds heading 8471. A fallback match is medium confidence: matched_via names HMRC's index, the citation asks you to confirm the code, and the formal tariff wording ("automatic data processing machines") stays the surest search. count 0 with an empty results[] is still a valid answer when neither finds the words. ${RATE}
 
 Returns: the query/code echo, count and results[] (hscode, description and hierarchy context) under result, ${ENV}
 

@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.22.4 — 2026-10-14
+
+### Fixed
+
+- **`hs_code_lookup` names the descriptions it searches as they are.** The description said search "runs first
+  against the official WCO HS descriptions"; the 6-digit texts are UN Comtrade's H6 wording (UN Statistics
+  Division), not the WCO's legal text. It now says "the HS 2022 descriptions (UN Comtrade H6)", the same words
+  the hosted endpoint uses. The WCO still maintains the Harmonized System.
+- **README "Data Sources" says what is true.** HS: UN Comtrade H6 descriptions, no named open licence (the
+  "Public Domain Dedication and Licence" label belonged to a third-party repackaging). Airlines: compiled by
+  FreightUtils from public sources, not published or endorsed by IATA or ICAO. UN/LOCODE: © UNECE, CC BY 4.0,
+  as UNECE states for UN/CEFACT standards.
+
+Why a patch: description and README text only. No schema, argument or result changes.
+
 ## 2.22.3 — 2026-10-14
 
 ### Fixed

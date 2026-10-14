@@ -236,15 +236,18 @@ Once connected, your AI agent can:
 - **ADR 2025** — UNECE, ECE/TRANS/352, applicable 1 Jan 2025; given legal effect by EU
   Directive 2008/68/EC (consolidated). Factual compilation, best-effort — not legal advice,
   not a regulatory authority.
-- **HS 2022** — UN Comtrade HS 2022 (Public Domain Dedication and Licence); the WCO
-  Harmonized System nomenclature is the authority.
-- **Airlines** — the IATA / ICAO code registries. Authority only: this dataset carries no
-  per-record provenance, and no licence or "open data" claim is made for it.
+- **HS 2022** — HS 2022 descriptions from UN Comtrade's H6 classification (UN Statistics
+  Division); the WCO maintains the Harmonized System nomenclature. No named open licence.
+- **Airlines** — compiled by FreightUtils from public sources. Verified records cite
+  carrier-published pages and FAA Order JO 7340.2 field by field; the rest are pending
+  verification. IATA and ICAO assign these codes, but this dataset is not published or
+  endorsed by IATA or ICAO, and no licence or "open data" claim is made for it.
 - **UN/LOCODE 2025-1** — UNECE official release artifact, coordinates strict-validated.
+  UN/LOCODE © UNECE, CC BY 4.0 (as UNECE states for UN/CEFACT standards).
 - **UK duty** — the live GOV.UK Trade Tariff API, pulled per request, so there is no local
   copy that can drift.
 - **Containers / ULD / vehicles** — ISO, IATA and industry-standard specifications.
-- **Emissions factors** — open DEFRA / EPA / ADEME factors (currently DEFRA 2026 + EPA 2025
+- **Emissions factors** — published DEFRA / EPA / ADEME factors (currently DEFRA 2026 + EPA 2025
   + ADEME Base Carbone v23.11), combined by the ISO 14083 / GLEC distance-based method.
   Estimates, not audited reports.
 
