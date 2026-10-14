@@ -439,7 +439,7 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
 
 const airlineLookup: ToolDef = {
   name: 'airline_lookup',
-  description: `Search 6,357 airlines by name, IATA code, ICAO code, AWB prefix, or country. AWB prefixes are the first 3 digits of an air waybill number and identify the issuing carrier (e.g. 176 = Emirates).
+  description: `Search 6,356 airlines by name, IATA code, ICAO code, AWB prefix, or country. AWB prefixes are the first 3 digits of an air waybill number and identify the issuing carrier (e.g. 176 = Emirates).
 
 Provide ONE parameter: query is a ranked fuzzy search across names and codes; iata / icao / prefix / country are exact filters.
 

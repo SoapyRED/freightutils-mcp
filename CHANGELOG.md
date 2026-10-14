@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.22.5 — 2026-10-14
+
+### Fixed
+
+- **`airline_lookup` states 6,356 airlines, not 6,357.** Georgian Airways was in the airline dataset twice (two
+  records, both A9 / TGZ). The duplicate was merged into the verified record, so the dataset holds 6,356 airlines. The
+  description and the README now say so.
+
+Why a patch: description and README text only. No schema, argument or result changes.
+
 ## 2.22.4 — 2026-10-14
 
 ### Fixed
