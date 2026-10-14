@@ -132,6 +132,19 @@ test('uk_duty_calculator: freight_cost and insurance_cost are 0 or more (2.21.2:
   await accepted('uk_duty_calculator', { ...base, freight_cost: 500, insurance_cost: 50 });
 });
 
+test('shipment_summary: freight_cost, insurance_cost and item customs_value are 0 or more, with the hosted messages (2.22.3)', async () => {
+  // The API and the hosted endpoint refuse these since 2026-10-12; this schema took any number.
+  const item = { length: 120, width: 80, height: 100, weight: 200, quantity: 2, hs_code: '8471300000', customs_value: 1000 };
+  const base = { mode: 'road', items: [item], origin: { country: 'CN' }, destination: { country: 'GB' } };
+  await refused('shipment_summary', { ...base, freight_cost: -1 }, /freight_cost must be 0 or more \(GBP\), or omitted for 0/);
+  await refused('shipment_summary', { ...base, insurance_cost: -0.01 }, /insurance_cost must be 0 or more \(GBP\), or omitted for 0/);
+  await refused('shipment_summary', { ...base, items: [{ ...item, customs_value: -5 }] }, /customs_value must be 0 or more \(GBP per item\), or omitted/);
+  await refused('shipment_summary', { ...base, freight_cost: Number.NEGATIVE_INFINITY }, /freight_cost|number/);
+  await accepted('shipment_summary', { ...base, freight_cost: 0, insurance_cost: 0, items: [{ ...item, customs_value: 0 }] });
+  await accepted('shipment_summary', { ...base, freight_cost: 500, insurance_cost: 50 });
+  await accepted('shipment_summary', base);
+});
+
 test('adr_lookup: "UN 1203" is accepted, as the description promises (2.21.2: the space was refused)', async () => {
   await accepted('adr_lookup', { un_number: 'UN 1203' });
   await accepted('adr_lookup', { un_number: 'un 1203' });
@@ -165,6 +178,24 @@ test('tools/list advertises the bounds, so an agent can see them before it calls
     assert.match(schema('consignment_calculator'), /"maxLength":200/);
     assert.match(schema('cbm_calculator'), /"maximum":9007199254740991/);
     assert.match(schema('uk_duty_calculator'), /"freight_cost":\{[^}]*"minimum":0/);
+    assert.match(schema('shipment_summary'), /"freight_cost":\{[^}]*"minimum":0/);
+    assert.match(schema('shipment_summary'), /"insurance_cost":\{[^}]*"minimum":0/);
+    assert.match(schema('shipment_summary'), /"customs_value":\{[^}]*"minimum":0/);
+  } finally {
+    await close();
+  }
+});
+
+test('validate and airline_lookup descriptions: a shared AWB prefix names no airline, it lists candidates (2.22.3)', async () => {
+  // The API withholds the airline on a prefix several records hold since 2026-09-11.
+  const { client, close } = await connect();
+  try {
+    const tools = (await client.listTools()).tools;
+    const desc = (name: string) => tools.find((t) => t.name === name)?.description ?? '';
+    assert.match(desc('validate'), /airline_candidates\[\]/);
+    assert.match(desc('validate'), /airline_note/);
+    assert.doesNotMatch(desc('validate'), /the operating airline resolved from the AWB-prefix dataset/);
+    assert.match(desc('airline_lookup'), /when one record holds the prefix, otherwise lists the candidates/);
   } finally {
     await close();
   }
