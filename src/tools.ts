@@ -449,7 +449,7 @@ Returns: count and results[] — per airline: airline_name, iata_code, icao_code
 
 Limitations: this dataset's provenance is pending independent verification (the envelope's provenance_status says so) — confirm operationally critical codes with IATA/ICAO or the carrier.
 
-Related: airport_lookup (searches AIRPORTS, not carriers), validate (checks an AWB number's check digit and names its airline from this dataset).`,
+Related: airport_lookup (searches AIRPORTS, not carriers), validate (checks an AWB number's check digit and names its airline from this dataset when one record holds the prefix, otherwise lists the candidates).`,
 
   schema: z.object({
     query: z.string().min(2, 'Query must be at least 2 characters').refine((s) => s.trim().length >= 2, 'Query must be at least 2 characters, not counting spaces').optional().describe('Ranked fuzzy search across name, codes, prefix and country (min 2 chars). Example: "emirates".'),
@@ -957,13 +957,13 @@ Related: consignment_calculator (canonical snake_case lines[] shape with advisor
       un_number: z.string().optional().describe('UN number — enables the dangerous-goods section.'),
       adr_quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').optional().describe("OPTIONAL ADR 1.1.3.6.3 quantity for this dangerous-goods line — the total for the whole line, all pieces together (never per piece), in adr_quantity_unit. SEPARATE from weight, which is gross package mass — 1.1.3.6.3 counts none of its four categories that way. Supply both on EVERY dangerous-goods line and adrFlags.totalPoints is calculated; omit either and it stays null."),
       adr_quantity_unit: z.enum(['L', 'kg']).optional().describe("Dimension of adr_quantity. CHECKED against the dimension 1.1.3.6.3 counts for the row — a litres entry given kilograms still withholds the total."),
-      customs_value: z.number().optional().describe('Customs value in GBP PER ITEM (per piece) — multiplied by quantity for the line; the duty estimate uses the sum over all lines. Enables the duty section with hs_code.'),
+      customs_value: z.number().nonnegative('customs_value must be 0 or more (GBP per item), or omitted').optional().describe('Customs value in GBP PER ITEM (per piece), 0 or more — multiplied by quantity for the line; the duty estimate uses the sum over all lines. Enables the duty section with hs_code.'),
     }, { hints: { un: 'un_number' }, acceptedLabel: 'Accepted on each item' })).min(1, 'items must hold at least one item').max(50, 'at most 50 items — the API refuses more').describe('Shipment items with dimensions, weight and optional HS/UN codes.'),
     origin: strictInput({ country: z.string(), locode: z.string().optional() }, { acceptedLabel: 'Accepted in origin and destination' }).optional().describe('Origin — ISO country code and optional UN/LOCODE.'),
     destination: strictInput({ country: z.string(), locode: z.string().optional() }, { acceptedLabel: 'Accepted in origin and destination' }).optional().describe('Destination — ISO country code and optional UN/LOCODE.'),
     incoterm: z.string().optional().describe('Incoterms 2020 three-letter code. Examples: "DAP", "EXW", "FOB".'),
-    freight_cost: z.number().optional().describe('Freight cost in GBP for the duty calculation.'),
-    insurance_cost: z.number().optional().describe('Insurance cost in GBP for the duty calculation.'),
+    freight_cost: z.number().nonnegative('freight_cost must be 0 or more (GBP), or omitted for 0').optional().describe('Freight cost in GBP for the duty calculation, 0 or more. Default: 0.'),
+    insurance_cost: z.number().nonnegative('insurance_cost must be 0 or more (GBP), or omitted for 0').optional().describe('Insurance cost in GBP for the duty calculation, 0 or more. Default: 0.'),
   }, { hints: toItemPath(SHIPMENT_ITEM_FIELDS), acceptedLabel: 'Accepted arguments' }),
 
   resultSchema: resultShape({
@@ -1329,7 +1329,7 @@ const identifierValidator: ToolDef = {
 
 Two modes: pass text=<arbitrary string> to find and validate every identifier in it (e.g. a booking-email line), OR pass value=<identifier> + type=<container|awb|imo> to validate one.
 
-Behavior: deterministic check-digit arithmetic; per identifier found it reports type, the normalised form, valid (pass/fail), expected vs actual check digit, and details (container: owner prefix + equipment category; AWB: airline prefix + the operating airline resolved from the AWB-prefix dataset; IMO: the 7-digit number); text mode with no identifiers found returns an empty found[] with a note. ${RATE}
+Behavior: deterministic check-digit arithmetic; per identifier found it reports type, the normalised form, valid (pass/fail), expected vs actual check digit, and details (container: owner prefix + equipment category; AWB: airline prefix + the airline from the AWB-prefix dataset when ONE record holds the prefix — when several do (e.g. 020: Lufthansa and Lufthansa Cargo), airline is null and airline_candidates[] lists every holder with airline_note saying why, never a guessed carrier; IMO: the 7-digit number); text mode with no identifiers found returns an empty found[] with a note. ${RATE}
 
 Returns: found[] (each entry with its own _source naming the standard applied) and disclaimer under result, ${ENV}
 

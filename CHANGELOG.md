@@ -1,5 +1,22 @@
 # Changelog
 
+## 2.22.3 — 2026-10-14
+
+### Fixed
+
+- **`shipment_summary`: `freight_cost`, `insurance_cost` and each item's `customs_value` are 0 or more.** The
+  API and the hosted endpoint refuse a negative cost since 12 Oct 2026; this package's schema took any
+  number, so -1 crossed the network to be refused there. It is now refused before the call, with the hosted
+  endpoint's own words ("freight_cost must be 0 or more (GBP), or omitted for 0"; customs_value "… (GBP per
+  item), or omitted"), and `tools/list` advertises `minimum: 0` on all three. 0 and omitted still answer.
+- **`validate` and `airline_lookup` describe a shared AWB prefix as the API answers it.** When several records
+  hold a prefix (020: Lufthansa and Lufthansa Cargo), `validate` returns `airline: null` with
+  `airline_candidates[]` and `airline_note` instead of naming one carrier; the descriptions said it named
+  "the operating airline". The answers were already right; only the text changes.
+
+Why a patch: nothing the API answers is refused here, and no result shape changes. Every refusal added is
+one the API and the hosted endpoint already make.
+
 ## 2.22.2 — 2026-10-08
 
 ### Fixed
