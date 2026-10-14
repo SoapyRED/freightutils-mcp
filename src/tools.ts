@@ -1248,9 +1248,9 @@ Provide mass + distance_km + mode (road | rail | sea | air | inland_waterway); o
 
 Behavior: deterministic given the same factor edition; the fleet-average factor already includes average empty running (see empty_running) — do NOT add your own empty-return leg; sea and air are low-representativeness generic defaults (real emissions vary materially by vessel/aircraft, load factor and routing — see representativeness and the result summary). An unknown mode/sub_mode/region returns available:false with the covered options, never a fabricated factor. ${RATE}
 
-Returns: well-to-wheel AND tank-to-wheel emissions where the factor has both, the exact factor used (value, authority, edition), the tonne-km activity and a per-result _source citing BOTH the ISO method and the specific open factor, all under result, ${ENV}
+Returns: well-to-wheel AND tank-to-wheel emissions where the factor has both, the exact factor used (value, authority, edition), the tonne-km activity and a per-result _source citing BOTH the ISO method and the specific published factor, all under result, ${ENV}
 
-Limitations: best-effort reference estimate from open factors (DEFRA / EPA / ADEME) — NOT a verified or audited carbon report.
+Limitations: best-effort reference estimate from published factors (DEFRA / EPA / ADEME) — NOT a verified or audited carbon report.
 
 Related: distinct from cbm_calculator / ldm_calculator / chargeable_weight_calculator (those size or bill a shipment; this one estimates its CO2e).`,
 
