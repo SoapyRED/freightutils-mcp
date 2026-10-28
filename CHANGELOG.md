@@ -1,5 +1,34 @@
 # Changelog
 
+## 2.23.0 — 2026-10-28
+
+### Added
+
+- **`adr_lookup` returns all 20 Table A columns (packing, tank, vehicle and carriage provisions).** The API has
+  served the 12 further columns since the website's 28 October rebuild from the UNECE ADR 2025 Table A workbook:
+  `packing_instructions` (8), `special_packing_provisions` (9a), `mixed_packing_provisions` (9b),
+  `portable_tank_instructions` (10), `portable_tank_special_provisions` (11), `tank_code` (12),
+  `tank_special_provisions` (13), `vehicle_for_tank_carriage` (14), `carriage_packages` (16), `carriage_bulk` (17),
+  `carriage_loading_unloading_handling` (18) and `carriage_operation` (19). The description's Returns clause and
+  the result schema now name them; an empty column is null. On the 28 scope-flagged rows `tank_code` carries the
+  row remark ("NOT SUBJECT TO ADR", "CARRIAGE PROHIBITED") as Table A prints it across columns (12)–(19).
+
+### Changed
+
+- **zod 4.6.x** (was 3.25.x), clearing GHSA-mrhx-c7xc-m3w5. The JSON Schemas in `tools/list` serialise in zod 4's
+  form, the same form the hosted endpoint uses: records gain `propertyNames: {"type": "string"}`, passthrough
+  objects say `additionalProperties: {}` for `true`, integers carry the safe-integer `maximum`. Same schemas.
+  Argument-validation messages that come from zod itself take zod 4's wording (e.g. `Unrecognized key: "foo"` for
+  `Unrecognized key(s) in object: 'foo'`); the ADR tools' own unknown-field refusal text is unchanged.
+- **`consignment_calculator` refuses an unknown key inside `lines[]`, `dims`, `weight`, `items[]` and `options`**,
+  as the hosted endpoint does, instead of dropping it. Those objects were always advertised with
+  `additionalProperties: false`; under zod 4 the advertisement needs the objects to be strict, so the behaviour now
+  matches it.
+- Transitive dependency updates (body-parser, qs, fast-uri, ip-address; `@modelcontextprotocol/sdk` 1.32.2 in the
+  lockfile): `npm audit --omit=dev` reports 0.
+
+Why a minor: new documented result fields.
+
 ## 2.22.5 — 2026-10-14
 
 ### Fixed

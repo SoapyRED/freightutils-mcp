@@ -20,7 +20,7 @@ export interface ToolDef {
   description: string;
   // Allow any ZodObject (including .strict() variants) so individual tools
   // can opt into strict-key enforcement without breaking the shared type.
-  schema: z.AnyZodObject;
+  schema: z.ZodObject;
   /** Register `schema` ITSELF, so an unknown key is a tool error naming it (2.21.0). Without
    *  this, server.ts registers `schema.shape` and the SDK strips unknown keys — a tool's own
    *  `.strict()` is then inert. Set on the three ADR-answer tools; the rest are a BACKLOG item. */
@@ -774,15 +774,15 @@ Related: cbm_calculator / chargeable_weight_calculator / ldm_calculator (single-
         w: z.number().positive().describe('Width in the given unit.'),
         h: z.number().positive().describe('Height in the given unit.'),
         unit: z.enum(['mm', 'cm', 'm', 'in']).describe('Dimension unit.'),
-      }).describe('Per-piece dimensions with unit.'),
+      }).strict().describe('Per-piece dimensions with unit.'),
       weight: z.object({
         value: z.number().positive().describe('Gross weight per piece.'),
         unit: z.enum(['kg', 'g', 't', 'lb']).describe('Weight unit.'),
-      }).describe('Per-piece weight with unit.'),
+      }).strict().describe('Per-piece weight with unit.'),
       hs_code: z.string().regex(/^\d{6,10}$/, 'HS code must be 6–10 digits').optional().describe('Optional HS commodity code (6-10 digits).'),
       un_number: z.string().regex(/^(UN)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN"').optional().describe('Optional UN number — triggers the dangerous-goods advisory flag.'),
       stackable: z.boolean().optional().describe('Stack two-high (halves the loading-metre footprint).'),
-    })).min(1).max(50).optional().describe('Canonical consignment lines (preferred, 1-50). Provide lines OR items.'),
+    }).strict()).min(1).max(50).optional().describe('Canonical consignment lines (preferred, 1-50). Provide lines OR items.'),
     items: z.array(z.object({
       description: z.string().optional().describe('Item description.'),
       length: z.number().positive().describe('Length in cm.'),
@@ -792,12 +792,12 @@ Related: cbm_calculator / chargeable_weight_calculator / ldm_calculator (single-
       gross_weight: z.number().positive().describe('Gross weight per piece in kg.'),
       stackable: z.boolean().optional().describe('Can the item be stacked?'),
       pallet_type: z.enum(['none', 'euro', 'uk', 'us', 'custom']).optional().describe('Pallet type (informational).'),
-    })).min(1).max(50).optional().describe('Legacy flat alias — dimensions in cm, weight in kg. Prefer lines.'),
+    }).strict()).min(1).max(50).optional().describe('Legacy flat alias — dimensions in cm, weight in kg. Prefer lines.'),
     options: z.object({
       air_volumetric_divisor: z.number().positive().max(10_000, 'air_volumetric_divisor must be at most 10,000').optional().describe('IATA volumetric divisor in cm³/kg. Default: 6000. Air mode only.'),
       container_number: z.string().max(20, 'container_number must be at most 20 characters').optional().describe('ISO 6346 container number — check-digit validated into flags.'),
       awb_number: z.string().max(20, 'awb_number must be at most 20 characters').optional().describe('IATA 11-digit air waybill number — check-digit validated into flags.'),
-    }).optional().describe('Optional settings.'),
+    }).strict().optional().describe('Optional settings.'),
   }).strict(),
 
   resultSchema: resultShape({
