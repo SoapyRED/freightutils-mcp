@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 /**
  * FreightUtils response envelope v1.1 — output-schema side. Accepts version '1' too
- * (a transitional response can carry either).
+ * (a transitional response can carry either), and the additive v1.2 status fields.
  *
  * Mirrors the hosted contract (freightutils.com schemas/response-envelope.v1.1.json
  * and the /api/mcp ENVELOPE_OUTPUT_SHAPE) field-for-field. The envelope itself is
@@ -18,8 +18,21 @@ import { z } from 'zod';
  */
 export function envelopeShape(result: z.ZodTypeAny): z.ZodRawShape {
   return {
-    envelope_version: z.enum(['1', '1.1']),
+    envelope_version: z.enum(['1', '1.1', '1.2']),
     ok: z.boolean(),
+    // v1.2 (freightutils.com, 2026-10-28; REST ?envelope=1.2): status fields beside ok, all optional
+    // here so a 1 / 1.1 envelope still validates. This package still requests ?envelope=1 — accepting
+    // the shape now means switching the request later is a one-line change, not a schema release.
+    status: z.enum(['ok', 'partial', 'not_found', 'unsupported', 'ambiguous']).optional(),
+    missing_inputs: z.array(z.string()).optional(),
+    edition: z.object({
+      name: z.string(),
+      applies_from: z.string().nullable(),
+      may_apply_until: z.string().nullable(),
+    }).nullable().optional(),
+    as_of: z.string().optional(),
+    // _meta.identify (2026-10-28): present only on an anonymous answer; informational.
+    _meta: z.object({ identify: z.string().optional() }).passthrough().optional(),
     result,
     confidence: z.object({
       level: z.enum(['high', 'medium', 'low']),
