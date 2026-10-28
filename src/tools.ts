@@ -253,7 +253,7 @@ Provide exactly ONE of: un_number (exact lookup — returns every packing-group 
 
 Behavior: read-only reference lookup; a name search or class filter is a paged list — total, truncated and next_offset, with offset and limit (at most 50 per search page, 100 per class page) — never a silently cut list. A search with no hits errors with suggestions: the closest proper shipping names in Table A ("acetne" → ACETONE, UN 1090). 28 Table A rows carry a scope remark instead of a packing group: those return packing_group null plus not_subject_to_adr (with conditions_ref, e.g. "5.5.3" for UN 1845 dry ice) or carriage_prohibited, and table_a_remark preserves the verbatim Table A text. ${RATE}
 
-Returns: count and results[] — per entry: un_number, proper_shipping_name, class, classification_code, packing_group, labels, special_provisions, limited_quantity, excepted_quantity, transport_category, tunnel_restriction_code, hazard_identification_number, variant_index/variant_count and, on scope-flagged rows, not_subject_to_adr/carriage_prohibited/conditions_ref/table_a_remark — under result, ${ENV}
+Returns: count and results[] — per entry, all 20 Table A columns: un_number, proper_shipping_name, class, classification_code, packing_group, labels, special_provisions, limited_quantity, excepted_quantity, packing_instructions, special_/mixed_packing_provisions, portable_tank_instructions/_special_provisions, tank_code, tank_special_provisions, vehicle_for_tank_carriage, carriage_packages/_bulk/_loading_unloading_handling/_operation, transport_category, tunnel_restriction_code, hazard_identification_number, variant_index/variant_count and, on scope-flagged rows, not_subject_to_adr/carriage_prohibited/conditions_ref/table_a_remark — under result, ${ENV}
 
 Limitations: a factual compilation of the ADR table, not legal or compliance advice; classification remains the consignor's responsibility — verify against the current UNECE ADR text.
 
@@ -295,6 +295,20 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
       special_provisions: z.string(),
       limited_quantity: z.string(),
       excepted_quantity: z.string(),
+      // Table A columns (8)–(14) and (16)–(19), served since the website's 2026-10-28 rebuild:
+      // codes as Table A prints them, null when the column is empty.
+      packing_instructions: z.string(),
+      special_packing_provisions: z.string(),
+      mixed_packing_provisions: z.string(),
+      portable_tank_instructions: z.string(),
+      portable_tank_special_provisions: z.string(),
+      tank_code: z.string(),
+      tank_special_provisions: z.string(),
+      vehicle_for_tank_carriage: z.string(),
+      carriage_packages: z.string(),
+      carriage_bulk: z.string(),
+      carriage_loading_unloading_handling: z.string(),
+      carriage_operation: z.string(),
       transport_category: z.string(),
       tunnel_restriction_code: z.string(),
       hazard_identification_number: z.string(),
