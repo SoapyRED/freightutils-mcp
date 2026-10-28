@@ -94,11 +94,12 @@ export function unknownKeysMessage(keys: readonly string[], sentKeys: Iterable<s
 /** z.object(shape).strict(), refusing an unknown key with the message above. */
 export function strictInput<T extends z.ZodRawShape>(shape: T, rule: KeyRule) {
   const accepted = Object.keys(shape);
-  return z.object(shape, {
-    errorMap: (issue, ctx) => {
-      if (issue.code !== z.ZodIssueCode.unrecognized_keys) return { message: ctx.defaultError };
-      const sent = typeof ctx.data === 'object' && ctx.data !== null ? Object.keys(ctx.data as object) : [];
-      return { message: unknownKeysMessage(issue.keys, sent, accepted, rule, keyPathWhere(issue.path)) };
+  return z.strictObject(shape, {
+    // zod 4: returning undefined keeps zod's default message for every other issue.
+    error: (issue) => {
+      if (issue.code !== 'unrecognized_keys') return undefined;
+      const sent = typeof issue.input === 'object' && issue.input !== null ? Object.keys(issue.input as object) : [];
+      return unknownKeysMessage(issue.keys, sent, accepted, rule, keyPathWhere((issue.path ?? []).filter((p): p is string | number => typeof p !== 'symbol')));
     },
-  }).strict();
+  });
 }

@@ -1,6 +1,6 @@
 {
   "name": "freightutils-mcp",
-  "version": "2.22.5",
+  "version": "2.23.0",
   "mcpName": "io.github.SoapyRED/freightutils",
   "description": "Neutral freight reference + validation layer for AI agents — ADR dangerous goods, HS codes, airlines, airports, UN/LOCODE, Incoterms, identifier validation and freight math. Every tool declares a typed output schema and returns a source-cited response envelope (structuredContent) an agent can cite.",
   "author": "FreightUtils <contact@freightutils.com>",
@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.1",
-    "zod": "^3.25.76"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^22",

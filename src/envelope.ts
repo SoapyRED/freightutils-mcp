@@ -71,7 +71,7 @@ export function envelopeShape(result: z.ZodTypeAny): z.ZodRawShape {
  * live response fail output-schema validation.
  */
 export function resultShape(fields: z.ZodRawShape): z.ZodTypeAny {
-  const tolerant: z.ZodRawShape = {};
+  const tolerant: Record<string, z.ZodTypeAny> = {};
   for (const [k, v] of Object.entries(fields)) tolerant[k] = (v as z.ZodTypeAny).nullish();
   // The typed branch documents the shape; the record branch is a safety net so
   // a type variance in a live response (the API evolves independently of the
@@ -81,7 +81,7 @@ export function resultShape(fields: z.ZodRawShape): z.ZodTypeAny {
 
 /** Same tolerance rule for nested record objects (array items, sub-objects). */
 export function loose(fields: z.ZodRawShape): z.ZodTypeAny {
-  const tolerant: z.ZodRawShape = {};
+  const tolerant: Record<string, z.ZodTypeAny> = {};
   for (const [k, v] of Object.entries(fields)) tolerant[k] = (v as z.ZodTypeAny).nullish();
   return z.object(tolerant).passthrough();
 }

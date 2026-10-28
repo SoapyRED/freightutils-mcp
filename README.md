@@ -38,9 +38,11 @@ Since **2.11.0**, every tool also declares a typed `outputSchema` and returns `s
 ### Dangerous Goods (ADR)
 | Tool | Description |
 |------|-------------|
-| `adr_lookup` | 2,939 UNECE ADR 2025 entries |
+| `adr_lookup` | 2,939 UNECE ADR 2025 entries, all 20 Table A columns — beyond class, packing group, labels, special provisions, LQ/EQ, transport category, tunnel code and HIN: `packing_instructions`, `special_packing_provisions`, `mixed_packing_provisions`, `portable_tank_instructions`, `portable_tank_special_provisions`, `tank_code`, `tank_special_provisions`, `vehicle_for_tank_carriage`, `carriage_packages`, `carriage_bulk`, `carriage_loading_unloading_handling`, `carriage_operation` |
 | `adr_exemption_calculator` | ADR 1.1.3.6 small load exemption check |
 | `adr_lq_eq_check` | Limited and Excepted Quantity eligibility |
+
+**What's new in 2.23.0:** `adr_lookup` names the 12 further Table A columns (packing, tank, vehicle and carriage provisions, columns 8–14 and 16–19) in its description and result schema; empty columns are null.
 
 Some UN numbers have more than one ADR Table A row (packing groups, concentration bands). When a bare UN number matches rows that give different answers, the ADR tools never pick one: they withhold the verdict and return the candidate rows, and you pin one with `packing_group` or `variant_index`. The rules, with worked cases (UN 1789, UN 1790 PG I, UN 2215 PG III): [the ADR 1.1.3.6 calculator in the API docs](https://www.freightutils.com/api-docs#adr-calculator).
 
