@@ -21,7 +21,7 @@ export function envelopeShape(result: z.ZodTypeAny): z.ZodRawShape {
     envelope_version: z.enum(['1', '1.1', '1.2']),
     ok: z.boolean(),
     // v1.2 (freightutils.com, 2026-10-28; REST ?envelope=1.2): status fields beside ok, all optional
-    // here so a 1 / 1.1 envelope still validates. This package still requests ?envelope=1 — accepting
+    // here so a 1 / 1.1 envelope still validates. This package still requests ?envelope=1.1 — accepting
     // the shape now means switching the request later is a one-line change, not a schema release.
     status: z.enum(['ok', 'partial', 'not_found', 'unsupported', 'ambiguous']).optional(),
     missing_inputs: z.array(z.string()).optional(),
