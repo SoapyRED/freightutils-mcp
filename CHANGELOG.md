@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.25.0 — 2026-10-30
+## 2.25.0 — 2026-10-29
 
 The npm mirror of freightutils.com builds 0B, G1 and R6, in lock-step with the hosted endpoint. A minor release:
 new documented fields and arguments, nothing removed — every 2.24.0 call answers as before.
