@@ -1,0 +1,1190 @@
+{
+  "_recorded": "production, keyed, 2026-10-29 ~23:10Z; check_id replaced by a synthetic id of the same shape",
+  "ok_cbm": {
+    "request": "GET /api/cbm?l=120&w=80&h=100&pcs=2&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": null,
+      "as_of": "2026-10-29",
+      "result": {
+        "cbm_per_piece": 0.96,
+        "total_cbm": 1.92,
+        "total_volume_m3": 1.92,
+        "cubic_feet": 67.8042,
+        "litres": 1920,
+        "cubic_inches": 117165.6,
+        "pieces": 2,
+        "meta": {
+          "inputs": {
+            "length_cm": 120,
+            "width_cm": 80,
+            "height_cm": 100,
+            "pieces": 2
+          }
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "Total CBM 1.92 m³ (2 piece(s), 0.96 m³ each) — computed per FreightUtils published methodology."
+      },
+      "normalized_input": {
+        "length_cm": 120,
+        "width_cm": 80,
+        "height_cm": 100,
+        "pieces": 2,
+        "defaults_applied": []
+      }
+    }
+  },
+  "partial_hs": {
+    "request": "GET /api/hs?envelope=1.2",
+    "status": 400,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": false,
+      "status": "partial",
+      "missing_inputs": [
+        "q"
+      ],
+      "edition": {
+        "name": "HS 2022",
+        "applies_from": "2022-01-01",
+        "may_apply_until": null
+      },
+      "as_of": "2026-07-24",
+      "result": {},
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "World Customs Organization (HS 2022)",
+        "checked": "2026-07-24",
+        "provenance_status": "verified",
+        "dataset_edition": "HS 2022",
+        "authority_current_edition": "HS 2022",
+        "checked_at": "2026-10-29"
+      },
+      "citation": {
+        "text": "Provide ?q= (search), ?code= (lookup), or ?section= (browse)."
+      },
+      "blocking_errors": [
+        {
+          "code": "MISSING_INPUT",
+          "message": "Provide ?q= (search), ?code= (lookup), or ?section= (browse).",
+          "recovery": {
+            "action": "Provide one of q, code or section.",
+            "tool": "hs_code_lookup",
+            "params": {
+              "q": "coffee"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "batch_unlocode": {
+    "request": "GET /api/unlocode?codes=NLRTM,GBFXT,XXZZZ&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "partial",
+      "missing_inputs": [],
+      "edition": null,
+      "as_of": "2026-10-29",
+      "result": {
+        "batch": true,
+        "tool": "unlocode_lookup",
+        "count": 3,
+        "status": "partial",
+        "not_found": [
+          2
+        ],
+        "unresolved": [],
+        "results": [
+          {
+            "index": 0,
+            "input": "NLRTM",
+            "status": "ok",
+            "ok": true,
+            "result": {
+              "code": "NLRTM",
+              "country": "NL",
+              "location_code": "RTM",
+              "name": "Rotterdam",
+              "name_ascii": "Rotterdam",
+              "subdivision": "ZH",
+              "functions": [
+                "port",
+                "rail",
+                "road",
+                "airport",
+                "postal"
+              ],
+              "status": "AF",
+              "coordinates": {
+                "lat": 51.92,
+                "lon": 4.5
+              },
+              "iata_code": "RTM",
+              "iata_code_basis": "location-code-confirmed-by-ourairports",
+              "change_indicator": null,
+              "entry_status": "active"
+            },
+            "edition": {
+              "name": "UN/LOCODE 2025-1",
+              "applies_from": null,
+              "may_apply_until": null
+            },
+            "as_of": "2026-10-29",
+            "warnings": [
+              {
+                "code": "PROVENANCE_PENDING",
+                "message": "unlocode provenance is pending independent verification."
+              }
+            ]
+          },
+          {
+            "index": 1,
+            "input": "GBFXT",
+            "status": "ok",
+            "ok": true,
+            "result": {
+              "code": "GBFXT",
+              "country": "GB",
+              "location_code": "FXT",
+              "name": "Felixstowe",
+              "name_ascii": "Felixstowe",
+              "subdivision": "SFK",
+              "functions": [
+                "port"
+              ],
+              "status": "AF",
+              "coordinates": null,
+              "iata_code": null,
+              "change_indicator": null,
+              "entry_status": "active"
+            },
+            "edition": {
+              "name": "UN/LOCODE 2025-1",
+              "applies_from": null,
+              "may_apply_until": null
+            },
+            "as_of": "2026-10-29",
+            "warnings": [
+              {
+                "code": "PROVENANCE_PENDING",
+                "message": "unlocode provenance is pending independent verification."
+              }
+            ]
+          },
+          {
+            "index": 2,
+            "input": "XXZZZ",
+            "status": "not_found",
+            "ok": false,
+            "result": {},
+            "edition": {
+              "name": "UN/LOCODE 2025-1",
+              "applies_from": null,
+              "may_apply_until": null
+            },
+            "as_of": "2026-10-29",
+            "blocking_errors": [
+              {
+                "code": "NOT_FOUND",
+                "message": "UN/LOCODE \"XXZZZ\" not found",
+                "recovery": {
+                  "action": "Check the 5-char UN/LOCODE (country + location) or search by the place name with q.",
+                  "tool": "unlocode_lookup"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "unlocode_lookup batch: 3 item(s) — 2 ok, 1 not found. Each item is the answer its single call gives."
+      }
+    }
+  },
+  "receipt_adr_calc": {
+    "request": "GET /api/adr-calculator?un=1203&qty=200&unit=L&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2025",
+        "applies_from": "2025-01-01",
+        "may_apply_until": "2027-06-30"
+      },
+      "as_of": "2026-10-29",
+      "result": {
+        "items": [
+          {
+            "un_number": "1203",
+            "state": "COUNTED",
+            "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+            "class": "3",
+            "packing_group": "II",
+            "variant_index": 0,
+            "transport_category": "2",
+            "quantity": 200,
+            "multiplier": 3,
+            "points": 600,
+            "quantity_unit": "L",
+            "quantity_basis": null,
+            "expected_unit": "L"
+          }
+        ],
+        "total_points": 600,
+        "threshold": 1000,
+        "exempt": true,
+        "has_category_zero": false,
+        "has_quantity_exceedance": false,
+        "warnings": [],
+        "message": "1.1.3.6 exemption applies",
+        "resolved_subtotal_points": 600,
+        "threshold_exceeded_by_resolved_items": false,
+        "verdict_basis": "all_items",
+        "unresolved_item_indexes": []
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "ADR 1.1.3.6: 600 transport point(s) vs 1000 threshold — exemption applies (1.1.3.6 exemption applies).",
+        "qualifier": "Deterministic ADR 1.1.3.6 calculation, best-effort — not legal advice; verify against the current UNECE ADR text."
+      },
+      "_meta": {
+        "check_id": "chk_RECORDED00000000000000",
+        "receipt_url": "https://www.freightutils.com/api/receipts/chk_RECORDED00000000000000"
+      }
+    }
+  },
+  "adr_compact_multi": {
+    "request": "GET /api/adr?un=1263&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2025",
+        "applies_from": "2025-01-01",
+        "may_apply_until": "2027-06-30"
+      },
+      "as_of": "2026-10-28",
+      "result": {
+        "count": 6,
+        "results": [
+          {
+            "verified": true,
+            "verification": {
+              "status": "verified",
+              "basis": "row",
+              "reason": "Row-level audit on 2026-08-26 against 2 cited source(s), field by field against the UNECE ADR 2025 Table A.",
+              "audited_at": "2026-08-26",
+              "sources": 2
+            },
+            "un_number": "1263",
+            "proper_shipping_name": "PAINT (including paint, lacquer, enamel, stain, shellac, varnish, polish, liquid filler and liquid lacquer base) or PAINT RELATED MATERIAL (including paint thinning and reducing compound)",
+            "class": "3",
+            "classification_code": "F1",
+            "packing_group": "I",
+            "labels": "3",
+            "special_provisions": "163 367 650",
+            "limited_quantity": "500 ml",
+            "excepted_quantity": "E3",
+            "packing_instructions": "P001",
+            "special_packing_provisions": null,
+            "mixed_packing_provisions": "MP7 MP17",
+            "portable_tank_instructions": "T11",
+            "portable_tank_special_provisions": "TP1 TP8 TP27",
+            "tank_code": "L4BN",
+            "tank_special_provisions": null,
+            "vehicle_for_tank_carriage": "FL",
+            "carriage_packages": null,
+            "carriage_bulk": null,
+            "carriage_loading_unloading_handling": null,
+            "carriage_operation": "S2 S20",
+            "transport_category": "1",
+            "tunnel_restriction_code": "(D/E)",
+            "hazard_identification_number": "33",
+            "variant_index": 0,
+            "variant_count": 6,
+            "sources": [
+              {
+                "url": "https://unece.org/adr-2025-files",
+                "accessed_at": "2026-08-26"
+              },
+              {
+                "url": "https://unece.org/sites/default/files/2025-01/2412006_E_ECE_TRANS_352_Vol.I_WEB_0.pdf",
+                "accessed_at": "2026-08-26"
+              }
+            ],
+            "audited_at": "2026-08-26",
+            "decision_rationale": "Row verified against ADR2025_tabA_E.xlsx (UN 1263, variant 1 of 6). Re-sourced (aggregator-citation fix-wave, 2026-08-26): all 11 stored Table A columns diff-verified against the purchased UNECE Digital ADR 2025 Table A artifact — 605/605 field comparisons across the 55 sourced rows matched. Citations repointed at the authority: the UNECE ADR 2025 publication page and its ECE/TRANS/352 Vol. I PDF (Part 3 = Table A), both read in a browser session 2026-08-26 (unece.org serves 403 to non-browser fetchers by WAF policy). The 2026-05-13 aggregator citations (adr-tool.com, adrdangerousgoods.com) are RETIRED: tertiary republishers count zero toward the sourcing bar (SOURCE_CLASS). Corrigenda: ECE/TRANS/352/Corr.1 (Oct 2024) checked — touches none of these rows; Corr.2/Corr.3 (Oct 2025) found on the authority page, content check ledgered."
+          },
+          {
+            "verified": true,
+            "verification": {
+              "status": "verified",
+              "basis": "row",
+              "reason": "Row-level audit on 2026-08-26 against 2 cited source(s), field by field against the UNECE ADR 2025 Table A.",
+              "audited_at": "2026-08-26",
+              "sources": 2
+            },
+            "un_number": "1263",
+            "proper_shipping_name": "PAINT (including paint, lacquer, enamel, stain, shellac, varnish, polish, liquid filler and liquid lacquer base) or PAINT RELATED MATERIAL (including paint thinning and reducing compound) (vapour pressure at 50 °C more than 110 kPa)",
+            "class": "3",
+            "classification_code": "F1",
+            "packing_group": "II",
+            "labels": "3",
+            "special_provisions": "163 367 640C 650",
+            "limited_quantity": "5 L",
+            "excepted_quantity": "E2",
+            "packing_instructions": "P001",
+            "special_packing_provisions": "PP1",
+            "mixed_packing_provisions": "MP19",
+            "portable_tank_instructions": "T4",
+            "portable_tank_special_provisions": "TP1 TP8 TP28",
+            "tank_code": "L1.5BN",
+            "tank_special_provisions": null,
+            "vehicle_for_tank_carriage": "FL",
+            "carriage_packages": null,
+            "carriage_bulk": null,
+            "carriage_loading_unloading_handling": null,
+            "carriage_operation": "S2 S20",
+            "transport_category": "2",
+            "tunnel_restriction_code": "(D/E)",
+            "hazard_identification_number": "33",
+            "variant_index": 1,
+            "variant_count": 6,
+            "sources": [
+              {
+                "url": "https://unece.org/adr-2025-files",
+                "accessed_at": "2026-08-26"
+              },
+              {
+                "url": "https://unece.org/sites/default/files/2025-01/2412006_E_ECE_TRANS_352_Vol.I_WEB_0.pdf",
+                "accessed_at": "2026-08-26"
+              }
+            ],
+            "audited_at": "2026-08-26",
+            "decision_rationale": "Row verified against ADR2025_tabA_E.xlsx (UN 1263, variant 2 of 6). Re-sourced (aggregator-citation fix-wave, 2026-08-26): all 11 stored Table A columns diff-verified against the purchased UNECE Digital ADR 2025 Table A artifact — 605/605 field comparisons across the 55 sourced rows matched. Citations repointed at the authority: the UNECE ADR 2025 publication page and its ECE/TRANS/352 Vol. I PDF (Part 3 = Table A), both read in a browser session 2026-08-26 (unece.org serves 403 to non-browser fetchers by WAF policy). The 2026-05-13 aggregator citations (adr-tool.com, adrdangerousgoods.com) are RETIRED: tertiary republishers count zero toward the sourcing bar (SOURCE_CLASS). Corrigenda: ECE/TRANS/352/Corr.1 (Oct 2024) checked — touches none of these rows; Corr.2/Corr.3 (Oct 2025) found on the authority page, content check ledgered."
+          },
+          {
+            "verified": true,
+            "verification": {
+              "status": "verified",
+              "basis": "row",
+              "reason": "Row-level audit on 2026-08-26 against 2 cited source(s), field by field against the UNECE ADR 2025 Table A.",
+              "audited_at": "2026-08-26",
+              "sources": 2
+            },
+            "un_number": "1263",
+            "proper_shipping_name": "PAINT (including paint, lacquer, enamel, stain, shellac, varnish, polish, liquid filler and liquid lacquer base) or PAINT RELATED MATERIAL (including paint thinning and reducing compound) (vapour pressure at 50 °C not more than 110 kPa)",
+            "class": "3",
+            "classification_code": "F1",
+            "packing_group": "II",
+            "labels": "3",
+            "special_provisions": "163 367 640D 650",
+            "limited_quantity": "5 L",
+            "excepted_quantity": "E2",
+            "packing_instructions": "P001 IBC02 R001",
+            "special_packing_provisions": "PP1",
+            "mixed_packing_provisions": "MP19",
+            "portable_tank_instructions": "T4",
+            "portable_tank_special_provisions": "TP1 TP8 TP28",
+            "tank_code": "LGBF",
+            "tank_special_provisions": null,
+            "vehicle_for_tank_carriage": "FL",
+            "carriage_packages": null,
+            "carriage_bulk": null,
+            "carriage_loading_unloading_handling": null,
+            "carriage_operation": "S2 S20",
+            "transport_category": "2",
+            "tunnel_restriction_code": "(D/E)",
+            "hazard_identification_number": "33",
+            "variant_index": 2,
+            "variant_count": 6,
+            "sources": [
+              {
+                "url": "https://unece.org/adr-2025-files",
+                "accessed_at": "2026-08-26"
+              },
+              {
+                "url": "https://unece.org/sites/default/files/2025-01/2412006_E_ECE_TRANS_352_Vol.I_WEB_0.pdf",
+                "accessed_at": "2026-08-26"
+              }
+            ],
+            "audited_at": "2026-08-26",
+            "decision_rationale": "Row verified against ADR2025_tabA_E.xlsx (UN 1263, variant 3 of 6). Re-sourced (aggregator-citation fix-wave, 2026-08-26): all 11 stored Table A columns diff-verified against the purchased UNECE Digital ADR 2025 Table A artifact — 605/605 field comparisons across the 55 sourced rows matched. Citations repointed at the authority: the UNECE ADR 2025 publication page and its ECE/TRANS/352 Vol. I PDF (Part 3 = Table A), both read in a browser session 2026-08-26 (unece.org serves 403 to non-browser fetchers by WAF policy). The 2026-05-13 aggregator citations (adr-tool.com, adrdangerousgoods.com) are RETIRED: tertiary republishers count zero toward the sourcing bar (SOURCE_CLASS). Corrigenda: ECE/TRANS/352/Corr.1 (Oct 2024) checked — touches none of these rows; Corr.2/Corr.3 (Oct 2025) found on the authority page, content check ledgered."
+          },
+          {
+            "verified": true,
+            "verification": {
+              "status": "verified",
+              "basis": "row",
+              "reason": "Row-level audit on 2026-08-26 against 2 cited source(s), field by field against the UNECE ADR 2025 Table A.",
+              "audited_at": "2026-08-26",
+              "sources": 2
+            },
+            "un_number": "1263",
+            "proper_shipping_name": "PAINT (including paint, lacquer, enamel, stain, shellac, varnish, polish, liquid filler and liquid lacquer base) or PAINT RELATED MATERIAL (including paint thinning and reducing compound)",
+            "class": "3",
+            "classification_code": "F1",
+            "packing_group": "III",
+            "labels": "3",
+            "special_provisions": "163 367 650",
+            "limited_quantity": "5 L",
+            "excepted_quantity": "E1",
+            "packing_instructions": "P001 IBC03 LP01 R001",
+            "special_packing_provisions": "PP1",
+            "mixed_packing_provisions": "MP19",
+            "portable_tank_instructions": "T2",
+            "portable_tank_special_provisions": "TP1 TP29",
+            "tank_code": "LGBF",
+            "tank_special_provisions": null,
+            "vehicle_for_tank_carriage": "FL",
+            "carriage_packages": "V12",
+            "carriage_bulk": null,
+            "carriage_loading_unloading_handling": null,
+            "carriage_operation": "S2",
+            "transport_category": "3",
+            "tunnel_restriction_code": "(D/E)",
+            "hazard_identification_number": "30",
+            "variant_index": 3,
+            "variant_count": 6,
+            "sources": [
+              {
+                "url": "https://unece.org/adr-2025-files",
+                "accessed_at": "2026-08-26"
+              },
+              {
+                "url": "https://unece.org/sites/default/files/2025-01/2412006_E_ECE_TRANS_352_Vol.I_WEB_0.pdf",
+                "accessed_at": "2026-08-26"
+              }
+            ],
+            "audited_at": "2026-08-26",
+            "decision_rationale": "Row verified against ADR2025_tabA_E.xlsx (UN 1263, variant 4 of 6). Re-sourced (aggregator-citation fix-wave, 2026-08-26): all 11 stored Table A columns diff-verified against the purchased UNECE Digital ADR 2025 Table A artifact — 605/605 field comparisons across the 55 sourced rows matched. Citations repointed at the authority: the UNECE ADR 2025 publication page and its ECE/TRANS/352 Vol. I PDF (Part 3 = Table A), both read in a browser session 2026-08-26 (unece.org serves 403 to non-browser fetchers by WAF policy). The 2026-05-13 aggregator citations (adr-tool.com, adrdangerousgoods.com) are RETIRED: tertiary republishers count zero toward the sourcing bar (SOURCE_CLASS). Corrigenda: ECE/TRANS/352/Corr.1 (Oct 2024) checked — touches none of these rows; Corr.2/Corr.3 (Oct 2025) found on the authority page, content check ledgered."
+          },
+          {
+            "verified": true,
+            "verification": {
+              "status": "verified",
+              "basis": "row",
+              "reason": "Row-level audit on 2026-08-26 against 2 cited source(s), field by field against the UNECE ADR 2025 Table A.",
+              "audited_at": "2026-08-26",
+              "sources": 2
+            },
+            "un_number": "1263",
+            "proper_shipping_name": "PAINT (including paint, lacquer, enamel, stain, shellac, varnish, polish, liquid filler and liquid lacquer base) or PAINT RELATED MATERIAL (including paint thinning and reducing compound) (having a flash-point below 23 °C and viscous according to 2.2.3.1.4) (vapour pressure at 50 °C more than 110 kPa)",
+            "class": "3",
+            "classification_code": "F1",
+            "packing_group": "III",
+            "labels": "3",
+            "special_provisions": "163 367 650",
+            "limited_quantity": "5 L",
+            "excepted_quantity": "E1",
+            "packing_instructions": "P001 R001",
+            "special_packing_provisions": "PP1",
+            "mixed_packing_provisions": "MP19",
+            "portable_tank_instructions": null,
+            "portable_tank_special_provisions": null,
+            "tank_code": null,
+            "tank_special_provisions": null,
+            "vehicle_for_tank_carriage": null,
+            "carriage_packages": null,
+            "carriage_bulk": null,
+            "carriage_loading_unloading_handling": null,
+            "carriage_operation": "S2",
+            "transport_category": "3",
+            "tunnel_restriction_code": "(E)",
+            "hazard_identification_number": null,
+            "variant_index": 4,
+            "variant_count": 6,
+            "sources": [
+              {
+                "url": "https://unece.org/adr-2025-files",
+                "accessed_at": "2026-08-26"
+              },
+              {
+                "url": "https://unece.org/sites/default/files/2025-01/2412006_E_ECE_TRANS_352_Vol.I_WEB_0.pdf",
+                "accessed_at": "2026-08-26"
+              }
+            ],
+            "audited_at": "2026-08-26",
+            "decision_rationale": "Row verified against ADR2025_tabA_E.xlsx (UN 1263, variant 5 of 6). Re-sourced (aggregator-citation fix-wave, 2026-08-26): all 11 stored Table A columns diff-verified against the purchased UNECE Digital ADR 2025 Table A artifact — 605/605 field comparisons across the 55 sourced rows matched. Citations repointed at the authority: the UNECE ADR 2025 publication page and its ECE/TRANS/352 Vol. I PDF (Part 3 = Table A), both read in a browser session 2026-08-26 (unece.org serves 403 to non-browser fetchers by WAF policy). The 2026-05-13 aggregator citations (adr-tool.com, adrdangerousgoods.com) are RETIRED: tertiary republishers count zero toward the sourcing bar (SOURCE_CLASS). Corrigenda: ECE/TRANS/352/Corr.1 (Oct 2024) checked — touches none of these rows; Corr.2/Corr.3 (Oct 2025) found on the authority page, content check ledgered."
+          },
+          {
+            "verified": true,
+            "verification": {
+              "status": "verified",
+              "basis": "row",
+              "reason": "Row-level audit on 2026-08-26 against 2 cited source(s), field by field against the UNECE ADR 2025 Table A.",
+              "audited_at": "2026-08-26",
+              "sources": 2
+            },
+            "un_number": "1263",
+            "proper_shipping_name": "PAINT (including paint, lacquer, enamel, stain, shellac, varnish, polish, liquid filler and liquid lacquer base) or PAINT RELATED MATERIAL (including paint thinning and reducing compound) (having a flash-point below 23 °C and viscous according to 2.2.3.1.4) (vapour pressure at 50 °C not more than 110 kPa)",
+            "class": "3",
+            "classification_code": "F1",
+            "packing_group": "III",
+            "labels": "3",
+            "special_provisions": "163 367 650",
+            "limited_quantity": "5 L",
+            "excepted_quantity": "E1",
+            "packing_instructions": "P001 IBC02 R001",
+            "special_packing_provisions": "PP1 BB4",
+            "mixed_packing_provisions": "MP19",
+            "portable_tank_instructions": null,
+            "portable_tank_special_provisions": null,
+            "tank_code": null,
+            "tank_special_provisions": null,
+            "vehicle_for_tank_carriage": null,
+            "carriage_packages": null,
+            "carriage_bulk": null,
+            "carriage_loading_unloading_handling": null,
+            "carriage_operation": "S2",
+            "transport_category": "3",
+            "tunnel_restriction_code": "(E)",
+            "hazard_identification_number": null,
+            "variant_index": 5,
+            "variant_count": 6,
+            "sources": [
+              {
+                "url": "https://unece.org/adr-2025-files",
+                "accessed_at": "2026-08-26"
+              },
+              {
+                "url": "https://unece.org/sites/default/files/2025-01/2412006_E_ECE_TRANS_352_Vol.I_WEB_0.pdf",
+                "accessed_at": "2026-08-26"
+              }
+            ],
+            "audited_at": "2026-08-26",
+            "decision_rationale": "Row verified against ADR2025_tabA_E.xlsx (UN 1263, variant 6 of 6). Re-sourced (aggregator-citation fix-wave, 2026-08-26): all 11 stored Table A columns diff-verified against the purchased UNECE Digital ADR 2025 Table A artifact — 605/605 field comparisons across the 55 sourced rows matched. Citations repointed at the authority: the UNECE ADR 2025 publication page and its ECE/TRANS/352 Vol. I PDF (Part 3 = Table A), both read in a browser session 2026-08-26 (unece.org serves 403 to non-browser fetchers by WAF policy). The 2026-05-13 aggregator citations (adr-tool.com, adrdangerousgoods.com) are RETIRED: tertiary republishers count zero toward the sourcing bar (SOURCE_CLASS). Corrigenda: ECE/TRANS/352/Corr.1 (Oct 2024) checked — touches none of these rows; Corr.2/Corr.3 (Oct 2025) found on the authority page, content check ledgered."
+          }
+        ],
+        "resolved_codes": [
+          {
+            "code": "3",
+            "family": "label",
+            "columns": [
+              "5"
+            ],
+            "rows": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "summary": "Label model 3 (flammable liquids): flame, black or white.",
+            "section": "5.2.2.2.2, label model No. 3",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "163",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "summary": "Not for substances named in Table A; substances here may hold up to 20 % nitrocellulose of at most 12.6 % nitrogen (dry mass).",
+            "section": "3.3.1, special provision 163",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "367",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "summary": "Paint and printing ink packed with their related material may be documented under the related-material shipping name.",
+            "section": "3.3.1, special provision 367",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "650",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "summary": "Paint waste may go as UN 1263 PG II or UN 3082, with extra options for packing, flexible IBCs, bulk and a set document description.",
+            "section": "3.3.1, special provision 650",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "P001",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "summary": "General packing instruction for liquids: combination, single, composite packagings and pressure receptacles, with capacity/mass limits by packing group.",
+            "section": "4.1.4.1, P001",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "MP7",
+            "family": "mp",
+            "columns": [
+              "9b"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Up to 5 litres per inner packaging may be mixed with same-class goods of other classification codes or with non-ADR goods.",
+            "section": "4.1.10.4, MP7",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "MP17",
+            "family": "mp",
+            "columns": [
+              "9b"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Up to 0.5 litre per inner and 1 litre per package may be mixed with other classes (not Class 7) that permit it, or with non-ADR goods.",
+            "section": "4.1.10.4, MP17",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "T11",
+            "family": "t",
+            "columns": [
+              "10"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Portable tank, Class 1 and 3–9: test 6 bar; shell See 6.7.2.4.2; relief Normal; bottom openings See 6.7.2.6.3.",
+            "section": "4.2.5.2.6, portable tank instruction T11",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "TP1",
+            "family": "tp",
+            "columns": [
+              "11"
+            ],
+            "rows": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "summary": "Portable tank must not be filled beyond the degree of filling set by 4.2.1.9.2 (the 97-based formula).",
+            "section": "4.2.5.3, TP1",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "TP8",
+            "family": "tp",
+            "columns": [
+              "11"
+            ],
+            "rows": [
+              0,
+              1,
+              2
+            ],
+            "summary": "Test pressure may drop to 1.5 bar when the substances carried have a flash point above 0 °C.",
+            "section": "4.2.5.3, TP8",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "TP27",
+            "family": "tp",
+            "columns": [
+              "11"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "A 4 bar minimum test pressure tank may be used if 4 bar or less is shown acceptable under 6.7.2.1.",
+            "section": "4.2.5.3, TP27",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "L4BN",
+            "family": "tank_code",
+            "columns": [
+              "12"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "ADR tank code for Classes 1 and 3–9: liquid tank, 4 bar, openings B, valves/devices N.",
+            "section": "4.3.4.1.1, tank code L4BN",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "FL",
+            "family": "vehicle",
+            "columns": [
+              "14"
+            ],
+            "rows": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "summary": "Vehicle for flammable liquids (flash point ≤ 60 °C), flammable gases or UN 2015 > 60 % in tanks above set sizes.",
+            "section": "9.1.1.2, FL vehicle",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "1",
+            "family": "transport_category",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Transport category 1: at most 20 per transport unit under 1.1.3.6 on its own; counts ×50 toward the 1,000-point limit.",
+            "section": "1.1.3.6.3",
+            "verification_status": "verified"
+          },
+          {
+            "code": "(D/E)",
+            "family": "tunnel_code",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "summary": "Tanks: Prohibited in D, E (bulk or tanks). Other carriage: Prohibited in E.",
+            "section": "8.6.4",
+            "verification_status": "verified"
+          },
+          {
+            "code": "S2",
+            "family": "s",
+            "columns": [
+              "19"
+            ],
+            "rows": [
+              0,
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "summary": "Flammable liquids/gases: no ordinary portable lights in closed load compartments; FL heaters off during loading; earth FL vehicles before filling.",
+            "section": "8.5, S2",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "S20",
+            "family": "s",
+            "columns": [
+              "19"
+            ],
+            "rows": [
+              0,
+              1,
+              2
+            ],
+            "summary": "Chapter 8.4 supervision applies above 10 000 kg in packages, or above 3 000 litres in tanks.",
+            "section": "8.5, S20",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "33",
+            "family": "hin",
+            "columns": [
+              "20"
+            ],
+            "rows": [
+              0,
+              1,
+              2
+            ],
+            "summary": "Hazard identification number 33 on the orange plate: highly flammable liquid (flash-point below 23 °C).",
+            "section": "5.3.2.3.2, 33",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "640C",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              1
+            ],
+            "summary": "SP 640 letter C: in ADR tanks the document shows \"Special provision 640C\"; on Class 3 PG II entries it marks vapour pressure at 50 °C above 110 kPa.",
+            "section": "3.3.1, special provision 640 (letter C)",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "PP1",
+            "family": "spp",
+            "columns": [
+              "9a"
+            ],
+            "rows": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "summary": "Small (≤ 5 L) metal or plastics packagings of certain paints, inks, adhesives etc. in PG II/III need no Chapter 6.1 tests if palletized or inner.",
+            "section": "4.1.4.1, P001, PP1",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "MP19",
+            "family": "mp",
+            "columns": [
+              "9b"
+            ],
+            "rows": [
+              1,
+              2,
+              3,
+              4,
+              5
+            ],
+            "summary": "Up to 5 litres per inner packaging may be mixed with goods of other codes or classes that permit it, or with non-ADR goods.",
+            "section": "4.1.10.4, MP19",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "T4",
+            "family": "t",
+            "columns": [
+              "10"
+            ],
+            "rows": [
+              1,
+              2
+            ],
+            "summary": "Portable tank, Class 1 and 3–9: test 2.65 bar; shell See 6.7.2.4.2; relief Normal; bottom openings See 6.7.2.6.3.",
+            "section": "4.2.5.2.6, portable tank instruction T4",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "TP28",
+            "family": "tp",
+            "columns": [
+              "11"
+            ],
+            "rows": [
+              1,
+              2
+            ],
+            "summary": "A 2.65 bar minimum test pressure tank may be used if 2.65 bar or less is shown acceptable under 6.7.2.1.",
+            "section": "4.2.5.3, TP28",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "L1.5BN",
+            "family": "tank_code",
+            "columns": [
+              "12"
+            ],
+            "rows": [
+              1
+            ],
+            "summary": "ADR tank code for Classes 1 and 3–9: liquid tank, 1.5 bar, openings B, valves/devices N.",
+            "section": "4.3.4.1.1, tank code L1.5BN",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "2",
+            "family": "transport_category",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              1,
+              2
+            ],
+            "summary": "Transport category 2: at most 333 per transport unit under 1.1.3.6 on its own; counts ×3 toward the 1,000-point limit.",
+            "section": "1.1.3.6.3",
+            "verification_status": "verified"
+          },
+          {
+            "code": "640D",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              2
+            ],
+            "summary": "SP 640 letter D: in ADR tanks the document shows \"Special provision 640D\"; on Class 3 PG II entries it marks vapour pressure at 50 °C ≤ 110 kPa.",
+            "section": "3.3.1, special provision 640 (letter D)",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "IBC02",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              2,
+              5
+            ],
+            "summary": "Liquids under IBC02 may use metal (31A/31B/31N), rigid plastics (31H1/31H2) or composite 31HZ1 IBCs, with B and BB limits per UN number.",
+            "section": "4.1.4.2, IBC02",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "R001",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              2,
+              3,
+              4,
+              5
+            ],
+            "summary": "R001 permits light gauge metal packagings 0A1 and 0A2 up to 40 l / 50 kg for packing groups II and III; packing group I is not allowed.",
+            "section": "4.1.4.1, R001",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "LGBF",
+            "family": "tank_code",
+            "columns": [
+              "12"
+            ],
+            "rows": [
+              2,
+              3
+            ],
+            "summary": "ADR tank code for Classes 1 and 3–9: liquid tank, G (general minimum), openings B, valves/devices F.",
+            "section": "4.3.4.1.1, tank code LGBF",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "IBC03",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              3
+            ],
+            "summary": "Liquids under IBC03 may use metal 31-series, rigid plastics 31H1/31H2 or a wider set of 31H composite IBCs.",
+            "section": "4.1.4.2, IBC03",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "LP01",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              3
+            ],
+            "summary": "Liquids in large packagings: glass, plastics or metal inners in 50-series outers, packing group III only, up to 3 m3.",
+            "section": "4.1.4.3, LP01",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "T2",
+            "family": "t",
+            "columns": [
+              "10"
+            ],
+            "rows": [
+              3
+            ],
+            "summary": "Portable tank, Class 1 and 3–9: test 1.5 bar; shell See 6.7.2.4.2; relief Normal; bottom openings See 6.7.2.6.3.",
+            "section": "4.2.5.2.6, portable tank instruction T2",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "TP29",
+            "family": "tp",
+            "columns": [
+              "11"
+            ],
+            "rows": [
+              3
+            ],
+            "summary": "A 1.5 bar minimum test pressure tank may be used if 1.5 bar or less is shown acceptable under 6.7.2.1.",
+            "section": "4.2.5.3, TP29",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "3",
+            "family": "transport_category",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              3,
+              4,
+              5
+            ],
+            "summary": "Transport category 3: at most 1000 per transport unit under 1.1.3.6 on its own; counts ×1 toward the 1,000-point limit.",
+            "section": "1.1.3.6.3",
+            "verification_status": "verified"
+          },
+          {
+            "code": "V12",
+            "family": "v",
+            "columns": [
+              "16"
+            ],
+            "rows": [
+              3
+            ],
+            "summary": "IBCs of type 31HZ2 (31HA2, 31HB2, 31HN2, 31HD2, 31HH2) must be carried in closed vehicles or closed containers.",
+            "section": "7.2.4, V12",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "30",
+            "family": "hin",
+            "columns": [
+              "20"
+            ],
+            "rows": [
+              3
+            ],
+            "summary": "HIN 30 (orange plate): flammable liquid, flash-point 23-60 °C; molten flammable matter heated to its flash-point (>60 °C); or self-heating liquid.",
+            "section": "5.3.2.3.2, 30",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "(E)",
+            "family": "tunnel_code",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              4,
+              5
+            ],
+            "summary": "Tanks: Prohibited in E. Other carriage: Prohibited in E.",
+            "section": "8.6.4",
+            "verification_status": "verified"
+          },
+          {
+            "code": "BB4",
+            "family": "spp",
+            "columns": [
+              "9a"
+            ],
+            "rows": [
+              5
+            ],
+            "summary": "RID/ADR only: listed flammable liquids in packing group III under 2.2.3.1.4 may not use IBCs above 450 litres.",
+            "section": "4.1.4.2, IBC02, BB4",
+            "verification_status": "paraphrase_unreviewed"
+          }
+        ],
+        "meta": {
+          "source": "ADR 2025 (UNECE, ECE/TRANS/352, applicable 1 Jan 2025); given legal effect by EU Directive 2008/68/EC (consolidated). Factual compilation, best-effort — not legal advice, not a regulatory authority.",
+          "edition": "ADR 2025",
+          "entries": 2939
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "UNECE ADR 2025 (ECE/TRANS/352)",
+        "checked": "2026-10-28",
+        "provenance_status": "verified",
+        "source_url": "https://unece.org/adr-2025-files",
+        "dataset_edition": "ADR 2025",
+        "authority_current_edition": "ADR 2025",
+        "checked_at": "2026-10-29"
+      },
+      "citation": {
+        "text": "UN 1263 PAINT (including paint, lacquer, enamel, stain, shellac, varnish, polish, liquid filler and liquid lacquer base) or PAINT RELATED MATERIAL (including paint thinning and reducing compound) — Class 3, 6 ADR Table A variants (packing groups I, II, III); packing group, transport category and limited quantity differ by variant, UNECE ADR 2025.",
+        "qualifier": "Factual compilation, not legal advice — verify against the current UNECE ADR text."
+      }
+    }
+  }
+}

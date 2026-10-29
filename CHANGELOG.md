@@ -1,9 +1,21 @@
 # Changelog
 
-## Unreleased — 2.25.0 (pending; mirrors freightutils.com build 0B)
+## 2.25.0 — 2026-10-30
+
+The npm mirror of freightutils.com builds 0B, G1 and R6, in lock-step with the hosted endpoint. A minor release:
+new documented fields and arguments, nothing removed — every 2.24.0 call answers as before.
 
 ### Added
 
+- **Scoped manifests.** `--scope dg | customs | ops` (or `FREIGHTUTILS_SCOPE`) serves only that scope's tools
+  (5 / 5 / 17), as the hosted `/api/mcp/<scope>`; the default `all` (25 tools) is unchanged. An unknown scope
+  stops the server with an error.
+- **resolve_reference decodes ADR Table A codes** — fourteen grammars: `TU9` → its record, meaning, section and
+  review status; a well-formed code no Table A row carries (`P999`) is `pattern_only`; `336` is both a special
+  provision and a hazard identification number, and both candidates come back.
+- **Every executed check names its edition.** The six checks answer `edition` + `as_of` for the dataset they read
+  (ADR 2025 with its dates, the UK Trade Tariff live, the ICS2 stop-word list version), or `edition: null` with
+  `_meta.edition_basis` "no regulatory dataset read" (typed; 2.24.0's passthrough `_meta` already accepted it).
 - **The consignment object.** `consignment_calculator`, `shipment_summary` and `adr_exemption_calculator` take a
   `consignment` argument (https://www.freightutils.com/schema/consignment-object.v1.json) instead of their own
   inputs; the API maps it onto the tool's request and answers as that request would. `validate` takes
@@ -28,16 +40,13 @@
 
 ### Changed
 
-- `adr_lookup` description: the lead sentence names all 20 Table A columns and `resolved_codes` (A-ADR-06).
-- `resolve_reference` description: fourteen grammars — ADR Table A codes join (`TU9` → its record; `P999` →
-  `pattern_only`; `336` is both a special provision and a hazard identification number).
+- `adr_lookup` description: the lead sentence names all 20 Table A columns and `resolved_codes`.
+- `resolve_reference` description: names the ADR Table A code families and the `TU9` example.
 - `adr_lookup` `resolved_codes` (freightutils.com R6): served once per answer, beside `results[]` — one entry per
   distinct code with `columns` and `rows` (the `results[]` indexes that carry it); compact leaves out `url` (the
   page is https://www.freightutils.com/adr/codes/{family}/{code}), `full` keeps it. The outputSchema and the
   description follow; rows keep the Table A code strings.
-- The check tools' envelope `_meta` types `edition_basis` (freightutils.com R6): every executed check names the
-  edition it rested on (`edition` + `as_of`), or answers `edition: null` with `_meta.edition_basis` "no regulatory
-  dataset read". 2.24.0's passthrough `_meta` already accepts it.
+- README: receipts, batch inputs, `resolved_codes` / `include_codes` and the scoped tool lists.
 
 ## 2.24.0 — 2026-10-29
 
