@@ -250,13 +250,13 @@ Related: vehicle_lookup (the trailer specs behind the vehicle presets), pallet_f
 
 const adrLookup: ToolDef = {
   name: 'adr_lookup',
-  description: `Look up European road dangerous-goods (ADR 2025) reference data for a substance: hazard class, classification code, packing group, labels, special provisions, limited/excepted quantities, transport category, tunnel restriction code and Kemler (hazard identification) number. Covers 2,939 entries across all 9 hazard classes, from UNECE ADR 2025 (ECE/TRANS/352).
+  description: `Look up the full European road dangerous-goods (ADR 2025) Table A entry for a substance — all 20 columns, from class, packing group and labels through special provisions, limited/excepted quantities, packing instructions, tank codes, carriage provisions, transport category, tunnel restriction code and hazard identification number — and what each of those codes means (resolved_codes). Covers 2,939 entries across all 9 hazard classes, from UNECE ADR 2025 (ECE/TRANS/352).
 
 Provide exactly ONE of: un_number (exact lookup — returns every packing-group variant of that UN number), search (case-insensitive partial match on the proper shipping name), or hazard_class (all entries in a class or division). un_number is normalised — "1203", "UN1203" and "un 1203" are equivalent, and normalized_input reports the correction; explosives keep their leading zero ("0004").
 
 Behavior: read-only reference lookup; a name search or class filter is a paged list — total, truncated and next_offset, with offset and limit (at most 50 per search page, 100 per class page) — never a silently cut list. A search with no hits errors with suggestions: the closest proper shipping names in Table A ("acetne" → ACETONE, UN 1090). 28 Table A rows carry a scope remark instead of a packing group: those return packing_group null plus not_subject_to_adr (with conditions_ref, e.g. "5.5.3" for UN 1845 dry ice) or carriage_prohibited, and table_a_remark preserves the verbatim Table A text. ${RATE}
 
-Returns: count and results[] — per entry, all 20 Table A columns: un_number, proper_shipping_name, class, classification_code, packing_group, labels, special_provisions, limited_quantity, excepted_quantity, packing_instructions, special_/mixed_packing_provisions, portable_tank_instructions/_special_provisions, tank_code, tank_special_provisions, vehicle_for_tank_carriage, carriage_packages/_bulk/_loading_unloading_handling/_operation, transport_category, tunnel_restriction_code, hazard_identification_number, variant_index/variant_count and, on scope-flagged rows, not_subject_to_adr/carriage_prohibited/conditions_ref/table_a_remark — under result, ${ENV}
+Returns: count and results[] — per entry, all 20 Table A columns: un_number, proper_shipping_name, class, classification_code, packing_group, labels, special_provisions, limited_quantity, excepted_quantity, packing_instructions, special_/mixed_packing_provisions, portable_tank_instructions/_special_provisions, tank_code, tank_special_provisions, vehicle_for_tank_carriage, carriage_packages/_bulk/_loading_unloading_handling/_operation, transport_category, tunnel_restriction_code, hazard_identification_number, variant_index/variant_count and, on scope-flagged rows, not_subject_to_adr/carriage_prohibited/conditions_ref/table_a_remark — plus resolved_codes[]: one entry per code in columns (5)–(20) with its column, code, family, summary, ADR section, verification_status and url (include_codes "full" adds title, meaning, parameters, applies_to, references; "none" omits the list; default compact for un_number, none for search, hazard_class and un_numbers). The meanings are FreightUtils' paraphrases of ADR 2025, cited to section and page; verification_status says whether a person has reviewed each one (paraphrase_unreviewed until then) — under result, ${ENV}
 
 Limitations: a factual compilation of the ADR table, not legal or compliance advice; classification remains the consignor's responsibility — verify against the current UNECE ADR text.
 
@@ -274,6 +274,7 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
     hazard_class: z.string().optional().describe('All entries in an ADR class (Table A column (3a)). Examples: "3" (flammable liquids), "6.1" (toxic), "1" (explosives — the division and compatibility group are in classification_code, e.g. "1.4S").'),
     offset: z.number().int().nonnegative().max(...wholeMax('offset')).optional().describe('search / hazard_class only: rows to skip (default 0). The response gives total and next_offset.'),
     limit: z.number().int().min(1).max(100).optional().describe('search / hazard_class only: rows per page (default and maximum 50 for a search, 100 for a class).'),
+    include_codes: z.enum(['none', 'compact', 'full']).optional().describe('resolved_codes on each row — what each Table A code means: "compact" (summary, section, verification_status, url), "full" (adds title, meaning, parameters, applies_to, references) or "none". Default compact for un_number, none for search, hazard_class and un_numbers (may go beside un_numbers).'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -318,6 +319,20 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
       hazard_identification_number: z.string(),
       variant_index: z.number(),
       variant_count: z.number(),
+      // The ADR code registry (freightutils.com G1): what each code of the row means.
+      resolved_codes: z.array(loose({
+        column: z.string(),
+        code: z.string(),
+        family: z.string(),
+        summary: z.string(),
+        section: z.string(),
+        verification_status: z.string(),
+        url: z.string(),
+        title: z.string(),
+        meaning: z.string(),
+        applies_to: z.string(),
+        references: z.array(z.string()),
+      })),
     })),
     meta: z.record(z.string(), z.unknown()),
   }),
@@ -325,7 +340,7 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
   annotations: readOnlyAnnotations('ADR Dangerous Goods Lookup'),
 
   handler: async (args, opts) =>
-    apiGet('adr', { un: args.un_number, q: args.search, class: args.hazard_class, offset: args.offset, limit: args.limit, un_numbers: listArg(args.un_numbers) }, opts),
+    apiGet('adr', { un: args.un_number, q: args.search, class: args.hazard_class, offset: args.offset, limit: args.limit, un_numbers: listArg(args.un_numbers), include_codes: args.include_codes }, opts),
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -1553,7 +1568,7 @@ const resolveReference: ToolDef = {
   name: 'resolve_reference',
   description: `Resolve an arbitrary freight identifier — one opaque string in, typed and cited candidates out. Use when you hold one identifier-ish token ("176", "UN1845", "NLRTM", "FOB", "22G1", "MSKU1100810", "D/E") and do not know what kind of identifier it is: each candidate names its entity type and carries the api_url and canonical_url of its full record.
 
-Provide q: ONE identifier (single token, max 32 chars). Thirteen grammars all run — UN numbers, AWB prefixes, airline IATA/ICAO, airport IATA/ICAO, UN/LOCODE, ISO 6346 container numbers (check digit computed), HS codes (6-10 digits; national lines resolve at their 6-digit international parent), Incoterms, ADR tunnel codes, ULD serials, ISO container size/type codes. Ambiguity is the product: colliding grammars return MULTIPLE ranked candidates ("LHR" is Heathrow AND an Egyptian carrier's ICAO), never a silent guess.
+Provide q: ONE identifier (single token, max 32 chars). Fourteen grammars all run — UN numbers, AWB prefixes, airline IATA/ICAO, airport IATA/ICAO, UN/LOCODE, ISO 6346 container numbers (check digit computed), HS codes (6-10 digits; national lines resolve at their 6-digit international parent), Incoterms, ADR tunnel codes, ADR Table A codes (special provisions, packing instructions and their PP/B/L provisions, MP, T/BK/TP, tank codes, TU/TC/TE/TA/TT/TM, V/VC/AP/CV/S, vehicle designations, labels, hazard identification numbers — e.g. "TU9" → its meaning, section and review status; a well-formed code no Table A row carries, e.g. "P999", is pattern_only), ULD serials, ISO container size/type codes. Ambiguity is the product: colliding grammars return MULTIPLE ranked candidates ("LHR" is Heathrow AND an Egyptian carrier's ICAO; "336" is an ADR special provision AND a hazard identification number), never a silent guess.
 
 Behavior: deterministic — normalize (trim, uppercase, collapse spaces/dashes, strip a UN prefix), match ALL grammars, rank by record-hit > verification status > static dataset prior (airlines/adr/unlocode first) > stable tiebreak; every candidate carries rank_basis so the ordering is inspectable. Zero candidates is a VALID result (count 0 + note), never an error. A failed container check digit returns a candidate with valid:false rather than dropping it. ${RATE}
 
@@ -1563,7 +1578,7 @@ Limitations: v1 is SINGLE-TOKEN resolution, not free-text extraction — pass on
 
 Related: every lookup tool this resolves into — adr_lookup, airline_lookup, airport_lookup, unlocode_lookup, hs_code_lookup, incoterms_lookup, container_lookup, uld_lookup, validate.`,
   schema: z.object({
-    q: z.string().min(1).max(32).refine((s) => s.trim().length > 0, 'q must not be blank').describe('One freight identifier — e.g. "176", "UN1845", "NLRTM", "FOB", "LHR", "22G1", "MSKU1100810", "090111", "AKE12345AB", "D/E".'),
+    q: z.string().min(1).max(32).refine((s) => s.trim().length > 0, 'q must not be blank').describe('One freight identifier — e.g. "176", "UN1845", "NLRTM", "FOB", "LHR", "22G1", "MSKU1100810", "090111", "AKE12345AB", "D/E", "TU9".'),
   }).strict(),
   resultSchema: resultShape({
     query: z.string(),

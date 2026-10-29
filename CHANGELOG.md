@@ -18,6 +18,17 @@
   with its own status. One call against the daily limit, N against the Pro monthly allowance.
 - **Scopes.** `--scope dg | customs | ops` (or `FREIGHTUTILS_SCOPE`) serves only that scope's tools, as the hosted
   `/api/mcp/<scope>`; the default `all` is unchanged.
+- **What each ADR code means** (mirrors freightutils.com G1, the ADR code registry). `adr_lookup` takes
+  `include_codes` (`none` | `compact` | `full`) and its outputSchema types `resolved_codes[]` — one entry per code in
+  Table A columns (5)–(20) with its summary, section, `verification_status` and url. The API answers it by default
+  (compact) for a UN number; this package passes `include_codes` only when given. The meanings are FreightUtils'
+  paraphrases of ADR 2025, not yet reviewed, and say so.
+
+### Changed
+
+- `adr_lookup` description: the lead sentence names all 20 Table A columns and `resolved_codes` (A-ADR-06).
+- `resolve_reference` description: fourteen grammars — ADR Table A codes join (`TU9` → its record; `P999` →
+  `pattern_only`; `336` is both a special provision and a hazard identification number).
 
 ## 2.24.0 — 2026-10-29
 
