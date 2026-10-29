@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased — 2.25.0 (pending; mirrors freightutils.com build 0B)
+
+### Added
+
+- **The consignment object.** `consignment_calculator`, `shipment_summary` and `adr_exemption_calculator` take a
+  `consignment` argument (https://www.freightutils.com/schema/consignment-object.v1.json) instead of their own
+  inputs; the API maps it onto the tool's request and answers as that request would. `validate` takes
+  `type: "consignment"`.
+- **Check receipts.** The six check tools' answers carry `_meta.check_id` and `_meta.receipt_url` (typed in the
+  envelope schema; 2.24.0's passthrough `_meta` already accepted them). The receipt is at
+  `GET /api/receipts/{check_id}` for 90 days.
+- **The exemption verdict basis.** `adr_exemption_calculator` results carry `resolved_subtotal_points`,
+  `threshold_exceeded_by_resolved_items`, `verdict_basis` and `unresolved_item_indexes`.
+- **Batch inputs.** `adr_lookup` `un_numbers[]`, `unlocode_lookup` / `airport_lookup` / `airline_lookup` /
+  `hs_code_lookup` `codes[]` (≤ 50) and `uk_duty_calculator` `lines[]` (≤ 10): `results[]` in input order, each
+  with its own status. One call against the daily limit, N against the Pro monthly allowance.
+- **Scopes.** `--scope dg | customs | ops` (or `FREIGHTUTILS_SCOPE`) serves only that scope's tools, as the hosted
+  `/api/mcp/<scope>`; the default `all` is unchanged.
+
 ## 2.24.0 — 2026-10-29
 
 ### Added

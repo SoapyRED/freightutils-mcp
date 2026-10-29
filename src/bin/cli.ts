@@ -3,6 +3,7 @@
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { createServer } from '../server.js';
 import { ANONYMOUS_DAILY_LIMIT, startupNotice } from '../notices.js';
+import { scopeFromArgs } from '../scopes.js';
 
 function printHelp(): void {
   process.stdout.write(
@@ -16,6 +17,8 @@ function printHelp(): void {
       '                                    non-zero on any failure with remediation hints)',
       '  npx freightutils-mcp --help       Show this help',
       '  npx freightutils-mcp --version    Print the package version',
+      '  npx freightutils-mcp --scope dg   Serve only one scope: dg (dangerous goods), customs or ops;',
+      '                                    all (default) serves every tool. Also FREIGHTUTILS_SCOPE.',
       '',
       'ENV',
       '  FREIGHTUTILS_API_KEY=<key>        Your API key, sent as Authorization: Bearer.',
@@ -62,7 +65,12 @@ async function main() {
   // anonymous-tier notice goes to stderr, once, before the transport starts.
   const notice = startupNotice();
   if (notice) process.stderr.write(notice + '\n');
-  const server = createServer();
+  const scope = scopeFromArgs(process.argv.slice(2), process.env);
+  if (typeof scope !== 'string') {
+    process.stderr.write(scope.error + '\n');
+    process.exit(2);
+  }
+  const server = createServer({ scope });
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
