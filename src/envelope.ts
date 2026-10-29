@@ -31,7 +31,9 @@ export function envelopeShape(result: z.ZodTypeAny): z.ZodRawShape {
     }).nullable().optional(),
     as_of: z.string().optional(),
     // _meta.identify (2026-10-28): present only on an anonymous answer; informational.
-    _meta: z.object({ identify: z.string().optional() }).passthrough().optional(),
+    // check_id / receipt_url (0B): the receipt of an executed check — the six check tools' answers.
+    // edition_basis (R6): why a check's edition is null — "no regulatory dataset read".
+    _meta: z.object({ identify: z.string().optional(), check_id: z.string().optional(), receipt_url: z.string().optional(), edition_basis: z.string().optional() }).passthrough().optional(),
     result,
     confidence: z.object({
       level: z.enum(['high', 'medium', 'low']),

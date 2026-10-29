@@ -18,6 +18,14 @@ Since **2.11.0**, every tool also declares a typed `outputSchema` and returns `s
 
 Since **2.24.0** the envelope is version **1.2**, which adds four fields beside `ok`: `status` (`ok`, `partial` when required inputs are missing, `not_found`, `ambiguous` or `unsupported`), `missing_inputs` (the inputs a `partial` answer still needs), `edition` (the edition the answer is served from, with the dates it applies from and may apply until; null for a computed or live answer) and `as_of` (the date the answer's data was last audited, or today for a computed answer). A refusal carries the same envelope on `structuredContent`, so an agent can read `partial` and `missing_inputs` there as well. The change is additive: envelope 1 and 1.1 answers still validate.
 
+Since **2.25.0**:
+
+- **Check receipts.** Every answer of the six executed checks (`adr_exemption_calculator`, `adr_lq_eq_check`, `uk_duty_calculator`, `consignment_calculator`, `shipment_summary`, `ics2_check`) carries `_meta.check_id` and `_meta.receipt_url`. A receipt is the record of that one check, kept for 90 days at `GET https://www.freightutils.com/api/receipts/{check_id}` (`?format=text` for a summary): the inputs as consumed, the edition and as-of date, the data hashes, the rules applied, the result, anything unresolved and a `receipt_hash` a copy can be checked against. Verifying by id needs no plan and no payment — an anonymous check's receipt is read with its id alone, a keyed check's with the same key — and a fetch counts as one request against the daily allowance, like a lookup. A receipt never holds a name, an address, a key or an IP address. Every check also names the edition it rested on (`edition` + `as_of`), or answers `edition: null` with `_meta.edition_basis` "no regulatory dataset read".
+- **Batch inputs.** `adr_lookup` takes `un_numbers[]`; `unlocode_lookup`, `airport_lookup`, `airline_lookup` and `hs_code_lookup` take `codes[]` (up to 50 each); `uk_duty_calculator` takes `lines[]` (up to 10). Send the list alone: the answer is `results[]` in input order, each item with its own `status`. One call against the daily limit, one per item against the Pro monthly allowance.
+- **What each ADR code means.** `adr_lookup` answers `resolved_codes[]` beside `results[]`: each code in Table A columns (5)–(20), once per answer, with the `rows` that carry it, its summary, ADR section and `verification_status`. `include_codes` picks `compact` (the default for a UN number), `full` (adds the url, title, meaning and references) or `none`; `include_statements: true` adds plain-word statements to every row. The meanings are FreightUtils' paraphrases of ADR 2025, cited to section, and say whether a person has reviewed them yet.
+- **Scopes.** `--scope dg | customs | ops` (or `FREIGHTUTILS_SCOPE`) serves only that scope's tools — see [Scoped tool lists](#scoped-tool-lists). The default serves all of them.
+- **The consignment object.** `consignment_calculator`, `shipment_summary` and `adr_exemption_calculator` take one `consignment` argument ([schema](https://www.freightutils.com/schema/consignment-object.v1.json)) instead of their own inputs; `validate` checks one with `type: "consignment"`.
+
 **Website:** https://www.freightutils.com
 **API Docs:** https://www.freightutils.com/api-docs
 
@@ -44,7 +52,9 @@ Since **2.24.0** the envelope is version **1.2**, which adds four fields beside 
 | `adr_exemption_calculator` | ADR 1.1.3.6 small load exemption check |
 | `adr_lq_eq_check` | Limited and Excepted Quantity eligibility |
 
-**What's new in 2.24.0:** every tool answers with response envelope 1.2 (`status`, `missing_inputs`, `edition`, `as_of`); `unlocode_lookup` says 116,086 UN/LOCODE codes. In 2.23.0, `adr_lookup` gained the 12 further Table A columns (packing, tank, vehicle and carriage provisions, columns 8–14 and 16–19) in its description and result schema; empty columns are null.
+**What's new in 2.25.0:** check receipts, batch inputs, `resolved_codes` on `adr_lookup` (what each Table A code means), `--scope dg | customs | ops`, the consignment object, and `resolve_reference` decodes ADR Table A codes ("TU9"). Nothing removed: every 2.24.0 call answers as before.
+
+**In 2.24.0:** every tool answers with response envelope 1.2 (`status`, `missing_inputs`, `edition`, `as_of`); `unlocode_lookup` says 116,086 UN/LOCODE codes. In 2.23.0, `adr_lookup` gained the 12 further Table A columns (packing, tank, vehicle and carriage provisions, columns 8–14 and 16–19) in its description and result schema; empty columns are null.
 
 Some UN numbers have more than one ADR Table A row (packing groups, concentration bands). When a bare UN number matches rows that give different answers, the ADR tools never pick one: they withhold the verdict and return the candidate rows, and you pin one with `packing_group` or `variant_index`. The rules, with worked cases (UN 1789, UN 1790 PG I, UN 2215 PG III): [the ADR 1.1.3.6 calculator in the API docs](https://www.freightutils.com/api-docs#adr-calculator).
 
@@ -104,6 +114,30 @@ Add to your MCP config (`claude_desktop_config.json` or `.claude/settings.json`)
   }
 }
 ```
+
+### Scoped tool lists
+
+An agent that only does one job can load fewer tool definitions. `--scope` (or the `FREIGHTUTILS_SCOPE` environment variable) serves one scope — the same tools, names, schemas and answers, filtered:
+
+| Scope | Tools |
+|------|-------|
+| `dg` | `adr_lookup`, `adr_exemption_calculator`, `adr_lq_eq_check`, `validate`, `resolve_reference` |
+| `customs` | `hs_code_lookup`, `uk_duty_calculator`, `ics2_check`, `incoterms_lookup`, `validate` |
+| `ops` | the 11 calculators and equipment lookups, `unlocode_lookup`, `airport_lookup`, `nearest_airport`, `airline_lookup`, `validate`, `resolve_reference` (17) |
+| `all` (default) | every tool |
+
+```json
+{
+  "mcpServers": {
+    "freightutils-dg": {
+      "command": "npx",
+      "args": ["freightutils-mcp", "--scope", "dg"]
+    }
+  }
+}
+```
+
+The hosted endpoint serves the same lists at `https://www.freightutils.com/api/mcp/dg`, `/customs` and `/ops`. An unknown scope stops the server with an error naming the four.
 
 ### Remote HTTP / SSE
 

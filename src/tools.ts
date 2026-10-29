@@ -58,6 +58,9 @@ const readOnlyAnnotations = (title: string): ToolAnnotationShape => ({
 // (Anthropic's connector checklist rejects both — 2.20.1). reset_at is on every limit error
 // a tool call can return: the REST 429 body (anonymous and keyed) this package surfaces, and
 // the hosted endpoint's JSON-RPC error data.
+/** A batch list as the REST API takes it on GET: comma-separated (0B). */
+const listArg = (v: unknown): string | undefined => (Array.isArray(v) ? v.map(String).join(',') : undefined);
+
 const RATE = 'Rate-limited: a limit error carries reset_at, the UTC time the allowance resets.';
 // Shared envelope tail — what every REST-backed tool returns around its result.
 const ENV = 'plus confidence, _source and citation (the FreightUtils v1 response envelope).';
@@ -247,13 +250,13 @@ Related: vehicle_lookup (the trailer specs behind the vehicle presets), pallet_f
 
 const adrLookup: ToolDef = {
   name: 'adr_lookup',
-  description: `Look up European road dangerous-goods (ADR 2025) reference data for a substance: hazard class, classification code, packing group, labels, special provisions, limited/excepted quantities, transport category, tunnel restriction code and Kemler (hazard identification) number. Covers 2,939 entries across all 9 hazard classes, from UNECE ADR 2025 (ECE/TRANS/352).
+  description: `Look up the full European road dangerous-goods (ADR 2025) Table A entry for a substance — all 20 columns, from class, packing group and labels through special provisions, limited/excepted quantities, packing instructions, tank codes, carriage provisions, transport category, tunnel restriction code and hazard identification number — and what each of those codes means (resolved_codes). Covers 2,939 entries across all 9 hazard classes, from UNECE ADR 2025 (ECE/TRANS/352).
 
 Provide exactly ONE of: un_number (exact lookup — returns every packing-group variant of that UN number), search (case-insensitive partial match on the proper shipping name), or hazard_class (all entries in a class or division). un_number is normalised — "1203", "UN1203" and "un 1203" are equivalent, and normalized_input reports the correction; explosives keep their leading zero ("0004").
 
 Behavior: read-only reference lookup; a name search or class filter is a paged list — total, truncated and next_offset, with offset and limit (at most 50 per search page, 100 per class page) — never a silently cut list. A search with no hits errors with suggestions: the closest proper shipping names in Table A ("acetne" → ACETONE, UN 1090). 28 Table A rows carry a scope remark instead of a packing group: those return packing_group null plus not_subject_to_adr (with conditions_ref, e.g. "5.5.3" for UN 1845 dry ice) or carriage_prohibited, and table_a_remark preserves the verbatim Table A text. ${RATE}
 
-Returns: count and results[] — per entry, all 20 Table A columns: un_number, proper_shipping_name, class, classification_code, packing_group, labels, special_provisions, limited_quantity, excepted_quantity, packing_instructions, special_/mixed_packing_provisions, portable_tank_instructions/_special_provisions, tank_code, tank_special_provisions, vehicle_for_tank_carriage, carriage_packages/_bulk/_loading_unloading_handling/_operation, transport_category, tunnel_restriction_code, hazard_identification_number, variant_index/variant_count and, on scope-flagged rows, not_subject_to_adr/carriage_prohibited/conditions_ref/table_a_remark — under result, ${ENV}
+Returns: count and results[] — per entry, all 20 Table A columns: un_number, proper_shipping_name, class, classification_code, packing_group, labels, special_provisions, limited_quantity, excepted_quantity, packing_instructions, special_/mixed_packing_provisions, portable_tank_instructions/_special_provisions, tank_code, tank_special_provisions, vehicle_for_tank_carriage, carriage_packages/_bulk/_loading_unloading_handling/_operation, transport_category, tunnel_restriction_code, hazard_identification_number, variant_index/variant_count and, on scope-flagged rows, not_subject_to_adr/carriage_prohibited/conditions_ref/table_a_remark — plus resolved_codes[] beside results[]: one entry per distinct code in columns (5)–(20) across the answer, with its code, family, columns, rows (the results[] indexes that carry it), summary, ADR section and verification_status (include_codes "full" adds url, title, meaning, parameters, applies_to, references; "none" omits the list; default compact for un_number, none for search, hazard_class and un_numbers; a code's page is https://www.freightutils.com/adr/codes/{family}/{code}). The meanings are FreightUtils' paraphrases of ADR 2025, cited to section and page; verification_status says whether a person has reviewed each one (paraphrase_unreviewed until then) — under result, ${ENV}
 
 Limitations: a factual compilation of the ADR table, not legal or compliance advice; classification remains the consignor's responsibility — verify against the current UNECE ADR text.
 
@@ -267,9 +270,12 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
     search: z.string().min(2, 'Search term must be at least 2 characters').optional().describe('Case-insensitive partial match on the proper shipping name (min 2 characters). Example: "acetone".'),
     // Table A column (3a) gives every explosive the class "1"; the division is part of the
     // classification code (column (3b), e.g. "1.4S"), so the old example "1.4" answered not found.
+    un_numbers: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 UN numbers. Send alone; answered as results[] in input order, each with its own status. One call against the daily limit, N against the Pro monthly allowance.'),
     hazard_class: z.string().optional().describe('All entries in an ADR class (Table A column (3a)). Examples: "3" (flammable liquids), "6.1" (toxic), "1" (explosives — the division and compatibility group are in classification_code, e.g. "1.4S").'),
     offset: z.number().int().nonnegative().max(...wholeMax('offset')).optional().describe('search / hazard_class only: rows to skip (default 0). The response gives total and next_offset.'),
     limit: z.number().int().min(1).max(100).optional().describe('search / hazard_class only: rows per page (default and maximum 50 for a search, 100 for a class).'),
+    include_codes: z.enum(['none', 'compact', 'full']).optional().describe('resolved_codes beside results[] — what each Table A code means, once per answer with the rows that carry it: "compact" (code, family, columns, rows, summary, section, verification_status), "full" (adds url, title, meaning, parameters, applies_to, references) or "none". Default compact for un_number, none for search, hazard_class and un_numbers (may go beside un_numbers).'),
+    include_statements: z.boolean().optional().describe('true adds statements[] to every row: plain-word statements (tunnel, transport category, labels, packing, tanks, carriage) assembled from the code meanings and the 8.6.4 / 1.1.3.6.3 tables, each with basis, codes and verification_status (the lowest of the codes it draws on). Default false.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -314,6 +320,30 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
       hazard_identification_number: z.string(),
       variant_index: z.number(),
       variant_count: z.number(),
+      statements: z.array(loose({
+        topic: z.string(),
+        text: z.string(),
+        basis: z.array(z.string()),
+        codes: z.array(z.string()),
+        verification_status: z.string(),
+      })),
+    })),
+    // The ADR code registry (freightutils.com G1; once per answer since R6): what each code means,
+    // served once however many rows carry it — rows[] are the results[] indexes, columns[] the
+    // Table A columns. "full" adds url, title, meaning, parameters, applies_to, references.
+    resolved_codes: z.array(loose({
+      code: z.string(),
+      family: z.string(),
+      columns: z.array(z.string()),
+      rows: z.array(z.number()),
+      summary: z.string(),
+      section: z.string(),
+      verification_status: z.string(),
+      url: z.string(),
+      title: z.string(),
+      meaning: z.string(),
+      applies_to: z.string(),
+      references: z.array(z.string()),
     })),
     meta: z.record(z.string(), z.unknown()),
   }),
@@ -321,7 +351,7 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
   annotations: readOnlyAnnotations('ADR Dangerous Goods Lookup'),
 
   handler: async (args, opts) =>
-    apiGet('adr', { un: args.un_number, q: args.search, class: args.hazard_class, offset: args.offset, limit: args.limit }, opts),
+    apiGet('adr', { un: args.un_number, q: args.search, class: args.hazard_class, offset: args.offset, limit: args.limit, un_numbers: listArg(args.un_numbers), include_codes: args.include_codes, include: args.include_statements ? 'statements' : undefined }, opts),
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -364,6 +394,7 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
       unit: z.enum(['L', 'kg']).optional().describe("OPTIONAL. The dimension `quantity` is stated in. Omit it and the number is taken as already on the ADR 1.1.3.6.3 basis (unchanged behaviour). Supply it and it is CHECKED against the dimension 1.1.3.6.3 counts for that Table A row — litres for liquids and for compressed or adsorbed gases, kilograms for solids, liquefied/refrigerated/dissolved gases and articles. A mismatch returns total_points null, exempt null and items[].basis_mismatch true, naming the dimension the entry is counted in."),
       basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging, so a quantity declared 'gross' returns no points in ANY unit — send the net figure instead."),
     }, { hints: EXEMPTION_KEY_HINTS, acceptedLabel: 'Accepted on each item' })).min(1, 'items must hold at least one item').optional().describe('Mixed-load items (use INSTEAD of un_number/quantity).'),
+    consignment: z.record(z.string(), z.unknown()).optional().describe('Alternative to the other arguments: the consignment object (https://www.freightutils.com/schema/consignment-object.v1.json) — lines[], journey, vehicle, options. Send it alone; an input this tool needs and the object lacks comes back in missing_inputs.'),
   }, {
     hints: EXEMPTION_KEY_HINTS,
     acceptedLabel: 'Accepted arguments',
@@ -396,6 +427,12 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
     has_quantity_exceedance: z.boolean(),
     warnings: z.array(z.unknown()),
     message: z.string(),
+    // What the verdict rests on (0B, Round 10): the COUNTED lines' points, whether they alone exceed
+    // 1,000, the basis and the BLOCKED lines. total_points / exempt keep their meaning.
+    resolved_subtotal_points: z.number(),
+    threshold_exceeded_by_resolved_items: z.boolean(),
+    verdict_basis: z.enum(['all_items', 'resolved_items_alone', 'none']),
+    unresolved_item_indexes: z.array(z.number()),
     // Scope-verdict path (Table A "NOT SUBJECT TO ADR" / "CARRIAGE PROHIBITED"):
     // the 1.1.3.6 math is short-circuited; conditions[] quotes ADR 2025
     // carriage conditions verbatim (e.g. section 5.5.3 for UN 1845 dry ice).
@@ -424,6 +461,8 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
   annotations: readOnlyAnnotations('ADR 1.1.3.6 Exemption Calculator'),
 
   handler: async (args, opts) => {
+    // The consignment object (0B): the API maps it onto items[] and answers as that request would.
+    if (args.consignment !== undefined) return apiPost('adr-calculator', { consignment: args.consignment }, opts);
     if (args.items) {
       // Every single-substance field beside items[] is FORWARDED, not dropped (2.20.0): the
       // API refuses them by name, so the caller learns the field reached no line. Dropping
@@ -471,6 +510,7 @@ Related: airport_lookup (searches AIRPORTS, not carriers), validate (checks an A
     icao: z.string().regex(/^[A-Za-z]{3}$/, 'ICAO code must be 3 letters (e.g., "UAE", "BAW")').optional().describe('Exact ICAO code — 3 letters. Examples: "UAE", "BAW".'),
     prefix: z.string().regex(/^\d{3}$/, 'AWB prefix must be exactly 3 digits').optional().describe('Exact AWB prefix — the first 3 digits of an air waybill. Example: "176".'),
     country: z.string().min(2, 'Country must be at least 2 characters').optional().describe('Filter by country name (min 2 chars). Example: "Netherlands".'),
+    codes: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 airline codes — 2 characters IATA, 3 letters ICAO, 3 digits AWB prefix. Send alone; answered as results[] in input order, each with its own status. One call against the daily limit, N against the Pro monthly allowance.'),
     ...LIST_FIELDS,
   }).strict(),
 
@@ -496,6 +536,7 @@ Related: airport_lookup (searches AIRPORTS, not carriers), validate (checks an A
 
   handler: async (args, opts) =>
     apiGet('airlines', {
+      codes: listArg(args.codes),
       q: args.query, iata: args.iata, icao: args.icao,
       prefix: args.prefix, country: args.country,
       ...listQuery(args, !args.iata && !args.icao && !args.prefix, 25),
@@ -591,6 +632,7 @@ Related: uk_duty_calculator (duty/VAT for a code found here), ics2_check (EU ENS
     // "8471.30" / "8471 30" — the written form — read as its digits (2.22.0, probe S14).
     code: z.string().refine((c) => /^\d{2,6}$/.test(c.trim().replace(/[\s.-]/g, '')), 'HS code must be 2–6 digits; dots, spaces and hyphens are ignored (e.g. "847130", "8471.30")').optional().describe('Exact HS code or prefix — 2, 4 or 6 digits, with or without dots or spaces. Examples: "8471", "8471.30".'),
     section: z.string().regex(/^[ivxIVX]{1,5}$/, 'Section must be a Roman numeral I–XXI').optional().describe('Browse a section by Roman numeral I-XXI. Example: "XVI" (machinery).'),
+    codes: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 HS codes. Send alone; answered as results[] in input order, each with its own status. One call against the daily limit, N against the Pro monthly allowance.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -605,7 +647,7 @@ Related: uk_duty_calculator (duty/VAT for a code found here), ics2_check (EU ENS
   annotations: readOnlyAnnotations('HS Code Lookup'),
 
   handler: async (args, opts) =>
-    apiGet('hs', { q: args.query, code: args.code, section: args.section }, opts),
+    apiGet('hs', { q: args.query, code: args.code, section: args.section, codes: listArg(args.codes) }, opts),
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -798,6 +840,7 @@ Related: cbm_calculator / chargeable_weight_calculator / ldm_calculator (single-
       container_number: z.string().max(20, 'container_number must be at most 20 characters').optional().describe('ISO 6346 container number — check-digit validated into flags.'),
       awb_number: z.string().max(20, 'awb_number must be at most 20 characters').optional().describe('IATA 11-digit air waybill number — check-digit validated into flags.'),
     }).strict().optional().describe('Optional settings.'),
+    consignment: z.record(z.string(), z.unknown()).optional().describe('Alternative to the other arguments: the consignment object (https://www.freightutils.com/schema/consignment-object.v1.json) — lines[], journey, vehicle, options. Send it alone; an input this tool needs and the object lacks comes back in missing_inputs.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -853,6 +896,7 @@ Related: airport_lookup (airport-specific records including ICAO codes), nearest
     country: z.string().regex(/^[A-Za-z]{2}$/, 'Country must be a 2-letter ISO code (e.g. "GB", "NL")').optional().describe('Filter by 2-letter ISO country code. Examples: "GB", "NL".'),
     function_type: z.enum(['port', 'airport', 'rail', 'road', 'icd', 'border']).optional().describe('Filter by location function.'),
     limit: z.number().int().min(1).max(100).optional().describe('Maximum results. Default: 20, max: 100.'),
+    codes: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 UN/LOCODEs. Send alone; answered as results[] in input order, each with its own status. One call against the daily limit, N against the Pro monthly allowance.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -876,6 +920,7 @@ Related: airport_lookup (airport-specific records including ICAO codes), nearest
 
   handler: async (args, opts) =>
     apiGet('unlocode', {
+      codes: listArg(args.codes),
       q: args.query, code: args.code, country: args.country,
       function: args.function_type, limit: args.limit,
     }, opts),
@@ -901,9 +946,10 @@ Related: hs_code_lookup (find the 6-digit code first), incoterms_lookup (who act
 
   schema: z.object({
     // Spaces allowed, as the API and the hosted tool accept ("8471 30 00 00").
-    commodity_code: z.string().regex(/^[\d\s]{6,14}$/, 'Commodity code must be 6–10 digits (spaces allowed)').refine((c) => /^\d{6,10}$/.test(c.replace(/\s/g, '')), 'Commodity code must be 6–10 digits (spaces allowed)').describe('UK tariff commodity code — the declarable 10 digits. Example: "8471300000" (portable computers). A 6- or 8-digit code is refused with the declarable codes beneath it.'),
-    origin_country: z.string().regex(/^[A-Za-z]{2}$/, 'Origin country must be a 2-letter ISO code (e.g., "CN", "DE")').describe('ISO 2-letter country of origin. Examples: "CN", "DE", "US".'),
-    customs_value: z.number().positive().describe('Goods value in GBP. Example: 1000.'),
+    commodity_code: z.string().regex(/^[\d\s]{6,14}$/, 'Commodity code must be 6–10 digits (spaces allowed)').refine((c) => /^\d{6,10}$/.test(c.replace(/\s/g, '')), 'Commodity code must be 6–10 digits (spaces allowed)').optional().describe('Required unless lines[] is sent. UK tariff commodity code — the declarable 10 digits. Example: "8471300000" (portable computers). A 6- or 8-digit code is refused with the declarable codes beneath it.'),
+    origin_country: z.string().regex(/^[A-Za-z]{2}$/, 'Origin country must be a 2-letter ISO code (e.g., "CN", "DE")').optional().describe('Required unless lines[] is sent. ISO 2-letter country of origin. Examples: "CN", "DE", "US".'),
+    customs_value: z.number().positive().optional().describe('Goods value in GBP. Required unless lines[] is sent. Example: 1000.'),
+    lines: z.array(z.record(z.string(), z.unknown())).min(1).max(10).optional().describe('Batch: up to 10 lines, each { commodity_code, origin_country, customs_value, freight_cost?, insurance_cost?, incoterm? }. Send alone; answered as results[] in input order, each line its own receipt. One call against the daily limit, N against the Pro monthly allowance.'),
     // A cost is 0 or more: -1000 took 1,000 off the dutiable value until 2.21.2, here, on the API
     // and on the hosted endpoint alike. The API now refuses a negative cost too.
     freight_cost: z.number().nonnegative('freight_cost must be 0 or more — a cost is never negative').optional().describe('Freight cost in GBP, 0 or more — added to the CIF value. Default: 0.'),
@@ -957,7 +1003,7 @@ Related: consignment_calculator (canonical snake_case lines[] shape with advisor
 
   strictKeys: true,
   schema: strictInput({
-    mode: z.enum(['road', 'air', 'sea', 'multimodal']).describe('Transport mode — selects the mode-specific section of the result.'),
+    mode: z.enum(['road', 'air', 'sea', 'multimodal']).optional().describe('Transport mode — selects the mode-specific section of the result. Required unless consignment is sent.'),
     items: z.array(strictInput({
       description: z.string().optional().describe('Optional item label.'),
       length: z.number().positive().describe('Length in cm.'),
@@ -972,12 +1018,13 @@ Related: consignment_calculator (canonical snake_case lines[] shape with advisor
       adr_quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').optional().describe("OPTIONAL ADR 1.1.3.6.3 quantity for this dangerous-goods line — the total for the whole line, all pieces together (never per piece), in adr_quantity_unit. SEPARATE from weight, which is gross package mass — 1.1.3.6.3 counts none of its four categories that way. Supply both on EVERY dangerous-goods line and adrFlags.totalPoints is calculated; omit either and it stays null."),
       adr_quantity_unit: z.enum(['L', 'kg']).optional().describe("Dimension of adr_quantity. CHECKED against the dimension 1.1.3.6.3 counts for the row — a litres entry given kilograms still withholds the total."),
       customs_value: z.number().nonnegative('customs_value must be 0 or more (GBP per item), or omitted').optional().describe('Customs value in GBP PER ITEM (per piece), 0 or more — multiplied by quantity for the line; the duty estimate uses the sum over all lines. Enables the duty section with hs_code.'),
-    }, { hints: { un: 'un_number' }, acceptedLabel: 'Accepted on each item' })).min(1, 'items must hold at least one item').max(50, 'at most 50 items — the API refuses more').describe('Shipment items with dimensions, weight and optional HS/UN codes.'),
+    }, { hints: { un: 'un_number' }, acceptedLabel: 'Accepted on each item' })).min(1, 'items must hold at least one item').max(50, 'at most 50 items — the API refuses more').optional().describe('Required unless consignment is sent. Shipment items with dimensions, weight and optional HS/UN codes.'),
     origin: strictInput({ country: z.string(), locode: z.string().optional() }, { acceptedLabel: 'Accepted in origin and destination' }).optional().describe('Origin — ISO country code and optional UN/LOCODE.'),
     destination: strictInput({ country: z.string(), locode: z.string().optional() }, { acceptedLabel: 'Accepted in origin and destination' }).optional().describe('Destination — ISO country code and optional UN/LOCODE.'),
     incoterm: z.string().optional().describe('Incoterms 2020 three-letter code. Examples: "DAP", "EXW", "FOB".'),
     freight_cost: z.number().nonnegative('freight_cost must be 0 or more (GBP), or omitted for 0').optional().describe('Freight cost in GBP for the duty calculation, 0 or more. Default: 0.'),
     insurance_cost: z.number().nonnegative('insurance_cost must be 0 or more (GBP), or omitted for 0').optional().describe('Insurance cost in GBP for the duty calculation, 0 or more. Default: 0.'),
+    consignment: z.record(z.string(), z.unknown()).optional().describe('Alternative to the other arguments: the consignment object (https://www.freightutils.com/schema/consignment-object.v1.json) — lines[], journey, vehicle, options. Send it alone; an input this tool needs and the object lacks comes back in missing_inputs.'),
   }, { hints: toItemPath(SHIPMENT_ITEM_FIELDS), acceptedLabel: 'Accepted arguments' }),
 
   resultSchema: resultShape({
@@ -1005,9 +1052,12 @@ Related: consignment_calculator (canonical snake_case lines[] shape with advisor
   // items[].unNumber / items[].customsValue. Map snake_case → camelCase on
   // the wire until the website's input parser adds snake_case aliases.
   handler: async (args, opts) =>
+    // The consignment object (0B): the API maps it onto { mode, items[], … }; mode and items are
+    // optional in the schema only because the object may replace them — the API names what is missing.
+    args.consignment !== undefined ? apiPost('shipment/summary', { consignment: args.consignment }, opts) :
     apiPost('shipment/summary', {
       mode: args.mode,
-      items: (args.items as Array<Record<string, unknown>>).map((i) => ({
+      items: ((args.items ?? []) as Array<Record<string, unknown>>).map((i) => ({
         description: i.description,
         length: i.length,
         width: i.width,
@@ -1354,7 +1404,8 @@ Related: container_lookup (container TYPE specs, not numbers), airline_lookup (t
   schema: z.object({
     text: z.string().optional().describe('Arbitrary string to scan for container / AWB / IMO identifiers (parse mode). Provide this OR value+type. Example: "2 cntrs MSKU3068808 / TGHU7654325 on AWB 176-12345675".'),
     value: z.string().optional().describe('A single identifier to validate (typed mode). Requires type — value without type is refused. Example: "MSKU3068808".'),
-    type: z.enum(['container', 'awb', 'imo']).optional().describe('Identifier type for value: container = ISO 6346, awb = IATA air waybill, imo = IMO ship number.'),
+    type: z.enum(['container', 'awb', 'imo', 'consignment']).optional().describe('Identifier type for value: container = ISO 6346, awb = IATA air waybill, imo = IMO ship number; or "consignment" with the consignment argument.'),
+    consignment: z.record(z.string(), z.unknown()).optional().describe('With type "consignment": the consignment object to validate. The answer says whether it is valid and which checks it carries the inputs for.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -1376,7 +1427,9 @@ Related: container_lookup (container TYPE specs, not numbers), airline_lookup (t
   annotations: readOnlyAnnotations('Freight Identifier Validator'),
 
   handler: async (args, opts) =>
-    apiGet('validate', { text: args.text, value: args.value, type: args.type }, opts),
+    args.type === 'consignment' || args.consignment !== undefined
+      ? apiPost('validate', { type: args.type, consignment: args.consignment, ...(args.text !== undefined ? { text: args.text } : {}), ...(args.value !== undefined ? { value: args.value } : {}) }, opts)
+      : apiGet('validate', { text: args.text, value: args.value, type: args.type }, opts),
 
   citation: (result: unknown) => {
     const r = result as { found?: { _source?: { reference?: string } }[] };
@@ -1469,6 +1522,7 @@ Related: nearest_airport (find airports FROM a coordinate), airline_lookup (sear
     icao: z.string().regex(/^[A-Za-z0-9]{4}$/, 'ICAO code must be 4 characters (e.g. "EGLL")').optional().describe('Exact 4-character ICAO / ident. Example: "EGLL".'),
     query: z.string().min(2, 'Query must be at least 2 characters').optional().describe('Name / city / municipality search (min 2 chars). Example: "heathrow".'),
     type: airportTypeEnum.optional().describe('Optional filter by airport type.'),
+    codes: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 airport codes — 3 letters IATA, 4 characters ICAO. Send alone; answered as results[] in input order, each with its own status. One call against the daily limit, N against the Pro monthly allowance.'),
   }).strict(),
   resultSchema: resultShape({
     count: z.number(),
@@ -1478,7 +1532,7 @@ Related: nearest_airport (find airports FROM a coordinate), airline_lookup (sear
   }),
   richText: true,
   annotations: readOnlyAnnotations('Airport Code Lookup'),
-  handler: async (args, opts) => apiGet('airports', { iata: args.iata, icao: args.icao, q: args.query, type: args.type }, opts),
+  handler: async (args, opts) => apiGet('airports', { iata: args.iata, icao: args.icao, q: args.query, type: args.type, codes: listArg(args.codes) }, opts),
   citation: airportCitation,
 };
 
@@ -1525,7 +1579,7 @@ const resolveReference: ToolDef = {
   name: 'resolve_reference',
   description: `Resolve an arbitrary freight identifier — one opaque string in, typed and cited candidates out. Use when you hold one identifier-ish token ("176", "UN1845", "NLRTM", "FOB", "22G1", "MSKU1100810", "D/E") and do not know what kind of identifier it is: each candidate names its entity type and carries the api_url and canonical_url of its full record.
 
-Provide q: ONE identifier (single token, max 32 chars). Thirteen grammars all run — UN numbers, AWB prefixes, airline IATA/ICAO, airport IATA/ICAO, UN/LOCODE, ISO 6346 container numbers (check digit computed), HS codes (6-10 digits; national lines resolve at their 6-digit international parent), Incoterms, ADR tunnel codes, ULD serials, ISO container size/type codes. Ambiguity is the product: colliding grammars return MULTIPLE ranked candidates ("LHR" is Heathrow AND an Egyptian carrier's ICAO), never a silent guess.
+Provide q: ONE identifier (single token, max 32 chars). Fourteen grammars all run — UN numbers, AWB prefixes, airline IATA/ICAO, airport IATA/ICAO, UN/LOCODE, ISO 6346 container numbers (check digit computed), HS codes (6-10 digits; national lines resolve at their 6-digit international parent), Incoterms, ADR tunnel codes, ADR Table A codes (special provisions, packing instructions and their PP/B/L provisions, MP, T/BK/TP, tank codes, TU/TC/TE/TA/TT/TM, V/VC/AP/CV/S, vehicle designations, labels, hazard identification numbers — e.g. "TU9" → its meaning, section and review status; a well-formed code no Table A row carries, e.g. "P999", is pattern_only), ULD serials, ISO container size/type codes. Ambiguity is the product: colliding grammars return MULTIPLE ranked candidates ("LHR" is Heathrow AND an Egyptian carrier's ICAO; "336" is an ADR special provision AND a hazard identification number), never a silent guess.
 
 Behavior: deterministic — normalize (trim, uppercase, collapse spaces/dashes, strip a UN prefix), match ALL grammars, rank by record-hit > verification status > static dataset prior (airlines/adr/unlocode first) > stable tiebreak; every candidate carries rank_basis so the ordering is inspectable. Zero candidates is a VALID result (count 0 + note), never an error. A failed container check digit returns a candidate with valid:false rather than dropping it. ${RATE}
 
@@ -1535,7 +1589,7 @@ Limitations: v1 is SINGLE-TOKEN resolution, not free-text extraction — pass on
 
 Related: every lookup tool this resolves into — adr_lookup, airline_lookup, airport_lookup, unlocode_lookup, hs_code_lookup, incoterms_lookup, container_lookup, uld_lookup, validate.`,
   schema: z.object({
-    q: z.string().min(1).max(32).refine((s) => s.trim().length > 0, 'q must not be blank').describe('One freight identifier — e.g. "176", "UN1845", "NLRTM", "FOB", "LHR", "22G1", "MSKU1100810", "090111", "AKE12345AB", "D/E".'),
+    q: z.string().min(1).max(32).refine((s) => s.trim().length > 0, 'q must not be blank').describe('One freight identifier — e.g. "176", "UN1845", "NLRTM", "FOB", "LHR", "22G1", "MSKU1100810", "090111", "AKE12345AB", "D/E", "TU9".'),
   }).strict(),
   resultSchema: resultShape({
     query: z.string(),

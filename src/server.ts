@@ -7,6 +7,7 @@ import {
 import { createRequire } from 'node:module';
 import { z } from 'zod';
 import { ALL_TOOLS, type ToolDef } from './tools.js';
+import { inScope, type Scope } from './scopes.js';
 import { envelopeShape } from './envelope.js';
 import { isHttpError } from './errors.js';
 
@@ -68,9 +69,11 @@ function refusalEnvelope(body: unknown, shape: z.ZodRawShape): Record<string, un
 // opposed to a transient failure (network, timeout, a 2xx that is not JSON), which is worth one
 // retry. Decided by class since 2.21.1; it used to match the message prefix.
 
-export function createServer(): McpServer {
+export function createServer(opts: { scope?: Scope } = {}): McpServer {
+  // --scope dg | customs | ops (2.25.0): a filter over the same tools, as the hosted /api/mcp/<scope>.
+  const scope: Scope = opts.scope ?? 'all';
   const server = new McpServer(
-    { name: 'freightutils-mcp', version: pkg.version },
+    { name: scope === 'all' ? 'freightutils-mcp' : `freightutils-mcp-${scope}`, version: pkg.version },
     // Declare prompts + resources capabilities up front so the low-level
     // setRequestHandler calls below are accepted (the SDK asserts a capability
     // is declared before its handler can be registered — see the historical
@@ -89,6 +92,7 @@ export function createServer(): McpServer {
   //  - errors fall back to the flat call so error text keeps its exact
   //    pre-2.11 bytes (2 requests — the rare path; successes cost 1)
   for (const tool of ALL_TOOLS) {
+    if (!inScope(scope, tool.name)) continue;
     const outputSchema = envelopeShape(tool.resultSchema);
     server.registerTool(
       tool.name,

@@ -1,5 +1,53 @@
 # Changelog
 
+## 2.25.0 — 2026-10-29
+
+The npm mirror of freightutils.com builds 0B, G1 and R6, in lock-step with the hosted endpoint. A minor release:
+new documented fields and arguments, nothing removed — every 2.24.0 call answers as before.
+
+### Added
+
+- **Scoped manifests.** `--scope dg | customs | ops` (or `FREIGHTUTILS_SCOPE`) serves only that scope's tools
+  (5 / 5 / 17), as the hosted `/api/mcp/<scope>`; the default `all` (25 tools) is unchanged. An unknown scope
+  stops the server with an error.
+- **resolve_reference decodes ADR Table A codes** — fourteen grammars: `TU9` → its record, meaning, section and
+  review status; a well-formed code no Table A row carries (`P999`) is `pattern_only`; `336` is both a special
+  provision and a hazard identification number, and both candidates come back.
+- **Every executed check names its edition.** The six checks answer `edition` + `as_of` for the dataset they read
+  (ADR 2025 with its dates, the UK Trade Tariff live, the ICS2 stop-word list version), or `edition: null` with
+  `_meta.edition_basis` "no regulatory dataset read" (typed; 2.24.0's passthrough `_meta` already accepted it).
+- **The consignment object.** `consignment_calculator`, `shipment_summary` and `adr_exemption_calculator` take a
+  `consignment` argument (https://www.freightutils.com/schema/consignment-object.v1.json) instead of their own
+  inputs; the API maps it onto the tool's request and answers as that request would. `validate` takes
+  `type: "consignment"`.
+- **Check receipts.** The six check tools' answers carry `_meta.check_id` and `_meta.receipt_url` (typed in the
+  envelope schema; 2.24.0's passthrough `_meta` already accepted them). The receipt is at
+  `GET /api/receipts/{check_id}` for 90 days.
+- **The exemption verdict basis.** `adr_exemption_calculator` results carry `resolved_subtotal_points`,
+  `threshold_exceeded_by_resolved_items`, `verdict_basis` and `unresolved_item_indexes`.
+- **Batch inputs.** `adr_lookup` `un_numbers[]`, `unlocode_lookup` / `airport_lookup` / `airline_lookup` /
+  `hs_code_lookup` `codes[]` (≤ 50) and `uk_duty_calculator` `lines[]` (≤ 10): `results[]` in input order, each
+  with its own status. One call against the daily limit, N against the Pro monthly allowance.
+- **Scopes.** `--scope dg | customs | ops` (or `FREIGHTUTILS_SCOPE`) serves only that scope's tools, as the hosted
+  `/api/mcp/<scope>`; the default `all` is unchanged.
+- **What each ADR code means** (mirrors freightutils.com G1, the ADR code registry). `adr_lookup` takes
+  `include_codes` (`none` | `compact` | `full`) and its outputSchema types `resolved_codes[]` — one entry per code in
+  Table A columns (5)–(20) with its summary, section, `verification_status` and url. The API answers it by default
+  (compact) for a UN number; this package passes `include_codes` only when given. The meanings are FreightUtils'
+  paraphrases of ADR 2025, not yet reviewed, and say so.
+- **Plain-word statements.** `adr_lookup` `include_statements: true` adds `statements[]` to every row (tunnel,
+  transport category, labels, packing, tanks, carriage), each with basis, codes and `verification_status`.
+
+### Changed
+
+- `adr_lookup` description: the lead sentence names all 20 Table A columns and `resolved_codes`.
+- `resolve_reference` description: names the ADR Table A code families and the `TU9` example.
+- `adr_lookup` `resolved_codes` (freightutils.com R6): served once per answer, beside `results[]` — one entry per
+  distinct code with `columns` and `rows` (the `results[]` indexes that carry it); compact leaves out `url` (the
+  page is https://www.freightutils.com/adr/codes/{family}/{code}), `full` keeps it. The outputSchema and the
+  description follow; rows keep the Table A code strings.
+- README: receipts, batch inputs, `resolved_codes` / `include_codes` and the scoped tool lists.
+
 ## 2.24.0 — 2026-10-29
 
 ### Added
