@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.24.0 — 2026-10-29
+
+### Added
+
+- **Every tool answers with response envelope 1.2.** The package requests `?envelope=1.2` (was 1.1), so
+  `structuredContent` carries four more fields beside `ok`: `status` (`ok`, `partial`, `not_found`, `ambiguous`,
+  `unsupported`), `missing_inputs`, `edition` (`{name, applies_from, may_apply_until}`, or null for a computed or
+  live answer) and `as_of`. An anonymous answer also carries `_meta.identify`, exactly as the API serves it. The
+  fields are additive and the output schema still accepts envelope 1 and 1.1 answers. The hosted endpoint
+  (freightutils.com/api/mcp) serves the same fields from the same release.
+- **A refusal carries its envelope on `structuredContent`.** When the API refuses a call with an envelope (a
+  MISSING_INPUT answer is HTTP 400 with `status: "partial"` and `missing_inputs`), the tool error now includes that
+  envelope as `structuredContent`, as the hosted endpoint's refusals do, but only when it passes the tool's output
+  schema. The error text is unchanged.
+
+### Fixed
+
+- **`unlocode_lookup` says 116,086 UN/LOCODE codes** (one record per code), not 116,232 rows.
+
+Why a minor: new documented result fields.
+
 ## 2.23.0 — 2026-10-28
 
 ### Added
