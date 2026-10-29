@@ -61,6 +61,19 @@ test('adr_lookup forwards include_codes and validates resolved_codes through its
   await close();
 });
 
+test('adr_lookup include_statements: true sends include=statements; false or absent sends nothing', async () => {
+  const { client, close } = await connect();
+  const withStatements = { ...ENV, result: { ...ENV.result, results: [{ ...ROW, statements: [{ topic: 'tunnel', text: 'Tunnel code (D/E): …', basis: ['8.6.4'], codes: ['(D/E)'], verification_status: 'verified' }] }] } };
+  await withApi(withStatements, async (calls) => {
+    const r = await client.callTool({ name: 'adr_lookup', arguments: { un_number: '1203', include_statements: true } });
+    assert.equal(new URL(calls[0]).searchParams.get('include'), 'statements');
+    assert.ok(!r.isError, JSON.stringify(r).slice(0, 300));
+    await client.callTool({ name: 'adr_lookup', arguments: { un_number: '1203', include_statements: false } });
+    assert.equal(new URL(calls[1]).searchParams.has('include'), false);
+  });
+  await close();
+});
+
 test('descriptions: adr_lookup names all 20 columns and resolved_codes; resolve_reference names the ADR code families', () => {
   const adr = ALL_TOOLS.find((t) => t.name === 'adr_lookup')!.description;
   assert.match(adr.split('\n')[0], /all 20 columns/);

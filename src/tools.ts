@@ -275,6 +275,7 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
     offset: z.number().int().nonnegative().max(...wholeMax('offset')).optional().describe('search / hazard_class only: rows to skip (default 0). The response gives total and next_offset.'),
     limit: z.number().int().min(1).max(100).optional().describe('search / hazard_class only: rows per page (default and maximum 50 for a search, 100 for a class).'),
     include_codes: z.enum(['none', 'compact', 'full']).optional().describe('resolved_codes on each row — what each Table A code means: "compact" (summary, section, verification_status, url), "full" (adds title, meaning, parameters, applies_to, references) or "none". Default compact for un_number, none for search, hazard_class and un_numbers (may go beside un_numbers).'),
+    include_statements: z.boolean().optional().describe('true adds statements[] to every row: plain-word statements (tunnel, transport category, labels, packing, tanks, carriage) assembled from the code meanings and the 8.6.4 / 1.1.3.6.3 tables, each with basis, codes and verification_status (the lowest of the codes it draws on). Default false.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -333,6 +334,13 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
         applies_to: z.string(),
         references: z.array(z.string()),
       })),
+      statements: z.array(loose({
+        topic: z.string(),
+        text: z.string(),
+        basis: z.array(z.string()),
+        codes: z.array(z.string()),
+        verification_status: z.string(),
+      })),
     })),
     meta: z.record(z.string(), z.unknown()),
   }),
@@ -340,7 +348,7 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
   annotations: readOnlyAnnotations('ADR Dangerous Goods Lookup'),
 
   handler: async (args, opts) =>
-    apiGet('adr', { un: args.un_number, q: args.search, class: args.hazard_class, offset: args.offset, limit: args.limit, un_numbers: listArg(args.un_numbers), include_codes: args.include_codes }, opts),
+    apiGet('adr', { un: args.un_number, q: args.search, class: args.hazard_class, offset: args.offset, limit: args.limit, un_numbers: listArg(args.un_numbers), include_codes: args.include_codes, include: args.include_statements ? 'statements' : undefined }, opts),
 };
 
 // ─────────────────────────────────────────────────────────────

@@ -23,6 +23,8 @@
   Table A columns (5)–(20) with its summary, section, `verification_status` and url. The API answers it by default
   (compact) for a UN number; this package passes `include_codes` only when given. The meanings are FreightUtils'
   paraphrases of ADR 2025, not yet reviewed, and say so.
+- **Plain-word statements.** `adr_lookup` `include_statements: true` adds `statements[]` to every row (tunnel,
+  transport category, labels, packing, tanks, carriage), each with basis, codes and `verification_status`.
 
 ### Changed
 
