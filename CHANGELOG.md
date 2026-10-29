@@ -31,6 +31,13 @@
 - `adr_lookup` description: the lead sentence names all 20 Table A columns and `resolved_codes` (A-ADR-06).
 - `resolve_reference` description: fourteen grammars — ADR Table A codes join (`TU9` → its record; `P999` →
   `pattern_only`; `336` is both a special provision and a hazard identification number).
+- `adr_lookup` `resolved_codes` (freightutils.com R6): served once per answer, beside `results[]` — one entry per
+  distinct code with `columns` and `rows` (the `results[]` indexes that carry it); compact leaves out `url` (the
+  page is https://www.freightutils.com/adr/codes/{family}/{code}), `full` keeps it. The outputSchema and the
+  description follow; rows keep the Table A code strings.
+- The check tools' envelope `_meta` types `edition_basis` (freightutils.com R6): every executed check names the
+  edition it rested on (`edition` + `as_of`), or answers `edition: null` with `_meta.edition_basis` "no regulatory
+  dataset read". 2.24.0's passthrough `_meta` already accepts it.
 
 ## 2.24.0 — 2026-10-29
 

@@ -111,3 +111,16 @@ test('batch: codes[] goes comma-separated on GET; duty lines[] in the POST body'
     await close();
   });
 });
+
+test('R6: a check with no regulatory dataset answers edition null with _meta.edition_basis, and validates', async () => {
+  const meta = { edition_basis: 'no regulatory dataset read', check_id: 'chk_AAAAAAAAAAAAAAAAAAAAAA', receipt_url: 'https://www.freightutils.com/api/receipts/chk_AAAAAAAAAAAAAAAAAAAAAA' };
+  await withApi(ENV({ mode: 'road', totals: {} }, { _meta: meta }), async () => {
+    const { client, close } = await connect();
+    const r = await client.callTool({ name: 'shipment_summary', arguments: { mode: 'road', items: [{ length: 120, width: 80, height: 100, weight: 250, quantity: 2 }] } });
+    assert.ok(!r.isError, JSON.stringify(r).slice(0, 300));
+    const sc = r.structuredContent as Record<string, unknown> & { _meta: Record<string, unknown> };
+    assert.equal(sc.edition, null);
+    assert.equal(sc._meta.edition_basis, 'no regulatory dataset read');
+    await close();
+  });
+});

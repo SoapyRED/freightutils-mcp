@@ -256,7 +256,7 @@ Provide exactly ONE of: un_number (exact lookup — returns every packing-group 
 
 Behavior: read-only reference lookup; a name search or class filter is a paged list — total, truncated and next_offset, with offset and limit (at most 50 per search page, 100 per class page) — never a silently cut list. A search with no hits errors with suggestions: the closest proper shipping names in Table A ("acetne" → ACETONE, UN 1090). 28 Table A rows carry a scope remark instead of a packing group: those return packing_group null plus not_subject_to_adr (with conditions_ref, e.g. "5.5.3" for UN 1845 dry ice) or carriage_prohibited, and table_a_remark preserves the verbatim Table A text. ${RATE}
 
-Returns: count and results[] — per entry, all 20 Table A columns: un_number, proper_shipping_name, class, classification_code, packing_group, labels, special_provisions, limited_quantity, excepted_quantity, packing_instructions, special_/mixed_packing_provisions, portable_tank_instructions/_special_provisions, tank_code, tank_special_provisions, vehicle_for_tank_carriage, carriage_packages/_bulk/_loading_unloading_handling/_operation, transport_category, tunnel_restriction_code, hazard_identification_number, variant_index/variant_count and, on scope-flagged rows, not_subject_to_adr/carriage_prohibited/conditions_ref/table_a_remark — plus resolved_codes[]: one entry per code in columns (5)–(20) with its column, code, family, summary, ADR section, verification_status and url (include_codes "full" adds title, meaning, parameters, applies_to, references; "none" omits the list; default compact for un_number, none for search, hazard_class and un_numbers). The meanings are FreightUtils' paraphrases of ADR 2025, cited to section and page; verification_status says whether a person has reviewed each one (paraphrase_unreviewed until then) — under result, ${ENV}
+Returns: count and results[] — per entry, all 20 Table A columns: un_number, proper_shipping_name, class, classification_code, packing_group, labels, special_provisions, limited_quantity, excepted_quantity, packing_instructions, special_/mixed_packing_provisions, portable_tank_instructions/_special_provisions, tank_code, tank_special_provisions, vehicle_for_tank_carriage, carriage_packages/_bulk/_loading_unloading_handling/_operation, transport_category, tunnel_restriction_code, hazard_identification_number, variant_index/variant_count and, on scope-flagged rows, not_subject_to_adr/carriage_prohibited/conditions_ref/table_a_remark — plus resolved_codes[] beside results[]: one entry per distinct code in columns (5)–(20) across the answer, with its code, family, columns, rows (the results[] indexes that carry it), summary, ADR section and verification_status (include_codes "full" adds url, title, meaning, parameters, applies_to, references; "none" omits the list; default compact for un_number, none for search, hazard_class and un_numbers; a code's page is https://www.freightutils.com/adr/codes/{family}/{code}). The meanings are FreightUtils' paraphrases of ADR 2025, cited to section and page; verification_status says whether a person has reviewed each one (paraphrase_unreviewed until then) — under result, ${ENV}
 
 Limitations: a factual compilation of the ADR table, not legal or compliance advice; classification remains the consignor's responsibility — verify against the current UNECE ADR text.
 
@@ -274,7 +274,7 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
     hazard_class: z.string().optional().describe('All entries in an ADR class (Table A column (3a)). Examples: "3" (flammable liquids), "6.1" (toxic), "1" (explosives — the division and compatibility group are in classification_code, e.g. "1.4S").'),
     offset: z.number().int().nonnegative().max(...wholeMax('offset')).optional().describe('search / hazard_class only: rows to skip (default 0). The response gives total and next_offset.'),
     limit: z.number().int().min(1).max(100).optional().describe('search / hazard_class only: rows per page (default and maximum 50 for a search, 100 for a class).'),
-    include_codes: z.enum(['none', 'compact', 'full']).optional().describe('resolved_codes on each row — what each Table A code means: "compact" (summary, section, verification_status, url), "full" (adds title, meaning, parameters, applies_to, references) or "none". Default compact for un_number, none for search, hazard_class and un_numbers (may go beside un_numbers).'),
+    include_codes: z.enum(['none', 'compact', 'full']).optional().describe('resolved_codes beside results[] — what each Table A code means, once per answer with the rows that carry it: "compact" (code, family, columns, rows, summary, section, verification_status), "full" (adds url, title, meaning, parameters, applies_to, references) or "none". Default compact for un_number, none for search, hazard_class and un_numbers (may go beside un_numbers).'),
     include_statements: z.boolean().optional().describe('true adds statements[] to every row: plain-word statements (tunnel, transport category, labels, packing, tanks, carriage) assembled from the code meanings and the 8.6.4 / 1.1.3.6.3 tables, each with basis, codes and verification_status (the lowest of the codes it draws on). Default false.'),
   }).strict(),
 
@@ -320,20 +320,6 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
       hazard_identification_number: z.string(),
       variant_index: z.number(),
       variant_count: z.number(),
-      // The ADR code registry (freightutils.com G1): what each code of the row means.
-      resolved_codes: z.array(loose({
-        column: z.string(),
-        code: z.string(),
-        family: z.string(),
-        summary: z.string(),
-        section: z.string(),
-        verification_status: z.string(),
-        url: z.string(),
-        title: z.string(),
-        meaning: z.string(),
-        applies_to: z.string(),
-        references: z.array(z.string()),
-      })),
       statements: z.array(loose({
         topic: z.string(),
         text: z.string(),
@@ -341,6 +327,23 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
         codes: z.array(z.string()),
         verification_status: z.string(),
       })),
+    })),
+    // The ADR code registry (freightutils.com G1; once per answer since R6): what each code means,
+    // served once however many rows carry it — rows[] are the results[] indexes, columns[] the
+    // Table A columns. "full" adds url, title, meaning, parameters, applies_to, references.
+    resolved_codes: z.array(loose({
+      code: z.string(),
+      family: z.string(),
+      columns: z.array(z.string()),
+      rows: z.array(z.number()),
+      summary: z.string(),
+      section: z.string(),
+      verification_status: z.string(),
+      url: z.string(),
+      title: z.string(),
+      meaning: z.string(),
+      applies_to: z.string(),
+      references: z.array(z.string()),
     })),
     meta: z.record(z.string(), z.unknown()),
   }),
