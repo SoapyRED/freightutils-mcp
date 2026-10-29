@@ -62,12 +62,15 @@ export function buildHeaders(extra?: Record<string, string>): Record<string, str
 }
 
 /** Options for the two outbound helpers. `envelope: true` requests the
- *  FreightUtils response envelope, v1.1 since 2.15.0 (`?envelope=1.1`) — used for the
- *  structuredContent channel. `legacySource: true` adds the bridge opt-in
+ *  FreightUtils response envelope — v1.1 from 2.15.0, v1.2 since 2.24.0 (`?envelope=1.2`: the
+ *  additive status, missing_inputs, edition and as_of fields) — used for the structuredContent channel. `legacySource: true` adds the bridge opt-in
  *  (`&legacy_source=1`): the API appends the flat channel's exact `_source`
  *  block to the envelope so the flat legacy text channel can be reconstructed
  *  from the SAME response — one request per successful call instead of two. */
 export interface ApiOpts { envelope?: boolean; legacySource?: boolean }
+
+/** The envelope version this package requests (and its outputSchema accepts, with 1 and 1.1). */
+export const ENVELOPE_REQUEST = '1.2';
 
 /** How long one call may take, end to end (connect, headers and body). A stalled connection used
  *  to hang a tool call for ever. Override with FREIGHTUTILS_TIMEOUT_MS. */
@@ -116,7 +119,7 @@ export async function apiGet(endpoint: string, params: Record<string, unknown>, 
     if (v === undefined || v === null || v === '') continue;
     url.searchParams.set(k, String(v));
   }
-  if (opts?.envelope) url.searchParams.set('envelope', '1.1');
+  if (opts?.envelope) url.searchParams.set('envelope', ENVELOPE_REQUEST);
   if (opts?.legacySource) url.searchParams.set('legacy_source', '1');
 
   return call(url.toString(), { headers: buildHeaders() });
@@ -124,7 +127,7 @@ export async function apiGet(endpoint: string, params: Record<string, unknown>, 
 
 export async function apiPost(endpoint: string, body: unknown, opts?: ApiOpts): Promise<unknown> {
   const q = [
-    ...(opts?.envelope ? ['envelope=1.1'] : []),
+    ...(opts?.envelope ? [`envelope=${ENVELOPE_REQUEST}`] : []),
     ...(opts?.legacySource ? ['legacy_source=1'] : []),
   ].join('&');
   const url = `${BASE_URL}/${endpoint}${q ? '?' + q : ''}`;

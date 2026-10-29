@@ -5,6 +5,7 @@ import {
   ListResourceTemplatesRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { createRequire } from 'node:module';
+import { z } from 'zod';
 import { ALL_TOOLS, type ToolDef } from './tools.js';
 import { envelopeShape } from './envelope.js';
 import { isHttpError } from './errors.js';
@@ -54,6 +55,15 @@ function stripBridge(env: Record<string, unknown>): Record<string, unknown> {
   return rest;
 }
 
+/** A refusal's body as structuredContent: an ok:false envelope that passes the tool's own
+ *  outputSchema (strict, as the SDK client checks it), bridge fields stripped; else undefined. */
+function refusalEnvelope(body: unknown, shape: z.ZodRawShape): Record<string, unknown> | undefined {
+  if (body === null || typeof body !== 'object' || Array.isArray(body)) return undefined;
+  const env = stripBridge(body as Record<string, unknown>);
+  if (env.ok !== false || typeof env.envelope_version !== 'string') return undefined;
+  return z.strictObject(shape).safeParse(env).success ? env : undefined;
+}
+
 // isHttpError (errors.ts): a definite upstream answer (any non-2xx — 400, 404, 429, 5xx) as
 // opposed to a transient failure (network, timeout, a 2xx that is not JSON), which is worth one
 // retry. Decided by class since 2.21.1; it used to match the message prefix.
@@ -71,7 +81,7 @@ export function createServer(): McpServer {
   // Register every tool with the envelope output schema. Dual-channel result
   // from ONE request (envelope-first, since 2.11.2):
   //  - the envelope is fetched with the legacy_source bridge
-  //    (`?envelope=1&legacy_source=1`); structuredContent = that envelope
+  //    (`?envelope=1.2&legacy_source=1`); structuredContent = that envelope
   //    with the bridge fields stripped (the clean public v1 envelope, byte-
   //    equal to the default `?envelope=1` response)
   //  - content[0].text  = the flat legacy body RECONSTRUCTED from
@@ -79,6 +89,7 @@ export function createServer(): McpServer {
   //  - errors fall back to the flat call so error text keeps its exact
   //    pre-2.11 bytes (2 requests — the rare path; successes cost 1)
   for (const tool of ALL_TOOLS) {
+    const outputSchema = envelopeShape(tool.resultSchema);
     server.registerTool(
       tool.name,
       {
@@ -91,7 +102,7 @@ export function createServer(): McpServer {
         // .strict() too, but registering `.shape` stripped the key — ldm_calculator { qty: 10 }
         // answered ONE pallet. The hosted endpoint refuses alike.
         inputSchema: tool.schema,
-        outputSchema: envelopeShape(tool.resultSchema),
+        outputSchema,
         annotations: tool.annotations,
       },
       async (args: Record<string, unknown>) => {
@@ -128,19 +139,25 @@ export function createServer(): McpServer {
           }
           if (failure !== undefined) {
             if (!isHttpError(failure)) return errResult(failure);
+            // 2.24.0: a refusal whose body is an envelope (a 1.2 MISSING_INPUT answer carries
+            // status "partial" and missing_inputs) rides structuredContent too, as the hosted
+            // endpoint's refusals do — only when it validates against this tool's outputSchema,
+            // so an odd error body can never turn a readable error into a -32602.
+            const refusal = refusalEnvelope(failure.json, outputSchema);
+            const withRefusal = (r: ReturnType<typeof errResult>) => (refusal ? { ...r, structuredContent: refusal } : r);
             // 2. Upstream said no (404/400/429…). Fall back to the flat
             //    call so the error text keeps its exact pre-2.11 bytes
             //    (the two channels' error bodies differ upstream).
             try {
               await tool.handler(args, { envelope: false });
             } catch (flatErr: unknown) {
-              return errResult(flatErr);
+              return withRefusal(errResult(flatErr));
             }
             // Flat succeeded while the envelope leg failed (e.g. the rate
             // limit boundary fell between the calls). outputSchema requires
             // structuredContent on success results, so surface the failure
             // (same behaviour as the 2.11.0/2.11.1 dual-request loop).
-            return errResult(failure);
+            return withRefusal(errResult(failure));
           }
           // Defensive: a 2xx envelope with ok:false does not occur upstream
           // (blocking_errors ride non-2xx statuses, which throw above), but

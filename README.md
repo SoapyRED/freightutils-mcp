@@ -16,6 +16,8 @@ Every response cites its source — a `_source` block with the authority, editio
 
 Since **2.11.0**, every tool also declares a typed `outputSchema` and returns `structuredContent` — the FreightUtils v1 response envelope: the answer under `result`, plus `confidence`, `normalized_input`, `warnings`, `_source` and a ready-to-use `citation`. The legacy flat JSON text channel is unchanged (byte-identical), so existing text-parsing consumers are unaffected.
 
+Since **2.24.0** the envelope is version **1.2**, which adds four fields beside `ok`: `status` (`ok`, `partial` when required inputs are missing, `not_found`, `ambiguous` or `unsupported`), `missing_inputs` (the inputs a `partial` answer still needs), `edition` (the edition the answer is served from, with the dates it applies from and may apply until; null for a computed or live answer) and `as_of` (the date the answer's data was last audited, or today for a computed answer). A refusal carries the same envelope on `structuredContent`, so an agent can read `partial` and `missing_inputs` there as well. The change is additive: envelope 1 and 1.1 answers still validate.
+
 **Website:** https://www.freightutils.com
 **API Docs:** https://www.freightutils.com/api-docs
 
@@ -42,7 +44,7 @@ Since **2.11.0**, every tool also declares a typed `outputSchema` and returns `s
 | `adr_exemption_calculator` | ADR 1.1.3.6 small load exemption check |
 | `adr_lq_eq_check` | Limited and Excepted Quantity eligibility |
 
-**What's new in 2.23.0:** `adr_lookup` names the 12 further Table A columns (packing, tank, vehicle and carriage provisions, columns 8–14 and 16–19) in its description and result schema; empty columns are null.
+**What's new in 2.24.0:** every tool answers with response envelope 1.2 (`status`, `missing_inputs`, `edition`, `as_of`); `unlocode_lookup` says 116,086 UN/LOCODE codes. In 2.23.0, `adr_lookup` gained the 12 further Table A columns (packing, tank, vehicle and carriage provisions, columns 8–14 and 16–19) in its description and result schema; empty columns are null.
 
 Some UN numbers have more than one ADR Table A row (packing groups, concentration bands). When a bare UN number matches rows that give different answers, the ADR tools never pick one: they withhold the verdict and return the candidate rows, and you pin one with `packing_group` or `variant_index`. The rules, with worked cases (UN 1789, UN 1790 PG I, UN 2215 PG III): [the ADR 1.1.3.6 calculator in the API docs](https://www.freightutils.com/api-docs#adr-calculator).
 
