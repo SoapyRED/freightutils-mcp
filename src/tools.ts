@@ -834,7 +834,7 @@ Related: cbm_calculator / chargeable_weight_calculator / ldm_calculator (single-
 
 const unlocodeLookup: ToolDef = {
   name: 'unlocode_lookup',
-  description: `Search 116,232 UN/LOCODE transport locations worldwide — ports, airports, rail and road terminals, inland container depots and border crossings. Codes are 5 characters: a 2-letter ISO country code + a 3-character location code (GBLHR = London Heathrow, NLRTM = Rotterdam).
+  description: `Search 116,086 UN/LOCODE transport locations worldwide — ports, airports, rail and road terminals, inland container depots and border crossings. Codes are 5 characters: a 2-letter ISO country code + a 3-character location code (GBLHR = London Heathrow, NLRTM = Rotterdam).
 
 Provide code for an exact record, or query (name search, min 2 chars) optionally narrowed by country and function_type; limit caps results (default 20, max 100). The spaced notation "GB LHR" reads as GBLHR in either.
 
