@@ -1,5 +1,27 @@
 # Changelog
 
+## 2.26.0 — pending
+
+The npm mirror of freightutils.com Build 1 (ADR editions), in lock-step with the hosted endpoint. A minor
+release: new optional arguments and documented answer fields, nothing removed — every 2.25.0 call answers as
+before.
+
+### Added
+
+- **`edition` and `as_of` on the five tools that read ADR data** — `adr_lookup`, `adr_exemption_calculator`,
+  `adr_lq_eq_check`, `consignment_calculator`, `shipment_summary`. `edition` is `"2025"` or `"2027"` and wins;
+  otherwise `as_of` (YYYY-MM-DD, default today, UTC) picks the edition by the legal timeline: ADR 2025 before
+  2027-01-01; ADR 2027 from then, with an `EDITION_TRANSITIONAL` notice while ADR 2025 may still be applied
+  (until 2027-06-30, 1.6.1.1); ADR 2027 only from 2027-07-01 (`edition: "2025"` → `EDITION_UNSUPPORTED`). Both are
+  forwarded to the API unchanged; nothing sent, nothing forwarded.
+- **The ADR 2027 answer fields pass through the outputSchema:** `adr_edition` (the edition, the date, what chose
+  it), `transitional_1_6_1_61` on the 1.1.3.6 answer and on the shipment summary's `adrFlags` (the ADR 2025
+  note-a basis for UN 0081, 0082, 0084, 0241, 0331, 0332, 0482, 1005, 1017, beside the ADR 2027 verdict, until
+  2030-12-31), `transitional_notes[]` on an ADR 2027 lookup of UN 2372 (1.6.3.64 / 1.6.4.70), and
+  `amended_in_2027` on the code meanings ADR 2027 amends.
+- The five descriptions name `edition` and `as_of`. The hosted server takes its descriptions from the installed
+  package, so they reach the hosted endpoint when this version is released and pinned there.
+
 ## 2.25.0 — 2026-10-29
 
 The npm mirror of freightutils.com builds 0B, G1 and R6, in lock-step with the hosted endpoint. A minor release:

@@ -64,6 +64,14 @@ const listArg = (v: unknown): string | undefined => (Array.isArray(v) ? v.map(St
 const RATE = 'Rate-limited: a limit error carries reset_at, the UTC time the allowance resets.';
 // Shared envelope tail — what every REST-backed tool returns around its result.
 const ENV = 'plus confidence, _source and citation (the FreightUtils v1 response envelope).';
+
+// Build 1 mirror (freightutils.com, 2026-10-30): the ADR edition arguments of the five tools that read
+// ADR data — the same names, values and words as the hosted server (app/api/mcp, EDITION_ARGS).
+const EDITION_SHAPE = {
+  edition: z.enum(['2025', '2027']).optional().describe('ADR edition: "2025" or "2027". Wins over as_of. Omit it and as_of picks the edition by the legal timeline: before 2027-01-01 ADR 2025; from 2027-01-01 ADR 2027 (ADR 2025 may still be applied until 2027-06-30 under 1.6.1.1 — edition "2025" answers on it until then); from 2027-07-01 ADR 2027 only. An ADR 2027 answer for a date before 2027-01-01 carries an EDITION_NOT_YET_APPLICABLE warning.'),
+  as_of: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'as_of must be a date written YYYY-MM-DD, e.g. 2027-01-15').optional().describe('YYYY-MM-DD the answer is for (default today, UTC); picks the ADR edition when edition is omitted, and is echoed in the answer and its check receipt.'),
+};
+const EDITIONS = 'edition ("2025" | "2027") and as_of (YYYY-MM-DD) choose the ADR edition — edition wins, else the date picks it (ADR 2025 before 2027-01-01, ADR 2027 from then; ADR 2025 may still be applied until 2027-06-30). An answer on a named edition carries adr_edition; neither sent, the answer is ADR 2025 until 2027-01-01.';
 // The field names a description lists are the snake_case ones this package serves (from the REST
 // API); the hosted endpoint at /api/mcp serves the same fields in camelCase (2.22.0, probe S22).
 const CASING = 'Field names as this package serves them (snake_case); the hosted /api/mcp endpoint serves the same fields in camelCase (e.g. total_cbm → totalCbm).';
@@ -258,6 +266,8 @@ Behavior: read-only reference lookup; a name search or class filter is a paged l
 
 Returns: count and results[] — per entry, all 20 Table A columns: un_number, proper_shipping_name, class, classification_code, packing_group, labels, special_provisions, limited_quantity, excepted_quantity, packing_instructions, special_/mixed_packing_provisions, portable_tank_instructions/_special_provisions, tank_code, tank_special_provisions, vehicle_for_tank_carriage, carriage_packages/_bulk/_loading_unloading_handling/_operation, transport_category, tunnel_restriction_code, hazard_identification_number, variant_index/variant_count and, on scope-flagged rows, not_subject_to_adr/carriage_prohibited/conditions_ref/table_a_remark — plus resolved_codes[] beside results[]: one entry per distinct code in columns (5)–(20) across the answer, with its code, family, columns, rows (the results[] indexes that carry it), summary, ADR section and verification_status (include_codes "full" adds url, title, meaning, parameters, applies_to, references; "none" omits the list; default compact for un_number, none for search, hazard_class and un_numbers; a code's page is https://www.freightutils.com/adr/codes/{family}/{code}). The meanings are FreightUtils' paraphrases of ADR 2025, cited to section and page; verification_status says whether a person has reviewed each one (paraphrase_unreviewed until then) — under result, ${ENV}
 
+Editions: ${EDITIONS}
+
 Limitations: a factual compilation of the ADR table, not legal or compliance advice; classification remains the consignor's responsibility — verify against the current UNECE ADR text.
 
 Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned here), adr_exemption_calculator (1.1.3.6 small-load points), consignment_calculator (flags dangerous-goods lines by UN number).`,
@@ -276,6 +286,7 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
     limit: z.number().int().min(1).max(100).optional().describe('search / hazard_class only: rows per page (default and maximum 50 for a search, 100 for a class).'),
     include_codes: z.enum(['none', 'compact', 'full']).optional().describe('resolved_codes beside results[] — what each Table A code means, once per answer with the rows that carry it: "compact" (code, family, columns, rows, summary, section, verification_status), "full" (adds url, title, meaning, parameters, applies_to, references) or "none". Default compact for un_number, none for search, hazard_class and un_numbers (may go beside un_numbers).'),
     include_statements: z.boolean().optional().describe('true adds statements[] to every row: plain-word statements (tunnel, transport category, labels, packing, tanks, carriage) assembled from the code meanings and the 8.6.4 / 1.1.3.6.3 tables, each with basis, codes and verification_status (the lowest of the codes it draws on). Default false.'),
+    ...EDITION_SHAPE,
   }).strict(),
 
   resultSchema: resultShape({
@@ -351,7 +362,7 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
   annotations: readOnlyAnnotations('ADR Dangerous Goods Lookup'),
 
   handler: async (args, opts) =>
-    apiGet('adr', { un: args.un_number, q: args.search, class: args.hazard_class, offset: args.offset, limit: args.limit, un_numbers: listArg(args.un_numbers), include_codes: args.include_codes, include: args.include_statements ? 'statements' : undefined }, opts),
+    apiGet('adr', { un: args.un_number, q: args.search, class: args.hazard_class, offset: args.offset, limit: args.limit, un_numbers: listArg(args.un_numbers), include_codes: args.include_codes, include: args.include_statements ? 'statements' : undefined, edition: args.edition, as_of: args.as_of }, opts),
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -374,6 +385,8 @@ Behavior: deterministic points arithmetic over ADR 2025 reference data; a UN tha
 
 Returns: items[] (each with state, packing_group, variant_index, transport_category, multiplier, points, air_only_id on an ID-prefixed line, quantity_unit/quantity_basis/expected_unit when a unit or basis was declared, scope flags where applicable, withheld + ambiguity_reason on an unpinned multi-variant line, and equivalent_variants + variant_note when a packing group resolved by equivalence), total_points (NULL when no verdict was reached), threshold (1000), exempt (NULL when no verdict was reached — never false as a stand-in), has_category_zero, has_quantity_exceedance, warnings, message, human_review_required + candidates[] when any line is withheld, and — on scope verdicts — not_subject_to_adr/conditions_ref/conditions[]/carriage_prohibited under result — or, when every line is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
 
+Editions: ${EDITIONS}
+
 Limitations: a deterministic calculation over reference data, not legal advice — 1.1.3.6 relieves goods carried in packages only (not in bulk or in tanks), and this calculator takes no packaging input; even exempt loads keep core duties (packaging, marking, documentation), and mixed-packing rules still apply; verify against the current UNECE ADR text.
 
 Related: adr_lookup (per-substance data incl. transport category + variant_index), adr_lq_eq_check (the LQ/EQ relief routes instead of 1.1.3.6).`,
@@ -395,6 +408,7 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
       basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging, so a quantity declared 'gross' returns no points in ANY unit — send the net figure instead."),
     }, { hints: EXEMPTION_KEY_HINTS, acceptedLabel: 'Accepted on each item' })).min(1, 'items must hold at least one item').optional().describe('Mixed-load items (use INSTEAD of un_number/quantity).'),
     consignment: z.record(z.string(), z.unknown()).optional().describe('Alternative to the other arguments: the consignment object (https://www.freightutils.com/schema/consignment-object.v1.json) — lines[], journey, vehicle, options. Send it alone; an input this tool needs and the object lacks comes back in missing_inputs.'),
+    ...EDITION_SHAPE,
   }, {
     hints: EXEMPTION_KEY_HINTS,
     acceptedLabel: 'Accepted arguments',
@@ -474,6 +488,7 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
         un_number: args.un_number, quantity: args.quantity,
         packing_group: args.packing_group, variant_index: args.variant_index,
         unit: args.unit, basis: args.basis,
+        edition: args.edition, as_of: args.as_of,
       }, opts);
     }
     return apiGet('adr-calculator', {
@@ -482,6 +497,7 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
       // The 1.1.3.6.3 declaration. Dropping these silently made the schema a lie:
       // the tool accepted unit/basis and the API never saw them.
       unit: args.unit, basis: args.basis,
+      edition: args.edition, as_of: args.as_of,
     }, opts);
   },
 };
@@ -802,6 +818,8 @@ Behavior: deterministic; flags are advisory only — implausible density, mode/o
 
 Returns: schema_version, mode, per_line[] (cbm, gross_weight_kg, density, volumetric_weight_kg, ldm, revenue_tonnes, chargeable_weight_kg), totals (incl. billing_basis) and flags[] under result, ${ENV}
 
+Editions: ${EDITIONS}
+
 Limitations: best-effort deterministic calculation and reference data — not regulatory, customs or dangerous-goods compliance advice; classification, documentation and carrier acceptance remain your responsibility.
 
 Related: cbm_calculator / chargeable_weight_calculator / ldm_calculator (single-figure versions), shipment_summary (adds vehicle/container suggestion and duty estimates), adr_lookup (what a flagged UN number is).`,
@@ -841,6 +859,7 @@ Related: cbm_calculator / chargeable_weight_calculator / ldm_calculator (single-
       awb_number: z.string().max(20, 'awb_number must be at most 20 characters').optional().describe('IATA 11-digit air waybill number — check-digit validated into flags.'),
     }).strict().optional().describe('Optional settings.'),
     consignment: z.record(z.string(), z.unknown()).optional().describe('Alternative to the other arguments: the consignment object (https://www.freightutils.com/schema/consignment-object.v1.json) — lines[], journey, vehicle, options. Send it alone; an input this tool needs and the object lacks comes back in missing_inputs.'),
+    ...EDITION_SHAPE,
   }).strict(),
 
   resultSchema: resultShape({
@@ -997,6 +1016,8 @@ Behavior: calls the ldm_calculator, adr_lookup and uk_duty_calculator engines di
 
 Returns: mode, itemCount, totals {pieces, grossWeight, volumeCBM, chargeableWeight, billingBasis}, modeSpecific (LDM / pallet floor positions / pallet rows / suggested vehicle, or revenue tonnes / container), warnings and dataVersion (road mode attributes the vehicle dataset and the LDM divisor) under result — note this composite's result uses camelCase field names (legacy shape); ${ENV}
 
+Editions: ${EDITIONS}
+
 Limitations: a planning summary, not a quotation or compliance determination.
 
 Related: consignment_calculator (canonical snake_case lines[] shape with advisory flags), cbm_calculator, chargeable_weight_calculator, ldm_calculator, adr_lookup, uk_duty_calculator. ldm_calculator, adr_lookup and uk_duty_calculator are the engines this actually calls; the rest are the single-purpose equivalents of arithmetic it does inline.`,
@@ -1025,6 +1046,7 @@ Related: consignment_calculator (canonical snake_case lines[] shape with advisor
     freight_cost: z.number().nonnegative('freight_cost must be 0 or more (GBP), or omitted for 0').optional().describe('Freight cost in GBP for the duty calculation, 0 or more. Default: 0.'),
     insurance_cost: z.number().nonnegative('insurance_cost must be 0 or more (GBP), or omitted for 0').optional().describe('Insurance cost in GBP for the duty calculation, 0 or more. Default: 0.'),
     consignment: z.record(z.string(), z.unknown()).optional().describe('Alternative to the other arguments: the consignment object (https://www.freightutils.com/schema/consignment-object.v1.json) — lines[], journey, vehicle, options. Send it alone; an input this tool needs and the object lacks comes back in missing_inputs.'),
+    ...EDITION_SHAPE,
   }, { hints: toItemPath(SHIPMENT_ITEM_FIELDS), acceptedLabel: 'Accepted arguments' }),
 
   resultSchema: resultShape({
@@ -1079,6 +1101,8 @@ Related: consignment_calculator (canonical snake_case lines[] shape with advisor
       incoterm: args.incoterm,
       freightCost: args.freight_cost,
       insuranceCost: args.insurance_cost,
+      edition: args.edition,
+      as_of: args.as_of,
     }, opts),
 };
 
@@ -1174,6 +1198,8 @@ Behavior: deterministic reference check; each item gets a status and reason (an 
 
 Returns: mode, overall_status (qualifies | does_not_qualify | partial | not_applicable | inconclusive), items[] (un_number, variant_index, substance, class, packing_group, lq_limit or eq_code, quantity_entered, status — within_limit | exceeds_limit | not_permitted | not_subject | inconclusive | withheld — reason, scope flags where applicable, withheld + ambiguity_reason on a withheld item, and equivalent_variants + variant_note when a packing group resolved by equivalence), summary {total_items, qualifying, exceeding, not_permitted, not_subject?, inconclusive?, withheld?}, the ADR chapter references, and human_review_required + candidates[] when any item is withheld — all under result — or, when every item is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
 
+Editions: ${EDITIONS}
+
 Limitations: a quantity-threshold check only — LQ/EQ relief also requires packaging, marking and documentation conformity that this tool does not assess; not legal advice, verify against the current UNECE ADR text.
 
 Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exemption_calculator (the 1.1.3.6 load-points route instead).`,
@@ -1190,6 +1216,7 @@ Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exempt
       packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group (I, II or III) — only needed to disambiguate a UN with more than one ADR Table A row (e.g. UN 1789). Ignored for single-row UNs.'),
       variant_index: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER, 'variant_index must be a safe integer').optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants sharing a packing group (concentration bands). Ignored for single-row UNs.'),
     }, { hints: { innerpackagings: 'inner_packaging_qty', un: 'un_number', qty: 'quantity' }, acceptedLabel: 'Accepted on each item' })).min(1).max(20).describe('Items to check (1-20 per call).'),
+    ...EDITION_SHAPE,
   }, {
     hints: toItemPath(LQ_ITEM_FIELDS, { innerpackagings: 'items[n].inner_packaging_qty' }),
     acceptedLabel: 'Accepted arguments',
@@ -1241,7 +1268,7 @@ Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exempt
   annotations: readOnlyAnnotations('ADR LQ / EQ Exemption Check'),
 
   handler: async (args, opts) =>
-    apiPost('adr/lq-check', { mode: args.mode, items: args.items }, opts),
+    apiPost('adr/lq-check', { mode: args.mode, items: args.items, edition: args.edition, as_of: args.as_of }, opts),
 };
 
 // ─────────────────────────────────────────────────────────────
