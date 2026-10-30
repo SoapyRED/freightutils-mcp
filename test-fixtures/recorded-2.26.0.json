@@ -1,0 +1,646 @@
+{
+  "_recorded": "production, keyed, 2026-10-30T13:36Z; check_id replaced by a synthetic id of the same shape",
+  "adr_lookup_2027_un2956": {
+    "request": "GET /api/adr?un=2956&edition=2027&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2027",
+        "applies_from": "2027-01-01",
+        "may_apply_until": null
+      },
+      "as_of": "2026-10-30",
+      "result": {
+        "count": 1,
+        "results": [
+          {
+            "verified": false,
+            "verification": {
+              "status": "unverified",
+              "basis": "dataset",
+              "reason": "No row-level audit. Built by replaying the official ADR 2027 amendment documents (ECE/TRANS/WP.15/274, Add.1, Corr.1) over the ADR 2025 Table A, every difference matched to its amendment; to be re-proven against the consolidated ADR 2027 publication when UNECE publishes it."
+            },
+            "un_number": "2956",
+            "proper_shipping_name": "5-tert-BUTYL-2,4,6-TRINITRO-m-XYLENE (MUSK XYLENE)",
+            "class": "4.1",
+            "classification_code": "SR1",
+            "packing_group": "III",
+            "labels": "4.1",
+            "special_provisions": "638",
+            "limited_quantity": "0",
+            "excepted_quantity": "E0",
+            "packing_instructions": "P409",
+            "special_packing_provisions": null,
+            "mixed_packing_provisions": "MP2",
+            "portable_tank_instructions": null,
+            "portable_tank_special_provisions": null,
+            "tank_code": null,
+            "tank_special_provisions": null,
+            "vehicle_for_tank_carriage": null,
+            "carriage_packages": null,
+            "carriage_bulk": null,
+            "carriage_loading_unloading_handling": "CV14",
+            "carriage_operation": "S24",
+            "transport_category": "3",
+            "tunnel_restriction_code": "(D)",
+            "hazard_identification_number": null,
+            "variant_index": 0,
+            "variant_count": 1
+          }
+        ],
+        "resolved_codes": [
+          {
+            "code": "4.1",
+            "family": "label",
+            "columns": [
+              "5"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Label model 4.1 (flammable solids, self-reactive and polymerizing substances, and solid desensitized explosives): flame, black.",
+            "section": "5.2.2.2.2, label model No. 4.1",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "638",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Covers substances related to Class 4.1 self-reactive substances (2.2.41.1.19).",
+            "section": "3.3.1, special provision 638",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "P409",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "UN 2956, 3242, 3251: fibre drum (50 kg), fibreboard box with one plastics bag (50 kg), or 4G/1G with plastics inners of 5 kg (25 kg).",
+            "section": "4.1.4.1, P409",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "MP2",
+            "family": "mp",
+            "columns": [
+              "9b"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "No mixed packing: the goods must be alone in their package.",
+            "section": "4.1.10.4, MP2",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "3",
+            "family": "transport_category",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Transport category 3: at most 1000 per transport unit under 1.1.3.6 on its own; counts ×1 toward the 1,000-point limit.",
+            "section": "1.1.3.6.3",
+            "verification_status": "verified"
+          },
+          {
+            "code": "(D)",
+            "family": "tunnel_code",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Tanks: Prohibited in D, E. Other carriage: Prohibited in D, E.",
+            "section": "8.6.4",
+            "verification_status": "verified"
+          },
+          {
+            "code": "CV14",
+            "family": "cv",
+            "columns": [
+              "18"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Shield goods from direct sun and heat in transit; store packages only in cool, well-ventilated places away from heat.",
+            "section": "7.5.11, CV14",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "S24",
+            "family": "s",
+            "columns": [
+              "19"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Chapter 8.4 vehicle supervision applies when the total mass in the vehicle exceeds 100 kg.",
+            "section": "8.5, S24",
+            "verification_status": "paraphrase_unreviewed"
+          }
+        ],
+        "meta": {
+          "source": "ADR 2027 (UNECE): ADR 2025 (ECE/TRANS/352) as amended by ECE/TRANS/WP.15/274, Add.1 and Corr.1. Factual compilation, best-effort — not legal advice, not a regulatory authority.",
+          "edition": "ADR 2027",
+          "entries": 2944
+        },
+        "adr_edition": {
+          "edition": "2027",
+          "name": "ADR 2027",
+          "as_of": "2026-10-30",
+          "selected_by": "edition",
+          "applies_from": "2027-01-01",
+          "may_apply_until": null
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "UNECE ADR 2027 (ADR 2025, ECE/TRANS/352, as amended by ECE/TRANS/WP.15/274, Add.1 and Corr.1)",
+        "checked": "2026-10-30",
+        "provenance_status": "verified",
+        "source_url": "https://documents.un.org/api/symbol/access?s=ECE/TRANS/WP.15/274&l=E",
+        "dataset_edition": "ADR 2027"
+      },
+      "citation": {
+        "text": "UN 2956 5-tert-BUTYL-2,4,6-TRINITRO-m-XYLENE (MUSK XYLENE) — Class 4.1 PG III, UNECE ADR 2025.",
+        "qualifier": "Factual compilation, not legal advice — verify against the current UNECE ADR text."
+      },
+      "warnings": [
+        {
+          "code": "EDITION_NOT_YET_APPLICABLE",
+          "message": "ADR 2027 amendments: accepted (C.N.395.2026), applying from 1 January 2027; not yet applicable on 2026-10-30. ADR 2025 is the edition that applies on that date.",
+          "details": {
+            "edition": "ADR 2027",
+            "applies_from": "2027-01-01",
+            "as_of": "2026-10-30"
+          }
+        }
+      ]
+    }
+  },
+  "calc_2027_un1005_25kg": {
+    "request": "GET /api/adr-calculator?un=1005&qty=25&edition=2027&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2027",
+        "applies_from": "2027-01-01",
+        "may_apply_until": null
+      },
+      "as_of": "2026-10-30",
+      "result": {
+        "items": [
+          {
+            "un_number": "1005",
+            "state": "COUNTED",
+            "proper_shipping_name": "AMMONIA, ANHYDROUS",
+            "class": "2",
+            "packing_group": null,
+            "variant_index": 0,
+            "transport_category": "1",
+            "quantity": 25,
+            "multiplier": 50,
+            "points": 1250,
+            "quantity_unit": null,
+            "quantity_basis": null,
+            "expected_unit": "kg"
+          }
+        ],
+        "total_points": 1250,
+        "threshold": 1000,
+        "exempt": false,
+        "has_category_zero": false,
+        "has_quantity_exceedance": true,
+        "warnings": [
+          "UN1005 (Category 1): 25 exceeds the 20 kg/L maximum for Transport Category 1"
+        ],
+        "message": "Per-substance quantity limit exceeded — full ADR compliance required",
+        "resolved_subtotal_points": 1250,
+        "threshold_exceeded_by_resolved_items": true,
+        "verdict_basis": "all_items",
+        "unresolved_item_indexes": [],
+        "transitional_1_6_1_61": {
+          "measure": "1.6.1.61",
+          "basis": "ADR 2025 note a",
+          "un_numbers": [
+            "1005"
+          ],
+          "max_kg": 50,
+          "multiplier": 20,
+          "points_on_this_basis": 500,
+          "exempt_on_this_basis": true,
+          "until": "2030-12-31",
+          "note": "ADR 2027 deletes 1.1.3.6.3 note a, so UN 1005 counts ×50 with a 20 kg maximum, and that is the verdict above. Transitional measure 1.6.1.61 allows the ADR 2025 note-a rule (×20, 50 kg maximum) to be applied until 31 December 2030: on that basis the load scores 500 points and is exempt."
+        },
+        "adr_edition": {
+          "edition": "2027",
+          "name": "ADR 2027",
+          "as_of": "2026-10-30",
+          "selected_by": "edition",
+          "applies_from": "2027-01-01",
+          "may_apply_until": null
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "ADR 1.1.3.6: 1250 transport point(s) vs 1000 threshold — full ADR compliance required (Per-substance quantity limit exceeded — full ADR compliance required).",
+        "qualifier": "Deterministic ADR 1.1.3.6 calculation, best-effort — not legal advice; verify against the current UNECE ADR text."
+      },
+      "warnings": [
+        {
+          "code": "EDITION_NOT_YET_APPLICABLE",
+          "message": "ADR 2027 amendments: accepted (C.N.395.2026), applying from 1 January 2027; not yet applicable on 2026-10-30. ADR 2025 is the edition that applies on that date.",
+          "details": {
+            "edition": "ADR 2027",
+            "applies_from": "2027-01-01",
+            "as_of": "2026-10-30"
+          }
+        }
+      ],
+      "_meta": {
+        "check_id": "chk_RECORDED00000000000000",
+        "receipt_url": "https://www.freightutils.com/api/receipts/chk_RECORDED00000000000000"
+      }
+    }
+  },
+  "adr_lookup_as_of_transitional": {
+    "request": "GET /api/adr?un=1203&as_of=2027-01-15&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2027",
+        "applies_from": "2027-01-01",
+        "may_apply_until": null
+      },
+      "as_of": "2027-01-15",
+      "result": {
+        "count": 1,
+        "results": [
+          {
+            "verified": false,
+            "verification": {
+              "status": "unverified",
+              "basis": "dataset",
+              "reason": "No row-level audit. Built by replaying the official ADR 2027 amendment documents (ECE/TRANS/WP.15/274, Add.1, Corr.1) over the ADR 2025 Table A, every difference matched to its amendment; to be re-proven against the consolidated ADR 2027 publication when UNECE publishes it."
+            },
+            "un_number": "1203",
+            "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+            "class": "3",
+            "classification_code": "F1",
+            "packing_group": "II",
+            "labels": "3",
+            "special_provisions": "243 534 664",
+            "limited_quantity": "1 L",
+            "excepted_quantity": "E2",
+            "packing_instructions": "P001 IBC02 R001",
+            "special_packing_provisions": "BB2",
+            "mixed_packing_provisions": "MP19",
+            "portable_tank_instructions": "T4",
+            "portable_tank_special_provisions": "TP1",
+            "tank_code": "LGBF",
+            "tank_special_provisions": "TU9",
+            "vehicle_for_tank_carriage": "FL",
+            "carriage_packages": null,
+            "carriage_bulk": null,
+            "carriage_loading_unloading_handling": null,
+            "carriage_operation": "S2 S20",
+            "transport_category": "2",
+            "tunnel_restriction_code": "(D/E)",
+            "hazard_identification_number": "33",
+            "variant_index": 0,
+            "variant_count": 1
+          }
+        ],
+        "resolved_codes": [
+          {
+            "code": "3",
+            "family": "label",
+            "columns": [
+              "5"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Label model 3 (flammable liquids): flame, black or white.",
+            "section": "5.2.2.2.2, label model No. 3",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "243",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Gasoline, motor spirit and petrol for spark-ignition engines go under this entry whatever their volatility.",
+            "section": "3.3.1, special provision 243",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "534",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Petrol with a 50 °C vapour pressure up to 150 kPa (1.50 bar) in some climates is still treated as not exceeding 110 kPa (1.10 bar).",
+            "section": "3.3.1, special provision 534",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "664",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Tank-vehicles and demountable tanks for this substance may carry additive devices under set construction, approval, use, test and document rules.",
+            "section": "3.3.1, special provision 664",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "P001",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "General packing instruction for liquids: combination, single, composite packagings and pressure receptacles, with capacity/mass limits by packing group.",
+            "section": "4.1.4.1, P001",
+            "verification_status": "paraphrase_unreviewed",
+            "amended_in_2027": "amended in ADR 2027 — this meaning is the ADR 2025 text"
+          },
+          {
+            "code": "IBC02",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Liquids under IBC02 may use metal (31A/31B/31N), rigid plastics (31H1/31H2) or composite 31HZ1 IBCs, with B and BB limits per UN number.",
+            "section": "4.1.4.2, IBC02",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "R001",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "R001 permits light gauge metal packagings 0A1 and 0A2 up to 40 l / 50 kg for packing groups II and III; packing group I is not allowed.",
+            "section": "4.1.4.1, R001",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "BB2",
+            "family": "spp",
+            "columns": [
+              "9a"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "RID/ADR only: UN 1203 may use IBCs only if its actual vapour pressure stays within 110 kPa (50 °C) or 130 kPa (55 °C).",
+            "section": "4.1.4.2, IBC02, BB2",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "MP19",
+            "family": "mp",
+            "columns": [
+              "9b"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Up to 5 litres per inner packaging may be mixed with goods of other codes or classes that permit it, or with non-ADR goods.",
+            "section": "4.1.10.4, MP19",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "T4",
+            "family": "t",
+            "columns": [
+              "10"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Portable tank, Class 1 and 3–9: test 2.65 bar; shell See 6.7.2.4.2; relief Normal; bottom openings See 6.7.2.6.3.",
+            "section": "4.2.5.2.6, portable tank instruction T4",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "TP1",
+            "family": "tp",
+            "columns": [
+              "11"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Portable tank must not be filled beyond the degree of filling set by 4.2.1.9.2 (the 97-based formula).",
+            "section": "4.2.5.3, TP1",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "LGBF",
+            "family": "tank_code",
+            "columns": [
+              "12"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "ADR tank code for Classes 1 and 3–9: liquid tank, G (general minimum), openings B, valves/devices F.",
+            "section": "4.3.4.1.1, tank code LGBF",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "TU9",
+            "family": "tsp",
+            "columns": [
+              "13"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "UN 1203 petrol with vapour pressure at 50 °C above 110 kPa and up to 150 kPa may also use tanks designed to 6.8.2.1.14 (a) with 6.8.2.2.6 equipment.",
+            "section": "4.3.5, TU9",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "FL",
+            "family": "vehicle",
+            "columns": [
+              "14"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Vehicle for flammable liquids (flash point ≤ 60 °C), flammable gases or UN 2015 > 60 % in tanks above set sizes.",
+            "section": "9.1.1.2, FL vehicle",
+            "verification_status": "paraphrase_unreviewed",
+            "amended_in_2027": "amended in ADR 2027 — this meaning is the ADR 2025 text"
+          },
+          {
+            "code": "2",
+            "family": "transport_category",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Transport category 2: at most 333 per transport unit under 1.1.3.6 on its own; counts ×3 toward the 1,000-point limit.",
+            "section": "1.1.3.6.3",
+            "verification_status": "verified"
+          },
+          {
+            "code": "(D/E)",
+            "family": "tunnel_code",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Tanks: Prohibited in D, E (bulk or tanks). Other carriage: Prohibited in E.",
+            "section": "8.6.4",
+            "verification_status": "verified"
+          },
+          {
+            "code": "S2",
+            "family": "s",
+            "columns": [
+              "19"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Flammable liquids/gases: no ordinary portable lights in closed load compartments; FL heaters off during loading; earth FL vehicles before filling.",
+            "section": "8.5, S2",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "S20",
+            "family": "s",
+            "columns": [
+              "19"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Chapter 8.4 supervision applies above 10 000 kg in packages, or above 3 000 litres in tanks.",
+            "section": "8.5, S20",
+            "verification_status": "paraphrase_unreviewed"
+          },
+          {
+            "code": "33",
+            "family": "hin",
+            "columns": [
+              "20"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Hazard identification number 33 on the orange plate: highly flammable liquid (flash-point below 23 °C).",
+            "section": "5.3.2.3.2, 33",
+            "verification_status": "paraphrase_unreviewed"
+          }
+        ],
+        "meta": {
+          "source": "ADR 2027 (UNECE): ADR 2025 (ECE/TRANS/352) as amended by ECE/TRANS/WP.15/274, Add.1 and Corr.1. Factual compilation, best-effort — not legal advice, not a regulatory authority.",
+          "edition": "ADR 2027",
+          "entries": 2944
+        },
+        "adr_edition": {
+          "edition": "2027",
+          "name": "ADR 2027",
+          "as_of": "2027-01-15",
+          "selected_by": "as_of",
+          "applies_from": "2027-01-01",
+          "may_apply_until": null
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "UNECE ADR 2027 (ADR 2025, ECE/TRANS/352, as amended by ECE/TRANS/WP.15/274, Add.1 and Corr.1)",
+        "checked": "2026-10-30",
+        "provenance_status": "verified",
+        "source_url": "https://documents.un.org/api/symbol/access?s=ECE/TRANS/WP.15/274&l=E",
+        "dataset_edition": "ADR 2027"
+      },
+      "citation": {
+        "text": "UN 1203 MOTOR SPIRIT or GASOLINE or PETROL — Class 3 PG II, UNECE ADR 2025.",
+        "qualifier": "Factual compilation, not legal advice — verify against the current UNECE ADR text."
+      },
+      "warnings": [
+        {
+          "code": "EDITION_TRANSITIONAL",
+          "message": "ADR 2027 applies from 1 January 2027; ADR 2025 may still be applied until 30 June 2027 (1.6.1.1). edition=2025 answers on ADR 2025 until then.",
+          "details": {
+            "measure": "1.6.1.1",
+            "adr_2025_may_apply_until": "2027-06-30",
+            "edition_2025_available": true
+          }
+        }
+      ]
+    }
+  }
+}
