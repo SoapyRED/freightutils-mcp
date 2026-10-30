@@ -33,7 +33,26 @@ export function envelopeShape(result: z.ZodTypeAny): z.ZodRawShape {
     // _meta.identify (2026-10-28): present only on an anonymous answer; informational.
     // check_id / receipt_url (0B): the receipt of an executed check — the six check tools' answers.
     // edition_basis (R6): why a check's edition is null — "no regulatory dataset read".
-    _meta: z.object({ identify: z.string().optional(), check_id: z.string().optional(), receipt_url: z.string().optional(), edition_basis: z.string().optional() }).passthrough().optional(),
+    // receipt (R7): a check called without an API key — nothing stored, no check_id; the receipt hash
+    // and the hashed fields the answer does not carry, so the hash recomputes from the answer alone.
+    _meta: z.object({
+      identify: z.string().optional(),
+      check_id: z.string().optional(),
+      receipt_url: z.string().optional(),
+      edition_basis: z.string().optional(),
+      receipt: z.object({
+        stored: z.literal(false),
+        reason: z.literal('key_required'),
+        schema_version: z.string(),
+        receipt_hash: z.string(),
+        created_at: z.string(),
+        tool: z.string(),
+        inputs: z.unknown(),
+        dataset_version: z.record(z.string(), z.string()),
+        engine_version: z.string(),
+        result: z.record(z.string(), z.unknown()),
+      }).passthrough().optional(),
+    }).passthrough().optional(),
     result,
     confidence: z.object({
       level: z.enum(['high', 'medium', 'low']),

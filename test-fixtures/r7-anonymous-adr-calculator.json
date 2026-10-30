@@ -1,0 +1,130 @@
+{
+  "hash_header": "sha256:2bed649c483a9955c364aae50199538a653684c3b9ead0bd5d1df6402bf5e4a1",
+  "body": {
+    "envelope_version": "1.2",
+    "ok": true,
+    "status": "ok",
+    "missing_inputs": [],
+    "edition": {
+      "name": "ADR 2025",
+      "applies_from": "2025-01-01",
+      "may_apply_until": "2027-06-30"
+    },
+    "as_of": "2026-10-30",
+    "result": {
+      "items": [
+        {
+          "un_number": "1203",
+          "state": "COUNTED",
+          "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+          "class": "3",
+          "packing_group": "II",
+          "variant_index": 0,
+          "transport_category": "2",
+          "quantity": 300,
+          "multiplier": 3,
+          "points": 900,
+          "quantity_unit": "L",
+          "quantity_basis": null,
+          "expected_unit": "L"
+        }
+      ],
+      "total_points": 900,
+      "threshold": 1000,
+      "exempt": true,
+      "has_category_zero": false,
+      "has_quantity_exceedance": false,
+      "warnings": [],
+      "message": "1.1.3.6 exemption applies",
+      "resolved_subtotal_points": 900,
+      "threshold_exceeded_by_resolved_items": false,
+      "verdict_basis": "all_items",
+      "unresolved_item_indexes": []
+    },
+    "confidence": {
+      "level": "high",
+      "basis": "deterministic"
+    },
+    "_source": {
+      "name": "FreightUtils published methodology",
+      "checked": "request-time",
+      "provenance_status": "computed",
+      "source_url": "https://www.freightutils.com/methodology"
+    },
+    "citation": {
+      "text": "ADR 1.1.3.6: 900 transport point(s) vs 1000 threshold — exemption applies (1.1.3.6 exemption applies).",
+      "qualifier": "Deterministic ADR 1.1.3.6 calculation, best-effort — not legal advice; verify against the current UNECE ADR text."
+    },
+    "legacy_source": {
+      "type": "reference",
+      "authority": "UNECE",
+      "dataset": "ADR 2025",
+      "source_url": "https://unece.org/adr-2025-files",
+      "data_vintage": "ADR 2025",
+      "licence": "factual compilation, no named open licence",
+      "retrieved_via": "freightutils.com",
+      "dataset_edition": "ADR 2025",
+      "authority_current_edition": "ADR 2025",
+      "checked_at": "2026-10-29"
+    },
+    "_meta": {
+      "receipt": {
+        "stored": false,
+        "reason": "key_required",
+        "schema_version": "receipt.v2",
+        "receipt_hash": "sha256:2bed649c483a9955c364aae50199538a653684c3b9ead0bd5d1df6402bf5e4a1",
+        "created_at": "2026-10-30T13:00:07.160Z",
+        "tool": "adr_exemption_calculator",
+        "inputs": {
+          "items": [
+            {
+              "un_number": "1203",
+              "quantity": 300,
+              "unit": "L",
+              "basis": "not stated",
+              "packing_group": null,
+              "variant_index": null
+            }
+          ]
+        },
+        "dataset_version": {
+          "lib/data/adr-2025.json": "sha256:3404fe281878b848"
+        },
+        "engine_version": "local",
+        "result": {
+          "verdict": "exempt",
+          "status": "ok",
+          "summary": {
+            "total_points": 900,
+            "threshold": 1000,
+            "exempt": true,
+            "has_category_zero": false,
+            "has_quantity_exceedance": false,
+            "resolved_subtotal_points": 900,
+            "threshold_exceeded_by_resolved_items": false,
+            "verdict_basis": "all_items",
+            "unresolved_item_indexes": [],
+            "items": [
+              {
+                "un_number": "1203",
+                "quantity": 300,
+                "quantity_unit": "L",
+                "quantity_basis": null,
+                "transport_category": "2",
+                "multiplier": 3,
+                "points": 900,
+                "state": "COUNTED",
+                "packing_group": "II",
+                "variant_index": 0
+              }
+            ]
+          },
+          "warnings": [],
+          "blocking_errors": [],
+          "unresolved": []
+        }
+      },
+      "identify": "Anonymous call (25/day per address). A free key raises the limit to 100/day and lets us tell you about changes: POST /api/keys/register. Add ?client=<your-app> if you want to be recognisable in our logs."
+    }
+  }
+}

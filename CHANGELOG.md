@@ -21,6 +21,11 @@ before.
   `amended_in_2027` on the code meanings ADR 2027 amends.
 - The five descriptions name `edition` and `as_of`. The hosted server takes its descriptions from the installed
   package, so they reach the hosted endpoint when this version is released and pinned there.
+- **Check receipts need an API key** (freightutils.com Run R7, 2026-10-30): a receipt is stored only for a call
+  made with an API key — a free key is enough. Without one, a check's answer carries `_meta.receipt`
+  (`stored: false`, `reason: "key_required"`, the receipt hash and the hashed fields, recomputable from the
+  answer alone) and no `check_id`; nothing is stored. `_meta.receipt` is typed in the envelope outputSchema
+  (`_meta` stays passthrough; nothing loosened). Verification by id is free.
 
 ## 2.25.0 — 2026-10-29
 
