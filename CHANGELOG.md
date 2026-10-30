@@ -1,10 +1,11 @@
 # Changelog
 
-## 2.26.0 — pending
+## 2.26.0 — 2026-10-30
 
-The npm mirror of freightutils.com Build 1 (ADR editions), in lock-step with the hosted endpoint. A minor
-release: new optional arguments and documented answer fields, nothing removed — every 2.25.0 call answers as
-before.
+The npm mirror of freightutils.com Build 1 (ADR editions) and Run R7 (check receipts need an API key), in
+lock-step with the hosted endpoint. A minor release: new documented arguments and answer fields, nothing
+removed, no default changed — every 2.25.0 argument and answer field still validates. ADR 2027 is accepted and
+applies from 1 January 2027.
 
 ### Added
 
@@ -12,20 +13,33 @@ before.
   `adr_lq_eq_check`, `consignment_calculator`, `shipment_summary`. `edition` is `"2025"` or `"2027"` and wins;
   otherwise `as_of` (YYYY-MM-DD, default today, UTC) picks the edition by the legal timeline: ADR 2025 before
   2027-01-01; ADR 2027 from then, with an `EDITION_TRANSITIONAL` notice while ADR 2025 may still be applied
-  (until 2027-06-30, 1.6.1.1); ADR 2027 only from 2027-07-01 (`edition: "2025"` → `EDITION_UNSUPPORTED`). Both are
-  forwarded to the API unchanged; nothing sent, nothing forwarded.
-- **The ADR 2027 answer fields pass through the outputSchema:** `adr_edition` (the edition, the date, what chose
-  it), `transitional_1_6_1_61` on the 1.1.3.6 answer and on the shipment summary's `adrFlags` (the ADR 2025
+  (until 2027-06-30, 1.6.1.1); ADR 2027 only from 2027-07-01 (`edition: "2025"` → `EDITION_UNSUPPORTED`). An
+  ADR 2027 answer for a date before 2027-01-01 says it is not yet applicable (`EDITION_NOT_YET_APPLICABLE`).
+  Both are forwarded to the API unchanged; nothing sent, nothing forwarded.
+- **The ADR 2027 answer fields validate through the outputSchema:** `adr_edition` (the edition, the date, what
+  chose it), `transitional_1_6_1_61` on the 1.1.3.6 answer and on the shipment summary's `adrFlags` (the ADR 2025
   note-a basis for UN 0081, 0082, 0084, 0241, 0331, 0332, 0482, 1005, 1017, beside the ADR 2027 verdict, until
   2030-12-31), `transitional_notes[]` on an ADR 2027 lookup of UN 2372 (1.6.3.64 / 1.6.4.70), and
   `amended_in_2027` on the code meanings ADR 2027 amends.
+- **The three edition codes** — `EDITION_NOT_YET_APPLICABLE`, `EDITION_TRANSITIONAL` (warnings) and
+  `EDITION_UNSUPPORTED` (a blocking error, status `unsupported`) — on the envelope's `warnings` /
+  `blocking_errors`.
+- **`_meta.receipt`** typed in the envelope outputSchema: a check called without an API key answers with
+  `stored: false`, `reason: "key_required"`, `schema_version`, `receipt_hash`, `created_at`, `tool`, `inputs`,
+  `dataset_version`, `engine_version` and `result` — the hashed fields the answer does not otherwise carry, so
+  the hash recomputes from the answer alone. `_meta` stays passthrough; nothing loosened.
+- Tests: production answers recorded on 2026-10-30 (`edition: "2027"` adr_lookup UN 2956, the keyed 2027
+  exemption check of UN 1005 25 kg with `transitional_1_6_1_61`, an `as_of` answer with `EDITION_TRANSITIONAL`)
+  beside the recorded anonymous R7 answer.
+
+### Changed
+
 - The five descriptions name `edition` and `as_of`. The hosted server takes its descriptions from the installed
-  package, so they reach the hosted endpoint when this version is released and pinned there.
-- **Check receipts need an API key** (freightutils.com Run R7, 2026-10-30): a receipt is stored only for a call
-  made with an API key — a free key is enough. Without one, a check's answer carries `_meta.receipt`
-  (`stored: false`, `reason: "key_required"`, the receipt hash and the hashed fields, recomputable from the
-  answer alone) and no `check_id`; nothing is stored. `_meta.receipt` is typed in the envelope outputSchema
-  (`_meta` stays passthrough; nothing loosened). Verification by id is free.
+  package, so they reach the hosted endpoint when this version is pinned there.
+- **Check receipts are stored for keyed calls only** (freightutils.com Run R7, 2026-10-30): a receipt is stored
+  only for a call made with an API key — a free key is enough. Without one, the answer carries `_meta.receipt`
+  and no `check_id`; nothing is stored. Verifying a receipt by id needs no plan and no payment.
+- README: the ADR editions, the receipts rule, "What's new in 2.26.0".
 
 ## 2.25.0 — 2026-10-29
 
