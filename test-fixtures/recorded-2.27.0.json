@@ -1,0 +1,1124 @@
+{
+  "_recorded": "production 2026-10-31T00:07Z, keyed, envelope 1.2 (freightutils.com Run A2: #319, #320, #321)",
+  "airline_prefix_081": {
+    "request": "GET /api/airlines?prefix=081&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "FreightUtils airline code compilation (public sources)",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-05-13",
+      "result": {
+        "count": 4,
+        "results": [
+          {
+            "slug": "eastern-australia-airlines",
+            "airline_name": "Eastern Australia Airlines",
+            "iata_code": "QF",
+            "icao_code": "EAQ",
+            "awb_prefix": [
+              "081"
+            ],
+            "prefix_shared": true,
+            "prefix_holders": [
+              "qantas",
+              "eastern-australia-airlines",
+              "qantaslink",
+              "sunstate-airlines"
+            ],
+            "callsign": "EASTERN",
+            "country": "Australia",
+            "has_cargo": true,
+            "verified": false,
+            "status": "unverified",
+            "status_checked_at": "2026-08-11",
+            "data_note": "Flagged verified in the 2026-05-13 anchor pass without per-field evidence; flag retired by the 2026-08-11 status migration pending re-verification.",
+            "operational_status": "unknown"
+          },
+          {
+            "slug": "qantas",
+            "airline_name": "Qantas",
+            "iata_code": "QF",
+            "icao_code": "QFA",
+            "awb_prefix": [
+              "081"
+            ],
+            "prefix_shared": true,
+            "prefix_holders": [
+              "qantas",
+              "eastern-australia-airlines",
+              "qantaslink",
+              "sunstate-airlines"
+            ],
+            "callsign": "QANTAS",
+            "country": "Australia",
+            "has_cargo": true,
+            "verified": true,
+            "sources": [
+              {
+                "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                "accessed_at": "2026-08-11"
+              },
+              {
+                "url": "https://www.iata.org/en/publications/directories/code-search/?airline.search=QF",
+                "accessed_at": "2026-08-11"
+              },
+              {
+                "url": "https://freight.qantas.com/en-au/business-rewards",
+                "accessed_at": "2026-08-11"
+              }
+            ],
+            "audited_at": "2026-08-11",
+            "decision_rationale": "Wave-1 verification (2026-08-11): confirmed icao_code (FAA Order JO 7340.2P Chg 3 (eff 2026-07-09), Chapter 3), callsign (FAA Order JO 7340.2P Chg 3 (eff 2026-07-09), Chapter 3), iata_code (IATA (free code search, tie-break spot check)), awb_prefix (Qantas Freight), operating_status (Qantas Freight). Carrier-published pages are the promoting source; FAA JO 7340.2P Chg 3 carries ICAO/callsign only; aggregators score zero (FAULT 4). 081 stated in prose on Qantas Freight's own site.",
+            "status": "active_verified",
+            "status_checked_at": "2026-08-11",
+            "field_provenance": {
+              "icao_code": [
+                {
+                  "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                  "publisher": "FAA Order JO 7340.2P Chg 3 (eff 2026-07-09), Chapter 3",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "callsign": [
+                {
+                  "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                  "publisher": "FAA Order JO 7340.2P Chg 3 (eff 2026-07-09), Chapter 3",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "iata_code": [
+                {
+                  "url": "https://www.iata.org/en/publications/directories/code-search/?airline.search=QF",
+                  "publisher": "IATA (free code search, tie-break spot check)",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "awb_prefix": [
+                {
+                  "url": "https://freight.qantas.com/en-au/business-rewards",
+                  "publisher": "Qantas Freight",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "operating_status": [
+                {
+                  "url": "https://freight.qantas.com/en-au/business-rewards",
+                  "publisher": "Qantas Freight",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "operational_status": [
+                {
+                  "url": "https://freight.qantas.com/en-au/business-rewards",
+                  "publisher": "Qantas Freight",
+                  "accessed_at": "2026-08-11"
+                }
+              ]
+            },
+            "operational_status": "active",
+            "operational_status_basis": "carrier_published"
+          },
+          {
+            "slug": "qantaslink",
+            "airline_name": "QantasLink",
+            "iata_code": "QF",
+            "icao_code": "QLK",
+            "awb_prefix": [
+              "081"
+            ],
+            "prefix_shared": true,
+            "prefix_holders": [
+              "qantas",
+              "eastern-australia-airlines",
+              "qantaslink",
+              "sunstate-airlines"
+            ],
+            "callsign": "QLINK",
+            "country": "Australia",
+            "has_cargo": true,
+            "verified": false,
+            "status": "unverified",
+            "status_checked_at": "2026-08-11",
+            "data_note": "Flagged verified in the 2026-05-13 anchor pass without per-field evidence; flag retired by the 2026-08-11 status migration pending re-verification.",
+            "field_provenance": {
+              "awb_prefix": [
+                {
+                  "url": "https://freight.qantas.com/en-au/business-rewards",
+                  "publisher": "Qantas Freight",
+                  "accessed_at": "2026-08-11"
+                },
+                {
+                  "url": "https://www.iata.org/globalassets/cnsc/airline-directory.pdf",
+                  "publisher": "IATA CNS Airline Directory (corroboration only)",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "operating_status": [
+                {
+                  "url": "https://www.qantas.com/au/en/qantas-experience/network-and-partner-airlines/qantaslink.html",
+                  "publisher": "Qantas",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "operational_status": [
+                {
+                  "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                  "publisher": "FAA Order JO 7340.2P Change 3 (eff 2026-07-09), Chapter 3",
+                  "accessed_at": "2026-10-30",
+                  "sha256": "8b6182b4318bac5f3e295797bb6a174da500275c13f97bd3d3ff17e6bd769970",
+                  "note": "ICAO QLK listed for QANTASLINK in the current edition"
+                }
+              ]
+            },
+            "sources": [
+              {
+                "url": "https://freight.qantas.com/en-au/business-rewards",
+                "accessed_at": "2026-08-11"
+              },
+              {
+                "url": "https://www.iata.org/globalassets/cnsc/airline-directory.pdf",
+                "accessed_at": "2026-08-11"
+              },
+              {
+                "url": "https://www.qantas.com/au/en/qantas-experience/network-and-partner-airlines/qantaslink.html",
+                "accessed_at": "2026-08-11"
+              }
+            ],
+            "operational_status": "active",
+            "operational_status_basis": "faa_designator_current"
+          },
+          {
+            "slug": "sunstate-airlines",
+            "airline_name": "Sunstate Airlines",
+            "iata_code": "QF",
+            "icao_code": "SSQ",
+            "awb_prefix": [
+              "081"
+            ],
+            "prefix_shared": true,
+            "prefix_holders": [
+              "qantas",
+              "eastern-australia-airlines",
+              "qantaslink",
+              "sunstate-airlines"
+            ],
+            "callsign": "SUNSTATE",
+            "country": "Australia",
+            "has_cargo": true,
+            "verified": false,
+            "status": "unverified",
+            "status_checked_at": "2026-08-11",
+            "data_note": "Flagged verified in the 2026-05-13 anchor pass without per-field evidence; flag retired by the 2026-08-11 status migration pending re-verification.",
+            "field_provenance": {
+              "icao_code": [
+                {
+                  "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                  "publisher": "FAA Order JO 7340.2P Chg 3 (eff 2026-07-09), Chapter 3",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "callsign": [
+                {
+                  "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                  "publisher": "FAA Order JO 7340.2P Chg 3 (eff 2026-07-09), Chapter 3",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "operating_status": [
+                {
+                  "url": "https://investor.qantas.com/FormBuilder/_Resource/_module/doLLG5ufYkCyEPjF1tpgyw/file/annual-reports/2025-Annual-Report.pdf",
+                  "publisher": "Qantas Airways Limited (2025 Annual Report, Consolidated Entity Disclosure Statement, p.132)",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "operational_status": [
+                {
+                  "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                  "publisher": "FAA Order JO 7340.2P Change 3 (eff 2026-07-09), Chapter 3",
+                  "accessed_at": "2026-10-30",
+                  "sha256": "8b6182b4318bac5f3e295797bb6a174da500275c13f97bd3d3ff17e6bd769970",
+                  "note": "ICAO SSQ listed for SUNSTATE AIRLINES (QLD) PTY in the current edition"
+                }
+              ]
+            },
+            "sources": [
+              {
+                "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                "accessed_at": "2026-08-11"
+              },
+              {
+                "url": "https://investor.qantas.com/FormBuilder/_Resource/_module/doLLG5ufYkCyEPjF1tpgyw/file/annual-reports/2025-Annual-Report.pdf",
+                "accessed_at": "2026-08-11"
+              }
+            ],
+            "operational_status": "active",
+            "operational_status_basis": "faa_designator_current"
+          }
+        ],
+        "meta": {
+          "source": "Compiled by FreightUtils from public sources. Verified records cite carrier-published pages and FAA Order JO 7340.2 field by field (field_provenance), with IATA's public code search as a tie-break only; the rest are pending verification. IATA and ICAO assign these codes, but this dataset is not published or endorsed by IATA or ICAO.",
+          "airlines": 6356,
+          "last_verified": "2026-05-13"
+        }
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "FreightUtils airline code compilation (public sources)",
+        "checked": "2026-05-13",
+        "provenance_status": "pending-verification"
+      },
+      "citation": {
+        "text": "AWB prefix 081 is held by 4 records — Qantas, Eastern Australia Airlines, QantasLink, Sunstate Airlines — the prefix alone does not identify one carrier.",
+        "qualifier": "Airline name/code/AWB-prefix reference — provenance pending verification; confirm against IATA/ICAO or the carrier."
+      },
+      "warnings": [
+        {
+          "code": "PROVENANCE_PENDING",
+          "message": "airline provenance is pending independent verification."
+        }
+      ]
+    }
+  },
+  "airline_icao_ira": {
+    "request": "GET /api/airlines?icao=IRA&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "FreightUtils airline code compilation (public sources)",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-05-13",
+      "result": {
+        "count": 1,
+        "results": [
+          {
+            "slug": "iran-air",
+            "airline_name": "Iran Air",
+            "iata_code": "IR",
+            "icao_code": "IRA",
+            "awb_prefix": [
+              "096"
+            ],
+            "prefix_shared": false,
+            "prefix_holders": [
+              "iran-air"
+            ],
+            "callsign": "IRANAIR",
+            "country": "Iran",
+            "has_cargo": true,
+            "verified": false,
+            "status": "unverified",
+            "status_checked_at": "2026-08-11",
+            "field_provenance": {
+              "icao_code": [
+                {
+                  "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                  "publisher": "FAA Order JO 7340.2P Chg 3 (eff 2026-07-09), Chapter 3",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "callsign": [
+                {
+                  "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                  "publisher": "FAA Order JO 7340.2P Chg 3 (eff 2026-07-09), Chapter 3",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "iata_code": [
+                {
+                  "url": "https://www.iata.org/en/publications/directories/code-search/?airline.search=IR",
+                  "publisher": "IATA (free code search, tie-break spot check)",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "operating_status": [
+                {
+                  "url": "https://www.iranaircargo.com/",
+                  "publisher": "Iran Air Cargo (IKA Cargo Terminal, Tehran)",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "awb_prefix": [
+                {
+                  "url": "https://www.wikidata.org/wiki/Q461631",
+                  "publisher": "Wikidata (CC0) item Q461631, revision 2558447487",
+                  "accessed_at": "2026-10-30",
+                  "grade": "second_class",
+                  "note": "Wikidata P5703 (airline accounting code) = 096"
+                }
+              ],
+              "operational_status": [
+                {
+                  "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                  "publisher": "FAA Order JO 7340.2P Change 3 (eff 2026-07-09), Chapter 3",
+                  "accessed_at": "2026-10-30",
+                  "sha256": "8b6182b4318bac5f3e295797bb6a174da500275c13f97bd3d3ff17e6bd769970",
+                  "note": "ICAO IRA listed for IRAN NATIONAL AIRLINES CORP. (IRAN AIR) in the current edition"
+                }
+              ],
+              "restrictions": [
+                {
+                  "url": "https://transport.ec.europa.eu/transport-themes/eu-air-safety-list_en",
+                  "publisher": "European Commission — EU Air Safety List (Commission Implementing Regulation (EU) 2026/1317)",
+                  "accessed_at": "2026-10-30",
+                  "sha256": "ae3643922553fb8b79c1812a3d19862a46745a65dfd6761053bc83bd3759dc96"
+                },
+                {
+                  "url": "https://www.gov.uk/guidance/uk-air-safety-list",
+                  "publisher": "UK Department for Transport — UK Air Safety List (GOV.UK)",
+                  "accessed_at": "2026-10-30",
+                  "sha256": "a636cda8fb81827c769f4e1118f7594f6a01b58b1a4a1552216014ba9cb5dd89"
+                }
+              ]
+            },
+            "sources": [
+              {
+                "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                "accessed_at": "2026-08-11"
+              },
+              {
+                "url": "https://www.iata.org/en/publications/directories/code-search/?airline.search=IR",
+                "accessed_at": "2026-08-11"
+              },
+              {
+                "url": "https://www.iranaircargo.com/",
+                "accessed_at": "2026-08-11"
+              }
+            ],
+            "operational_status": "active",
+            "operational_status_basis": "faa_designator_current",
+            "restrictions": [
+              {
+                "list": "eu_air_safety_list",
+                "annex": "B",
+                "scope": "restricted",
+                "since": null,
+                "regulation": "Commission Implementing Regulation (EU) 2026/1317",
+                "regulation_date": "2026-06-08",
+                "source_url": "https://transport.ec.europa.eu/document/download/67b75752-d144-4366-9f4a-c04157840211_en?filename=air-safety-list.xlsx",
+                "accessed_at": "2026-10-30",
+                "sha256": "ae3643922553fb8b79c1812a3d19862a46745a65dfd6761053bc83bd3759dc96",
+                "match_basis": "icao_designator",
+                "listed_name": "IRAN AIR",
+                "restricted": "All aircraft of type Fokker F100  and of type Boeing B747"
+              },
+              {
+                "list": "uk_air_safety_list",
+                "annex": null,
+                "scope": "restricted",
+                "since": null,
+                "regulation": "UK Air Safety List (Department for Transport)",
+                "list_updated": "2025-10-31",
+                "source_url": "https://www.gov.uk/guidance/uk-air-safety-list",
+                "accessed_at": "2026-10-30",
+                "sha256": "a636cda8fb81827c769f4e1118f7594f6a01b58b1a4a1552216014ba9cb5dd89",
+                "match_basis": "name_and_state",
+                "listed_name": "Iran Air",
+                "restricted": "Iran Air, with the exception of their Fokker 100 and B747 aircraft which are banned"
+              }
+            ]
+          }
+        ],
+        "meta": {
+          "source": "Compiled by FreightUtils from public sources. Verified records cite carrier-published pages and FAA Order JO 7340.2 field by field (field_provenance), with IATA's public code search as a tie-break only; the rest are pending verification. IATA and ICAO assign these codes, but this dataset is not published or endorsed by IATA or ICAO.",
+          "airlines": 6356,
+          "last_verified": "2026-05-13"
+        }
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "FreightUtils airline code compilation (public sources)",
+        "checked": "2026-05-13",
+        "provenance_status": "pending-verification"
+      },
+      "citation": {
+        "text": "Iran Air — ICAO IRA.",
+        "qualifier": "Airline name/code/AWB-prefix reference — provenance pending verification; confirm against IATA/ICAO or the carrier."
+      },
+      "warnings": [
+        {
+          "code": "PROVENANCE_PENDING",
+          "message": "airline provenance is pending independent verification."
+        }
+      ]
+    }
+  },
+  "airline_icao_adr": {
+    "request": "GET /api/airlines?icao=ADR&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "FreightUtils airline code compilation (public sources)",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-05-13",
+      "result": {
+        "count": 1,
+        "results": [
+          {
+            "slug": "adria-airways",
+            "airline_name": "Adria Airways",
+            "iata_code": "JP",
+            "icao_code": "ADR",
+            "awb_prefix": [
+              "165"
+            ],
+            "prefix_shared": false,
+            "prefix_holders": [
+              "adria-airways"
+            ],
+            "callsign": "ADRIA",
+            "country": "Slovenia",
+            "has_cargo": true,
+            "verified": false,
+            "status": "historical",
+            "status_checked_at": "2026-08-11",
+            "field_provenance": {
+              "icao_code": [
+                {
+                  "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                  "publisher": "FAA Order JO 7340.2P Chg 3 (eff 2026-07-09), Chapter 3",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "callsign": [
+                {
+                  "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                  "publisher": "FAA Order JO 7340.2P Chg 3 (eff 2026-07-09), Chapter 3",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "operating_status": [
+                {
+                  "url": "https://www.adria.si/",
+                  "publisher": "Adria Airways (own domain)",
+                  "accessed_at": "2026-08-11"
+                },
+                {
+                  "url": "https://www.iata.org/en/publications/directories/code-search/?airline.search=JP",
+                  "publisher": "IATA (free code search)",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "operational_status": [
+                {
+                  "url": "https://www.adria.si/",
+                  "publisher": "Adria Airways (own domain)",
+                  "accessed_at": "2026-08-11"
+                },
+                {
+                  "url": "https://www.wikidata.org/wiki/Q223191",
+                  "publisher": "Wikidata (CC0) item Q223191, revision 2470823216",
+                  "accessed_at": "2026-10-30",
+                  "grade": "second_class",
+                  "candidate_status": "ceased",
+                  "note": "Wikidata P576 (dissolved) 2019-09-30 — second-class, never sufficient alone; for a later pass"
+                }
+              ]
+            },
+            "audited_at": "2026-08-11",
+            "data_note": "Adria's own site markets the name as a licensable heritage brand only; IATA JP is now held by Jettime A/S. ICAO ADR is still carried in FAA JO 7340.2P Ch3, so codes are kept as historical fact. AWB prefix 165 not re-evidenced (no carrier property left to check).",
+            "decision_rationale": "Wave-1 verification (2026-08-11): cessation evidenced by icao_code (FAA Order JO 7340.2P Chg 3 (eff 2026-07-09), Chapter 3), callsign (FAA Order JO 7340.2P Chg 3 (eff 2026-07-09), Chapter 3), operating_status (Adria Airways (own domain); IATA (free code search)). Codes retained as historical fact — identifiers may since have been reassigned. Adria's own site markets the name as a licensable heritage brand only; IATA JP is now held by Jettime A/S. ICAO ADR is still carried in FAA JO 7340.2P Ch3, so codes are kept as historical fact. AWB prefix 165 not re-evidenced (no carrier property left to …",
+            "sources": [
+              {
+                "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                "accessed_at": "2026-08-11"
+              },
+              {
+                "url": "https://www.adria.si/",
+                "accessed_at": "2026-08-11"
+              },
+              {
+                "url": "https://www.iata.org/en/publications/directories/code-search/?airline.search=JP",
+                "accessed_at": "2026-08-11"
+              }
+            ],
+            "operational_status": "ceased",
+            "operational_status_basis": "carrier_published"
+          }
+        ],
+        "meta": {
+          "source": "Compiled by FreightUtils from public sources. Verified records cite carrier-published pages and FAA Order JO 7340.2 field by field (field_provenance), with IATA's public code search as a tie-break only; the rest are pending verification. IATA and ICAO assign these codes, but this dataset is not published or endorsed by IATA or ICAO.",
+          "airlines": 6356,
+          "last_verified": "2026-05-13"
+        }
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "FreightUtils airline code compilation (public sources)",
+        "checked": "2026-05-13",
+        "provenance_status": "pending-verification"
+      },
+      "citation": {
+        "text": "Adria Airways — ICAO ADR (historical record: the carrier no longer operates and the code may since have been reassigned).",
+        "qualifier": "Airline name/code/AWB-prefix reference — provenance pending verification; confirm against IATA/ICAO or the carrier."
+      },
+      "warnings": [
+        {
+          "code": "PROVENANCE_PENDING",
+          "message": "airline provenance is pending independent verification."
+        }
+      ]
+    }
+  },
+  "nearest_default_heathrow": {
+    "request": "GET /api/nearest-airport?lat=51.47&lon=-0.46&max_results=3&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "OurAirports (community-maintained open data) (OurAirports 2026-10-30)",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-10-30",
+      "result": {
+        "count": 3,
+        "results": [
+          {
+            "ident": "EGLL",
+            "icao_code": "EGLL",
+            "iata_code": "LHR",
+            "name": "London Heathrow Airport",
+            "type": "large_airport",
+            "municipality": "London",
+            "region": "England",
+            "country": "GB",
+            "country_name": "United Kingdom",
+            "latitude": 51.470748,
+            "longitude": -0.459909,
+            "elevation_ft": 83,
+            "scheduled_service": true,
+            "iso_region": "GB-ENG",
+            "gps_code": null,
+            "keywords": "LON, Londres",
+            "distance_km": 0.08
+          },
+          {
+            "ident": "EGLC",
+            "icao_code": "EGLC",
+            "iata_code": "LCY",
+            "name": "London City Airport",
+            "type": "medium_airport",
+            "municipality": "London",
+            "region": "England",
+            "country": "GB",
+            "country_name": "United Kingdom",
+            "latitude": 51.505299,
+            "longitude": 0.055278,
+            "elevation_ft": 19,
+            "scheduled_service": true,
+            "iso_region": "GB-ENG",
+            "gps_code": null,
+            "keywords": "LON",
+            "distance_km": 35.89
+          },
+          {
+            "ident": "EGKK",
+            "icao_code": "EGKK",
+            "iata_code": "LGW",
+            "name": "London Gatwick Airport",
+            "type": "large_airport",
+            "municipality": "London",
+            "region": "England",
+            "country": "GB",
+            "country_name": "United Kingdom",
+            "latitude": 51.148744,
+            "longitude": -0.185739,
+            "elevation_ft": 202,
+            "scheduled_service": true,
+            "iso_region": "GB-ENG",
+            "gps_code": null,
+            "keywords": "LON, Crawley, Charlwood",
+            "distance_km": 40.49
+          }
+        ],
+        "distance_basis": "great_circle",
+        "filter": "scheduled_iata",
+        "filter_description": "airports with scheduled airline service and an IATA code; heliports and closed fields excluded — include_all lists every type",
+        "disclaimer": "Airport reference data from OurAirports (public domain), cross-checked against OpenFlights and Wikidata. Reference-only, best-effort — coordinates are the airport reference point (not runway thresholds) and are intended for search and nearest-airport ranking, NOT navigation or regulatory filing. Verify current IATA / ICAO codes with the airport authority. Small, closed, heliport and seaplane entries are less authoritative; a few very new airports carry a provisional ident.",
+        "meta": {
+          "query": {
+            "latitude": 51.47,
+            "longitude": -0.46,
+            "radius_km": null,
+            "max_results": 3,
+            "type": null,
+            "include_all": false
+          },
+          "source": "Airport reference data from OurAirports (ourairports.com/data), dedicated to the public domain. All large airports cross-checked against OpenFlights + an independent Wikidata sample (codes + coordinates). Reference-only, best-effort — not authoritative for navigation or regulatory filing; verify current codes with IATA / ICAO.",
+          "airports": 86248
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "match_quality",
+        "score": 0.93
+      },
+      "_source": {
+        "name": "OurAirports (community-maintained open data) (OurAirports 2026-10-30)",
+        "checked": "2026-10-30",
+        "provenance_status": "verified",
+        "source_url": "https://ourairports.com/data/"
+      },
+      "citation": {
+        "text": "London Heathrow Airport (LHR) — 0.08 km, OurAirports.",
+        "qualifier": "Best-effort nearest airport by great-circle distance from OurAirports data — reference only, not authoritative for navigation or filing; verify codes with IATA/ICAO."
+      },
+      "normalized_input": {
+        "latitude": 51.47,
+        "longitude": -0.46,
+        "radius_km": null,
+        "max_results": 3,
+        "type": null,
+        "include_all": false,
+        "defaults_applied": [
+          "radius_km=unbounded",
+          "closed airfields excluded (type=closed lists them)",
+          "scheduled airports with an IATA code only (include_all=true lists every type)"
+        ]
+      },
+      "warnings": [
+        {
+          "code": "FUZZY_BEST_MATCH",
+          "message": "Nearest of 3 airport(s) — \"London Heathrow Airport\" (large_airport) at 0.08 km.",
+          "details": {
+            "candidates": 3,
+            "distance_km": 0.08,
+            "type": "large_airport"
+          }
+        }
+      ]
+    }
+  },
+  "nearest_include_all_uluru": {
+    "request": "GET /api/nearest-airport?lat=-25&lon=131&max_results=2&include_all=true&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "OurAirports (community-maintained open data) (OurAirports 2026-10-30)",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-10-30",
+      "result": {
+        "count": 2,
+        "results": [
+          {
+            "ident": "YAYE",
+            "icao_code": "YAYE",
+            "iata_code": "AYQ",
+            "name": "Ayers Rock Connellan Airport",
+            "type": "medium_airport",
+            "municipality": "Yulara",
+            "region": "Northern Territory",
+            "country": "AU",
+            "country_name": "Australia",
+            "latitude": -25.185913,
+            "longitude": 130.97703,
+            "elevation_ft": 1626,
+            "scheduled_service": true,
+            "iso_region": "AU-NT",
+            "gps_code": null,
+            "keywords": "Ayers Rock, Uluru",
+            "distance_km": 20.8
+          },
+          {
+            "ident": "YCSP",
+            "icao_code": null,
+            "iata_code": null,
+            "name": "Curtin Springs Airport",
+            "type": "small_airport",
+            "municipality": null,
+            "region": "Northern Territory",
+            "country": "AU",
+            "country_name": "Australia",
+            "latitude": -25.333921,
+            "longitude": 131.759308,
+            "elevation_ft": null,
+            "scheduled_service": false,
+            "iso_region": "AU-NT",
+            "gps_code": "YCSP",
+            "keywords": null,
+            "distance_km": 84.96
+          }
+        ],
+        "distance_basis": "great_circle",
+        "filter": "all",
+        "filter_description": "every airport type except closed fields (include_all)",
+        "disclaimer": "Airport reference data from OurAirports (public domain), cross-checked against OpenFlights and Wikidata. Reference-only, best-effort — coordinates are the airport reference point (not runway thresholds) and are intended for search and nearest-airport ranking, NOT navigation or regulatory filing. Verify current IATA / ICAO codes with the airport authority. Small, closed, heliport and seaplane entries are less authoritative; a few very new airports carry a provisional ident.",
+        "meta": {
+          "query": {
+            "latitude": -25,
+            "longitude": 131,
+            "radius_km": null,
+            "max_results": 2,
+            "type": null,
+            "include_all": true
+          },
+          "source": "Airport reference data from OurAirports (ourairports.com/data), dedicated to the public domain. All large airports cross-checked against OpenFlights + an independent Wikidata sample (codes + coordinates). Reference-only, best-effort — not authoritative for navigation or regulatory filing; verify current codes with IATA / ICAO.",
+          "airports": 86248
+        }
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "match_quality",
+        "score": 0.79
+      },
+      "_source": {
+        "name": "OurAirports (community-maintained open data) (OurAirports 2026-10-30)",
+        "checked": "2026-10-30",
+        "provenance_status": "verified",
+        "source_url": "https://ourairports.com/data/"
+      },
+      "citation": {
+        "text": "Ayers Rock Connellan Airport (AYQ) — 20.8 km, OurAirports.",
+        "qualifier": "Best-effort nearest airport by great-circle distance from OurAirports data — reference only, not authoritative for navigation or filing; verify codes with IATA/ICAO."
+      },
+      "normalized_input": {
+        "latitude": -25,
+        "longitude": 131,
+        "radius_km": null,
+        "max_results": 2,
+        "type": null,
+        "include_all": true,
+        "defaults_applied": [
+          "radius_km=unbounded",
+          "closed airfields excluded (type=closed lists them)"
+        ]
+      },
+      "warnings": [
+        {
+          "code": "FUZZY_BEST_MATCH",
+          "message": "Nearest of 2 airport(s) — \"Ayers Rock Connellan Airport\" (medium_airport) at 20.8 km.",
+          "details": {
+            "candidates": 2,
+            "distance_km": 20.8,
+            "type": "medium_airport"
+          }
+        }
+      ]
+    }
+  },
+  "validate_awb_bad_check_digit": {
+    "request": "GET /api/validate?value=176-12345676&type=awb&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ISO 6346 + IATA AWB mod-7 + IMO number scheme",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-06-23",
+      "result": {
+        "found": [
+          {
+            "type": "awb",
+            "raw": "176-12345676",
+            "normalised": "176-12345676",
+            "valid": false,
+            "check_digit": {
+              "expected": 5,
+              "actual": 6
+            },
+            "details": {
+              "airline_prefix": "176",
+              "serial": "12345676",
+              "airline": {
+                "name": "Emirates",
+                "iata": "EK",
+                "icao": "UAE"
+              }
+            },
+            "_source": {
+              "type": "methodology",
+              "standard": "IATA Air Waybill numbering (unweighted modulus-7 check digit)",
+              "reference": "IATA Cargo Services Conference Resolution 600a (\"The Air Waybill\") — air-waybill serial-number modulus-7 check digit",
+              "authority": "IATA",
+              "source_url": "https://www.freightutils.com/validate",
+              "computed_by": "freightutils.com"
+            },
+            "failure": {
+              "reason": "INVALID_CHECK_DIGIT",
+              "message": "The check digit of 176-12345676 is 6; the modulus-7 calculation gives 5.",
+              "expected_format": "IATA air waybill: 3-digit airline prefix + 8-digit serial whose last digit is the check digit (first 7 serial digits mod 7) — 11 digits",
+              "example": "020-58717481"
+            }
+          }
+        ],
+        "disclaimer": "Structural validation only — a valid check digit means the identifier is well-formed, not that the container/shipment/vessel exists or is active. Not a registry lookup, and not legal or compliance advice."
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "ISO 6346 (containers) / IATA Air Waybill modulus-7 (air waybills) / IMO Ship Identification Number Scheme — public check-digit algorithms, implemented not reproduced (ISO 6346 + IATA AWB mod-7 + IMO number scheme)",
+        "checked": "2026-06-23",
+        "provenance_status": "verified",
+        "source_url": "https://www.freightutils.com/validate",
+        "dataset_edition": "ISO 6346 + IATA AWB mod-7 + IMO number scheme",
+        "authority_current_edition": "ISO 6346 + IATA AWB mod-7 + IMO number scheme",
+        "checked_at": "2026-10-27"
+      },
+      "citation": {
+        "text": "awb 176-12345676: invalid check digit — structural check-digit validation (ISO 6346 / IATA AWB mod-7 / IMO), not a registry lookup."
+      },
+      "normalized_input": {
+        "input": "176-12345676",
+        "mode": "typed",
+        "type": "awb",
+        "normalised": [
+          {
+            "type": "awb",
+            "normalised": "176-12345676"
+          }
+        ],
+        "defaults_applied": []
+      }
+    }
+  },
+  "validate_awb_unknown_prefix": {
+    "request": "GET /api/validate?value=998-12345675&type=awb&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ISO 6346 + IATA AWB mod-7 + IMO number scheme",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-06-23",
+      "result": {
+        "found": [
+          {
+            "type": "awb",
+            "raw": "998-12345675",
+            "normalised": "998-12345675",
+            "valid": true,
+            "check_digit": {
+              "expected": 5,
+              "actual": 5
+            },
+            "details": {
+              "airline_prefix": "998",
+              "serial": "12345675",
+              "airline": null,
+              "airline_failure": {
+                "reason": "UNKNOWN_PREFIX",
+                "message": "No record in the airline dataset holds AWB prefix 998. The dataset is a compilation, not the IATA registry: an unlisted prefix is not proof that no carrier holds it.",
+                "expected_format": "IATA air waybill: 3-digit airline prefix + 8-digit serial whose last digit is the check digit (first 7 serial digits mod 7) — 11 digits",
+                "example": "020-58717481"
+              }
+            },
+            "_source": {
+              "type": "methodology",
+              "standard": "IATA Air Waybill numbering (unweighted modulus-7 check digit)",
+              "reference": "IATA Cargo Services Conference Resolution 600a (\"The Air Waybill\") — air-waybill serial-number modulus-7 check digit",
+              "authority": "IATA",
+              "source_url": "https://www.freightutils.com/validate",
+              "computed_by": "freightutils.com"
+            }
+          }
+        ],
+        "disclaimer": "Structural validation only — a valid check digit means the identifier is well-formed, not that the container/shipment/vessel exists or is active. Not a registry lookup, and not legal or compliance advice."
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "ISO 6346 (containers) / IATA Air Waybill modulus-7 (air waybills) / IMO Ship Identification Number Scheme — public check-digit algorithms, implemented not reproduced (ISO 6346 + IATA AWB mod-7 + IMO number scheme)",
+        "checked": "2026-06-23",
+        "provenance_status": "verified",
+        "source_url": "https://www.freightutils.com/validate",
+        "dataset_edition": "ISO 6346 + IATA AWB mod-7 + IMO number scheme",
+        "authority_current_edition": "ISO 6346 + IATA AWB mod-7 + IMO number scheme",
+        "checked_at": "2026-10-27"
+      },
+      "citation": {
+        "text": "awb 998-12345675: valid check digit — structural check-digit validation (ISO 6346 / IATA AWB mod-7 / IMO), not a registry lookup."
+      },
+      "normalized_input": {
+        "input": "998-12345675",
+        "mode": "typed",
+        "type": "awb",
+        "normalised": [
+          {
+            "type": "awb",
+            "normalised": "998-12345675"
+          }
+        ],
+        "defaults_applied": []
+      }
+    }
+  },
+  "resolve_awb_bad_check_digit": {
+    "request": "GET /api/resolve?q=176-12345676&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": null,
+      "as_of": "2026-10-31",
+      "result": {
+        "query": "176-12345676",
+        "normalized": "17612345676",
+        "candidates": [
+          {
+            "entity_type": "air_waybill",
+            "identifier_type": "awb_number",
+            "value_normalized": "176-12345676",
+            "summary": "AWB 176-12345676 — modulus-7 check digit FAILS (expected 5, got 6); prefix 176: Emirates",
+            "record": {
+              "raw": "17612345676",
+              "normalised": "176-12345676",
+              "valid": false,
+              "check_digit": {
+                "expected": 5,
+                "actual": 6
+              },
+              "details": {
+                "airline_prefix": "176",
+                "serial": "12345676",
+                "airline": {
+                  "name": "Emirates",
+                  "iata": "EK",
+                  "icao": "UAE"
+                }
+              },
+              "failure": {
+                "reason": "INVALID_CHECK_DIGIT",
+                "message": "The check digit of 176-12345676 is 6; the modulus-7 calculation gives 5.",
+                "expected_format": "IATA air waybill: 3-digit airline prefix + 8-digit serial whose last digit is the check digit (first 7 serial digits mod 7) — 11 digits",
+                "example": "020-58717481"
+              }
+            },
+            "verification_status": "computed",
+            "verification_basis": "dataset",
+            "rank_basis": "dataset record hit · verification computed (dataset-level) · static prior validate #9 of 11 · tiebreak awb_number/176-12345676",
+            "canonical_url": "/airlines/iata/EK",
+            "api_url": "/api/validate?value=176-12345676&type=awb",
+            "citation": {
+              "text": "awb 176-12345676: invalid check digit — structural check-digit validation (ISO 6346 / IATA AWB mod-7 / IMO), not a registry lookup."
+            }
+          }
+        ],
+        "count": 1,
+        "validation": {
+          "type": "awb",
+          "valid": false,
+          "failure": {
+            "reason": "INVALID_CHECK_DIGIT",
+            "message": "The check digit of 176-12345676 is 6; the modulus-7 calculation gives 5.",
+            "expected_format": "IATA air waybill: 3-digit airline prefix + 8-digit serial whose last digit is the check digit (first 7 serial digits mod 7) — 11 digits",
+            "example": "020-58717481"
+          }
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "\"176-12345676\" resolved to 1 candidate — top: awb_number 176-12345676, AWB 176-12345676 — modulus-7 check digit FAILS (expected 5, got 6); prefix 176: Emirates.",
+        "qualifier": "Deterministic grammar match over FreightUtils reference datasets — each candidate carries its own dataset citation; not legal advice."
+      },
+      "normalized_input": {
+        "q_input": "176-12345676",
+        "normalized": "17612345676"
+      }
+    }
+  },
+  "resolve_no_match": {
+    "request": "GET /api/resolve?q=QQQQQQQQQQQQ&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "not_found",
+      "missing_inputs": [],
+      "edition": null,
+      "as_of": "2026-10-31",
+      "result": {
+        "query": "QQQQQQQQQQQQ",
+        "normalized": "QQQQQQQQQQQQ",
+        "candidates": [],
+        "count": 0,
+        "note": "no known freight identifier grammar matched",
+        "failure": {
+          "reason": "NO_MATCH",
+          "message": "\"QQQQQQQQQQQQ\" matches none of the freight identifier grammars this resolver runs."
+        }
+      },
+      "confidence": {
+        "level": "low",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "\"QQQQQQQQQQQQ\" matched no known freight identifier grammar (normalized \"QQQQQQQQQQQQ\").",
+        "qualifier": "Deterministic grammar match over FreightUtils reference datasets — each candidate carries its own dataset citation; not legal advice."
+      },
+      "warnings": [
+        {
+          "code": "NO_MATCH",
+          "message": "No known freight identifier grammar matched the query."
+        }
+      ]
+    }
+  }
+}

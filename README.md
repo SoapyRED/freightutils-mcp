@@ -56,7 +56,7 @@ Since **2.25.0**:
 | `adr_exemption_calculator` | ADR 1.1.3.6 small load exemption check |
 | `adr_lq_eq_check` | Limited and Excepted Quantity eligibility |
 
-**What's new in 2.26.0:** `edition` and `as_of` on the five ADR tools — ADR 2025 and ADR 2027 (accepted, applying from 1 January 2027) by edition or by date, with the ADR 2027 answer fields (`adr_edition`, `transitional_1_6_1_61`, `transitional_notes`, `amended_in_2027`); a check receipt is stored for keyed calls only, and an answer without a key carries its receipt hash in `_meta.receipt`. Nothing removed: every 2.25.0 argument and answer field still validates.
+**In 2.26.0:** `edition` and `as_of` on the five ADR tools — ADR 2025 and ADR 2027 (accepted, applying from 1 January 2027) by edition or by date, with the ADR 2027 answer fields (`adr_edition`, `transitional_1_6_1_61`, `transitional_notes`, `amended_in_2027`); a check receipt is stored for keyed calls only, and an answer without a key carries its receipt hash in `_meta.receipt`. Nothing removed: every 2.25.0 argument and answer field still validates.
 
 **In 2.25.0:** check receipts, batch inputs, `resolved_codes` on `adr_lookup` (what each Table A code means), `--scope dg | customs | ops`, the consignment object, and `resolve_reference` decodes ADR Table A codes ("TU9"). Nothing removed: every 2.24.0 call answers as before.
 
@@ -78,15 +78,22 @@ Some UN numbers have more than one ADR Table A row (packing groups, concentratio
 | `resolve_reference` | Resolve any freight identifier ("176", "UN1845", "NLRTM", "FOB") to typed, ranked, cited candidates when its type is unknown |
 | `airline_lookup` | 6,356 airlines with IATA/ICAO codes and AWB prefixes |
 | `unlocode_lookup` | 116,086 UN/LOCODE transport locations |
-| `airport_lookup` | 85,555 airports by IATA/ICAO code, name or city (OurAirports) |
-| `nearest_airport` | Nearest airports to a latitude/longitude, by great-circle distance |
+| `airport_lookup` | 86,248 airports by IATA/ICAO code, name or city (OurAirports) |
+| `nearest_airport` | Nearest airports to a latitude/longitude, by great-circle distance — by default airports with scheduled airline service and an IATA code (`include_all: true` lists every type) |
 | `uld_lookup` | 16 air cargo ULD types (LD3, PMC, etc.) |
 | `vehicle_lookup` | 17 road freight vehicles and trailers |
+
+**What's new in 2.27.0:** the airline record's operational status, shared-prefix flag and air-safety-list flags; `nearest_airport`'s scheduled-service default with `include_all`; the refreshed airport fields; failure reasons on `validate` and `resolve_reference`. Nothing removed: every 2.26.0 argument and answer field still validates.
+
+- **Airlines (`airline_lookup`).** A cargo carrier's record carries `operational_status` (`active`, `ceased` or `unknown`) with `operational_status_basis` — the carrier's own published page, a current FAA designator listed for that carrier, or a dead-domain check after the FAA withdrew the designator. It is a separate thing from the verification `status` ladder: a record can be `historical` in verification and still say why the carrier is ceased. Every record with an AWB prefix carries `prefix_shared` and `prefix_holders` (prefix 081 is shared by four carriers, Qantas among them). `restrictions[]` lists the carrier when the EU Air Safety List or the UK Air Safety List names it, with the list, annex, regulation or list date and the source URL. It is a flag with its source, not a legal determination — best-effort; verify with the list itself. Where the carrier publishes them, the record links its own cargo website (`cargo_website`), its tracking URL template (`tracking_url_template`) and its dangerous-goods acceptance page (`dg_acceptance_url`).
+- **Airports (`airport_lookup`, `nearest_airport`).** 86,248 airports from the OurAirports refresh of 30 October 2026; records gain `icao_code`, `scheduled_service`, `iso_region`, `gps_code` and `keywords`. `nearest_airport` answers, by default, airports with scheduled airline service and an IATA code — never a heliport and never a closed field. `include_all: true` lists every type except closed fields; a `type` filter keeps the earlier behaviour for that type. Every answer states `distance_basis: "great_circle"`, the `filter` applied (`scheduled_iata`, `all` or `type`) and `filter_description`. The hosted server changed the same way on 30 October; the package now sends `include_all` and types the answer.
 
 ### Validation
 | Tool | Description |
 |------|-------------|
 | `validate` | Parse any text (a booking line, an email) to find & validate every container (ISO 6346), AWB (modulus-7) and IMO number in it — or validate a single identifier by type |
+
+**Failure reasons (2.27.0).** An invalid identifier in a `validate` answer carries `failure` — `reason` (`INVALID_CHECK_DIGIT`, `WRONG_LENGTH` or `BAD_CHARSET`), `message`, `expected_format` and an `example` of a valid one — so an agent can tell the user what to fix ("176-12345676": the check digit is 6, the modulus-7 calculation gives 5). An AWB whose prefix no record holds, or several records share, says so in `details.airline_failure` (`UNKNOWN_PREFIX` / `AMBIGUOUS`); the check digit is a different question. `resolve_reference` carries `validation` (`type`, `valid`, `failure`) when the query is an AWB, container or IMO number — an invalid AWB still names the carrier its prefix belongs to — and `failure` (`NO_MATCH` / `AMBIGUOUS`, with `candidate_types`) when nothing or more than one type matched.
 
 ### Composite
 | Tool | Description |

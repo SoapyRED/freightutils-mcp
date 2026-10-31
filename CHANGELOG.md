@@ -1,5 +1,51 @@
 # Changelog
 
+## 2.27.0 — 2026-10-31
+
+The npm mirror of freightutils.com Run A2 (airline record v2, the OurAirports refresh, structured failure
+reasons), in lock-step with the hosted endpoint. Additive: one new optional argument, new typed answer fields,
+nothing removed or loosened — every 2.26.0 argument and answer field still validates.
+
+Why a minor release: new documented arguments and answer fields, nothing removed. The one default that changed —
+`nearest_airport`'s filter — changed on the hosted server and the REST API with freightutils.com #320 on
+30 October 2026; the package forwards to that API, so its answers had already followed. This release makes the
+package say so, send `include_all`, and type the answer.
+
+### Added
+
+- **`airline_lookup`** — the record v2 fields typed: `prefix_shared` and `prefix_holders` on every record with an
+  AWB prefix; on cargo records `operational_status` (`active` / `ceased` / `unknown`) with
+  `operational_status_basis` (`carrier_published`, `faa_designator_current`, `domain_fetch_check`,
+  `wikidata_dissolved`), `restrictions[]` (EU Air Safety List / UK Air Safety List entries: list, annex, scope,
+  regulation and date, source, sha256, match basis), carrier-published `cargo_website`,
+  `tracking_url_template`, `dg_acceptance_url`, `code_history[]` and `chargeable_weight_ref`.
+- **`nearest_airport`** — `include_all` (boolean, optional, forwarded only when true). The API now ranks, by
+  default, airports with scheduled airline service and an IATA code (no heliports); `include_all: true`
+  restores every type except closed fields. `distance_basis` (`great_circle`), `filter` and
+  `filter_description` typed on the answer.
+- **Airport records** (`airport_lookup`, `nearest_airport`) — `icao_code`, `scheduled_service`, `iso_region`,
+  `gps_code`, `keywords` typed (the OurAirports refresh of 2026-10-30).
+- **`validate`** — `failure { reason, message, expected_format, example }` on a hit with `valid: false`
+  (`INVALID_CHECK_DIGIT`, `WRONG_LENGTH`, `BAD_CHARSET`; `UNSUPPORTED_TYPE` on the REST refusal); an AWB's
+  `details.airline_failure` (`UNKNOWN_PREFIX` / `AMBIGUOUS`) rides in `details`, already open.
+- **`resolve_reference`** — `validation { type, valid, failure? }` when the query is an AWB, container or IMO
+  number (the API now resolves 11-digit AWB numbers and IMO numbers), and `failure` (`NO_MATCH` / `AMBIGUOUS`,
+  `candidate_types`).
+- Tests: production answers recorded on 2026-10-31 (`test-fixtures/recorded-2.27.0.json`) driven through the
+  validating SDK client.
+
+### Changed
+
+- **`nearest_airport`** answers airports with scheduled airline service and an IATA code by default (no
+  heliports, no closed fields); `include_all: true` restores every type, and a `type` filter keeps the earlier
+  behaviour. The hosted server and the REST API changed the same way on 30 October 2026 (freightutils.com #320).
+- Descriptions: `airport_lookup` and `nearest_airport` count 86,248 airports; `nearest_airport` names the
+  default filter and `include_all`; `airline_lookup` names the record v2 fields. The hosted server takes its
+  descriptions from the installed package, so they reach the hosted endpoint when this version is pinned there.
+- README: the airline record's operational status, shared prefixes and air-safety-list flags (a flag with its
+  source, not a legal determination); the `nearest_airport` default, `include_all` and `distance_basis`; failure
+  reasons on `validate` and `resolve_reference`; 86,248 airports.
+
 ## 2.26.0 — 2026-10-30
 
 The npm mirror of freightutils.com Build 1 (ADR editions) and Run R7 (check receipts need an API key), in
