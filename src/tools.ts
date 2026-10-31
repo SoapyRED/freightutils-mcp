@@ -514,7 +514,7 @@ Provide ONE parameter: query is a ranked fuzzy search across names and codes; ia
 
 Behavior: read-only; fuzzy query hits report their match quality through the envelope's confidence (basis match_quality, score 0-1) with a FUZZY_BEST_MATCH advisory naming the matched field; a query that contains no name falls back to the closest names in the dataset ("Emirats" → Emirates). A query or country answer is a list: summary rows, 25 per page, with total, truncated and next_offset (full: true for full records); an iata / icao / prefix answer is the holder records in full. ${RATE}
 
-Returns: count and results[] — per airline: airline_name, iata_code, icao_code, awb_prefix[], callsign, country, has_cargo and verification fields (aliases and sources in full records) — under result, ${ENV}
+Returns: count and results[] — per airline: airline_name, iata_code, icao_code, awb_prefix[], callsign, country, has_cargo and verification fields (aliases and sources in full records); prefix_shared + prefix_holders on every record with a prefix; on cargo records operational_status (active / ceased / unknown) with operational_status_basis, restrictions[] when the EU or UK Air Safety List names the carrier, and carrier-published cargo_website / tracking_url_template / dg_acceptance_url where they exist — under result, ${ENV}
 
 Limitations: this dataset's provenance is pending independent verification (the envelope's provenance_status says so) — confirm operationally critical codes with IATA/ICAO or the carrier.
 
@@ -544,6 +544,32 @@ Related: airport_lookup (searches AIRPORTS, not carriers), validate (checks an A
       aliases: z.array(z.string()),
       verified: z.boolean(),
       audited_at: z.string(),
+      // Record v2 (freightutils.com Run A2, 2026-10-30) — additive.
+      prefix_shared: z.boolean(),
+      prefix_holders: z.array(z.string()),
+      operational_status: z.enum(['active', 'ceased', 'unknown']),
+      operational_status_basis: z.enum(['carrier_published', 'faa_designator_current', 'domain_fetch_check', 'wikidata_dissolved']),
+      operational_status_since: z.string(),
+      restrictions: z.array(loose({
+        list: z.enum(['eu_air_safety_list', 'uk_air_safety_list']),
+        annex: z.string(),
+        scope: z.enum(['banned', 'restricted']),
+        since: z.string(),
+        regulation: z.string(),
+        regulation_date: z.string(),
+        list_updated: z.string(),
+        source_url: z.string(),
+        accessed_at: z.string(),
+        sha256: z.string(),
+        match_basis: z.enum(['icao_designator', 'name_and_state']),
+        listed_name: z.string(),
+        restricted: z.string(),
+      })),
+      cargo_website: z.string(),
+      tracking_url_template: z.string(),
+      dg_acceptance_url: z.string(),
+      code_history: z.array(loose({ field: z.string(), value: z.string(), from: z.string(), until: z.string(), source: z.record(z.string(), z.unknown()) })),
+      chargeable_weight_ref: z.string(),
     })),
     meta: z.record(z.string(), z.unknown()),
   }),
@@ -1414,6 +1440,14 @@ Related: distinct from cbm_calculator / ldm_calculator / chargeable_weight_calcu
 //  Identifier Validator (ISO 6346 / IATA AWB / IMO)
 // ─────────────────────────────────────────────────────────────
 
+/** Why an identifier failed (freightutils.com Run A2): validate hits, the validate refusal, resolve's validation. */
+const VALIDATION_FAILURE = loose({
+  reason: z.enum(['INVALID_CHECK_DIGIT', 'WRONG_LENGTH', 'BAD_CHARSET', 'UNKNOWN_PREFIX', 'UNSUPPORTED_TYPE', 'AMBIGUOUS']),
+  message: z.string(),
+  expected_format: z.string(),
+  example: z.string(),
+});
+
 const identifierValidator: ToolDef = {
   name: 'validate',
   description: `Validate and parse freight identifiers by their public check-digit algorithms: shipping container numbers (ISO 6346), air waybill (AWB) numbers (IATA modulus-7) and IMO ship identification numbers.
@@ -1444,9 +1478,12 @@ Related: container_lookup (container TYPE specs, not numbers), airline_lookup (t
       check_digit: z.record(z.string(), z.unknown()),
       details: z.record(z.string(), z.unknown()),
       _source: z.record(z.string(), z.unknown()),
+      // freightutils.com Run A2: present exactly when valid is false.
+      failure: VALIDATION_FAILURE,
     })),
     disclaimer: z.string(),
     note: z.string(),
+    failure: VALIDATION_FAILURE,
   }),
 
   richText: true,
@@ -1526,6 +1563,12 @@ const airportRecord = loose({
   latitude: z.number(),
   longitude: z.number(),
   elevation_ft: z.number(),
+  // freightutils.com Run A2 (OurAirports refresh 2026-10-30) — additive.
+  icao_code: z.string(),
+  scheduled_service: z.boolean(),
+  iso_region: z.string(),
+  gps_code: z.string(),
+  keywords: z.string(),
 });
 const airportCitation = (result: unknown) => {
   const r = result as { _source?: { citeShort?: string; authority?: string } };
@@ -1535,7 +1578,7 @@ const airportCitation = (result: unknown) => {
 
 const airportLookup: ToolDef = {
   name: 'airport_lookup',
-  description: `Look up an airport by IATA code (3 letters, e.g. "LHR"), ICAO code (4 chars, e.g. "EGLL"), or free-text name/city search (e.g. "heathrow"). Covers 85,555 airports worldwide (OurAirports, public domain, cross-checked vs OpenFlights + Wikidata).
+  description: `Look up an airport by IATA code (3 letters, e.g. "LHR"), ICAO code (4 chars, e.g. "EGLL"), or free-text name/city search (e.g. "heathrow"). Covers 86,248 airports worldwide (OurAirports, public domain, cross-checked vs OpenFlights + Wikidata).
 
 Provide ONE of iata, icao, or query; the optional type filter narrows results. Behavior: read-only; exact code hits return one record; ambiguous name searches return ranked candidates (exact codes first, then larger airports) with match quality reported via the envelope's confidence (basis match_quality); an unknown code errors with a not-found message. ${RATE}
 
@@ -1565,13 +1608,13 @@ Related: nearest_airport (find airports FROM a coordinate), airline_lookup (sear
 
 const nearestAirport: ToolDef = {
   name: 'nearest_airport',
-  description: `Find the airports nearest to a caller-provided latitude/longitude, sorted by great-circle (haversine) distance with distance_km on each result. Searches 85,555 airports (OurAirports, public domain).
+  description: `Find the airports nearest to a caller-provided latitude/longitude, sorted by great-circle (haversine) distance with distance_km on each result. Searches 86,248 airports (OurAirports, public domain).
 
-Provide latitude and longitude (decimal degrees); optional radius_km, max_results (1-50, default 10) and type filter (e.g. large_airport only). Coordinates are INPUT only — nothing is stored or logged.
+Provide latitude and longitude (decimal degrees); optional radius_km, max_results (1-50, default 10), type filter (e.g. large_airport only) and include_all. By default only airports with scheduled airline service and an IATA code are ranked — never a heliport or a closed field; include_all: true ranks every type except closed fields, and type filters on that type. Coordinates are INPUT only — nothing is stored or logged.
 
 Behavior: deterministic distance sort; confidence reflects proximity and airport size (a large airport within 25 km scores high; closed/heliport/seaplane results cap lower). This tool does NOT geocode place names and does NOT compute routes — pass coordinates you already hold. ${RATE}
 
-Returns: count and results[] (the airport record plus distance_km) under result, ${ENV}
+Returns: count, results[] (the airport record plus distance_km), distance_basis ("great_circle"), filter (scheduled_iata / all / type) and filter_description under result, ${ENV}
 
 Limitations: reference data only — not for navigation; verify codes with IATA / ICAO.
 
@@ -1582,10 +1625,14 @@ Related: airport_lookup (exact code or name lookup, no distance), unlocode_looku
     radius_km: z.number().positive().optional().describe('Maximum distance in kilometres — omit for no radius cap.'),
     max_results: z.number().int().min(1).max(50).optional().describe('Maximum results (1-50). Default: 10.'),
     type: airportTypeEnum.optional().describe('Optional filter by airport type. Example: "large_airport".'),
+    include_all: z.boolean().optional().describe('Default false: only airports with scheduled airline service and an IATA code (no heliports). true: every airport type except closed fields.'),
   }).strict(),
   resultSchema: resultShape({
     count: z.number(),
     results: z.array(airportRecord),
+    distance_basis: z.literal('great_circle'),
+    filter: z.enum(['scheduled_iata', 'all', 'type']),
+    filter_description: z.string(),
     disclaimer: z.string(),
     meta: z.record(z.string(), z.unknown()),
   }),
@@ -1594,6 +1641,7 @@ Related: airport_lookup (exact code or name lookup, no distance), unlocode_looku
   handler: async (args, opts) => apiGet('nearest-airport', {
     lat: args.latitude, lon: args.longitude,
     radius_km: args.radius_km, max_results: args.max_results, type: args.type,
+    include_all: args.include_all === true ? 'true' : undefined,
   }, opts),
   citation: airportCitation,
 };
@@ -1636,6 +1684,9 @@ Related: every lookup tool this resolves into — adr_lookup, airline_lookup, ai
       api_url: z.string(),
       citation: loose({ text: z.string(), qualifier: z.string() }),
     })),
+    // freightutils.com Run A2 — additive.
+    validation: loose({ type: z.enum(['awb', 'container', 'imo']), valid: z.boolean(), failure: VALIDATION_FAILURE }),
+    failure: loose({ reason: z.enum(['NO_MATCH', 'AMBIGUOUS']), message: z.string(), candidate_types: z.array(z.string()) }),
   }),
   // Deliberately NOT richText: the non-richText path appends the ENVELOPE's
   // citation.text as content[1], byte-matching the hosted /api/mcp surface.
