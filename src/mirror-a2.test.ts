@@ -82,6 +82,7 @@ test('nearest_airport default: LHR first, distance_basis great_circle, filter sc
   assert.equal(rows[0].iata_code, 'LHR');
   assert.equal(rows[0].scheduled_service, true);
   assert.equal(typeof rows[0].iso_region, 'string');
+  for (const r of rows) assert.notEqual(r.type, 'heliport', 'the default never ranks a heliport');
 });
 
 test('nearest_airport include_all: forwarded as include_all=true; the strip is listed', async () => {
@@ -89,7 +90,11 @@ test('nearest_airport include_all: forwarded as include_all=true; the strip is l
   assert.notEqual(res.isError, true, JSON.stringify(res).slice(0, 300));
   assert.equal(new URL(urls[0]).searchParams.get('include_all'), 'true');
   assert.equal(sc.result.filter, 'all');
-  assert.equal((sc.result.results as Row[])[1].ident, 'YCSP');
+  const strip = (sc.result.results as Row[])[1];
+  assert.equal(strip.ident, 'YCSP');
+  // A row the default filter excludes: no scheduled service, no IATA code.
+  assert.equal(strip.scheduled_service, false);
+  assert.ok(!strip.iata_code);
 });
 
 test('validate: a wrong AWB check digit carries failure.reason INVALID_CHECK_DIGIT', async () => {
@@ -99,6 +104,7 @@ test('validate: a wrong AWB check digit carries failure.reason INVALID_CHECK_DIG
   assert.equal(hit.valid, false);
   assert.equal((hit.failure as Row).reason, 'INVALID_CHECK_DIGIT');
   assert.equal((hit.failure as Row).example, '020-58717481');
+  assert.match(String((hit.failure as Row).expected_format), /11 digits/);
 });
 
 test('validate: a prefix no record holds — valid stays true, details.airline_failure UNKNOWN_PREFIX', async () => {

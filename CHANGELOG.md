@@ -1,10 +1,15 @@
 # Changelog
 
-## 2.27.0 — pending
+## 2.27.0 — 2026-10-31
 
 The npm mirror of freightutils.com Run A2 (airline record v2, the OurAirports refresh, structured failure
 reasons), in lock-step with the hosted endpoint. Additive: one new optional argument, new typed answer fields,
-nothing removed or loosened — every 2.26.0 argument and answer field still validates. **Not yet released.**
+nothing removed or loosened — every 2.26.0 argument and answer field still validates.
+
+Why a minor release: new documented arguments and answer fields, nothing removed. The one default that changed —
+`nearest_airport`'s filter — changed on the hosted server and the REST API with freightutils.com #320 on
+30 October 2026; the package forwards to that API, so its answers had already followed. This release makes the
+package say so, send `include_all`, and type the answer.
 
 ### Added
 
@@ -31,9 +36,15 @@ nothing removed or loosened — every 2.26.0 argument and answer field still val
 
 ### Changed
 
+- **`nearest_airport`** answers airports with scheduled airline service and an IATA code by default (no
+  heliports, no closed fields); `include_all: true` restores every type, and a `type` filter keeps the earlier
+  behaviour. The hosted server and the REST API changed the same way on 30 October 2026 (freightutils.com #320).
 - Descriptions: `airport_lookup` and `nearest_airport` count 86,248 airports; `nearest_airport` names the
   default filter and `include_all`; `airline_lookup` names the record v2 fields. The hosted server takes its
   descriptions from the installed package, so they reach the hosted endpoint when this version is pinned there.
+- README: the airline record's operational status, shared prefixes and air-safety-list flags (a flag with its
+  source, not a legal determination); the `nearest_airport` default, `include_all` and `distance_basis`; failure
+  reasons on `validate` and `resolve_reference`; 86,248 airports.
 
 ## 2.26.0 — 2026-10-30
 
