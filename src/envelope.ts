@@ -42,7 +42,8 @@ export function envelopeShape(result: z.ZodTypeAny): z.ZodRawShape {
       edition_basis: z.string().optional(),
       receipt: z.object({
         stored: z.literal(false),
-        reason: z.literal('key_required'),
+        // 0C (website, 2026-11-04): "quota" — a free key whose account has stored its 25 receipts today.
+        reason: z.enum(['key_required', 'quota']),
         schema_version: z.string(),
         receipt_hash: z.string(),
         created_at: z.string(),
