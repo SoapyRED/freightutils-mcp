@@ -71,6 +71,9 @@ const EDITION_SHAPE = {
   edition: z.enum(['2025', '2027']).optional().describe('ADR edition: "2025" or "2027". Wins over as_of. Omit it and as_of picks the edition by the legal timeline: before 2027-01-01 ADR 2025; from 2027-01-01 ADR 2027 (ADR 2025 may still be applied until 2027-06-30 under 1.6.1.1 — edition "2025" answers on it until then); from 2027-07-01 ADR 2027 only. An ADR 2027 answer for a date before 2027-01-01 carries an EDITION_NOT_YET_APPLICABLE warning.'),
   as_of: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'as_of must be a date written YYYY-MM-DD, e.g. 2027-01-15').optional().describe('YYYY-MM-DD the answer is for (default today, UTC); picks the ADR edition when edition is omitted, and is echoed in the answer and its check receipt.'),
 };
+// The ADR code registry's verification_status (2.28.0, website G2 / G2-2): the set /api/adr and the code
+// pages serve (lib/adr/codes.ts VerificationStatus on freightutils.com).
+const ADR_CODE_STATUS = z.enum(['paraphrase_unreviewed', 'machine_reviewed', 'contested', 'owner_reviewed', 'dg_reviewed', 'needs_fix', 'verified']);
 const EDITIONS = 'edition ("2025" | "2027") and as_of (YYYY-MM-DD) choose the ADR edition — edition wins, else the date picks it (ADR 2025 before 2027-01-01, ADR 2027 from then; ADR 2025 may still be applied until 2027-06-30). An answer on a named edition carries adr_edition; neither sent, the answer is ADR 2025 until 2027-01-01.';
 // The field names a description lists are the snake_case ones this package serves (from the REST
 // API); the hosted endpoint at /api/mcp serves the same fields in camelCase (2.22.0, probe S22).
@@ -264,7 +267,7 @@ Provide exactly ONE of: un_number (exact lookup — returns every packing-group 
 
 Behavior: read-only reference lookup; a name search or class filter is a paged list — total, truncated and next_offset, with offset and limit (at most 50 per search page, 100 per class page) — never a silently cut list. A search with no hits errors with suggestions: the closest proper shipping names in Table A ("acetne" → ACETONE, UN 1090). 28 Table A rows carry a scope remark instead of a packing group: those return packing_group null plus not_subject_to_adr (with conditions_ref, e.g. "5.5.3" for UN 1845 dry ice) or carriage_prohibited, and table_a_remark preserves the verbatim Table A text. ${RATE}
 
-Returns: count and results[] — per entry, all 20 Table A columns: un_number, proper_shipping_name, class, classification_code, packing_group, labels, special_provisions, limited_quantity, excepted_quantity, packing_instructions, special_/mixed_packing_provisions, portable_tank_instructions/_special_provisions, tank_code, tank_special_provisions, vehicle_for_tank_carriage, carriage_packages/_bulk/_loading_unloading_handling/_operation, transport_category, tunnel_restriction_code, hazard_identification_number, variant_index/variant_count and, on scope-flagged rows, not_subject_to_adr/carriage_prohibited/conditions_ref/table_a_remark — plus resolved_codes[] beside results[]: one entry per distinct code in columns (5)–(20) across the answer, with its code, family, columns, rows (the results[] indexes that carry it), summary, ADR section and verification_status (include_codes "full" adds url, title, meaning, parameters, applies_to, references; "none" omits the list; default compact for un_number, none for search, hazard_class and un_numbers; a code's page is https://www.freightutils.com/adr/codes/{family}/{code}). The meanings are FreightUtils' paraphrases of ADR 2025, cited to section and page; verification_status says whether a person has reviewed each one (paraphrase_unreviewed until then) — under result, ${ENV}
+Returns: count and results[] — per entry, all 20 Table A columns: un_number, proper_shipping_name, class, classification_code, packing_group, labels, special_provisions, limited_quantity, excepted_quantity, packing_instructions, special_/mixed_packing_provisions, portable_tank_instructions/_special_provisions, tank_code, tank_special_provisions, vehicle_for_tank_carriage, carriage_packages/_bulk/_loading_unloading_handling/_operation, transport_category, tunnel_restriction_code, hazard_identification_number, variant_index/variant_count and, on scope-flagged rows, not_subject_to_adr/carriage_prohibited/conditions_ref/table_a_remark — plus resolved_codes[] beside results[]: one entry per distinct code in columns (5)–(20) across the answer, with its code, family, columns, rows (the results[] indexes that carry it), summary, ADR section and verification_status (include_codes "full" adds url, title, meaning, parameters, applies_to, references; "none" omits the list; default compact for un_number, none for search, hazard_class and un_numbers; a code's page is https://www.freightutils.com/adr/codes/{family}/{code}). The meanings are FreightUtils' paraphrases of ADR 2025, cited to section and page; verification_status says how each one has been reviewed, in the registry's own words: paraphrase_unreviewed (not yet reviewed), machine_reviewed (two independent readings of the UNECE text, compared with the record; the owner adjudicates every disagreement), contested (the readings disagree and no person has reviewed it yet), owner_reviewed (the owner's ok), dg_reviewed (the owner's and the DG reviewer's ok), needs_fix (the latest review asks for a fix), or verified on the transport category and tunnel code entries, which are read from the 1.1.3.6.3 and 8.6.4 tables — under result, ${ENV}
 
 Editions: ${EDITIONS}
 
@@ -336,7 +339,7 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
         text: z.string(),
         basis: z.array(z.string()),
         codes: z.array(z.string()),
-        verification_status: z.string(),
+        verification_status: ADR_CODE_STATUS,
       })),
     })),
     // The ADR code registry (freightutils.com G1; once per answer since R6): what each code means,
@@ -349,7 +352,7 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
       rows: z.array(z.number()),
       summary: z.string(),
       section: z.string(),
-      verification_status: z.string(),
+      verification_status: ADR_CODE_STATUS,
       url: z.string(),
       title: z.string(),
       meaning: z.string(),
@@ -373,17 +376,21 @@ const adrExemptionCalculator: ToolDef = {
   name: 'adr_exemption_calculator',
   description: `Calculate ADR 1.1.3.6 "small load" exemption points for a dangerous-goods load and say whether it qualifies. Each substance's transport category (Table A column (15), 0-4) sets a points multiplier (1.1.3.6.4: category 1 x50, 2 x3, 3 x1, 4 x0; the nine ADR 1.1.3.6.3 note-a entries UN 0081/0082/0084/0241/0331/0332/0482/1005/1017 are x20); points = quantity x multiplier. The rule (1.1.3.6.2), for dangerous goods carried in packages: goods of ONE transport category qualify when their TOTAL on the transport unit stays within that category's 1.1.3.6.3 column (3) maximum — category 1: 20, 2: 333, 3: 1,000 (kg or L); note-a entries 50 kg; category 4 unlimited; category 0: 0 — however it is split across lines; goods of DIFFERENT categories qualify when the 1.1.3.6.4 points sum does not exceed 1,000. This calculator also holds every line, and every substance summed across its lines, to its category maximum — on a mixed load that is stricter than 1.1.3.6.4 (the conservative side). Transport category 0 substances can NEVER use this exemption — has_category_zero flags them.
 
-Provide un_number + quantity for a single substance, OR items[] for a load — never both: every field of the single-substance form (un_number, quantity, packing_group, variant_index, unit, basis) sent beside items[] is refused (the API answers 400 naming the field), never dropped — put it on the item it belongs to, a substance as an item of its own. Quantities are in kg or litres per the substance's ADR unit. un_number also takes an ID-prefixed air-only number (e.g. "ID8000") — see Routing.
+Provide un_number + quantity for a single substance, OR items[] for a load — never both: every field of the single-substance form (un_number, quantity, packing_group, variant_index, unit, basis) sent beside items[] is refused (the API answers 400 naming the field), never dropped — put it on the item it belongs to, a substance as an item of its own. Quantities are in kg or litres per the substance's ADR unit. An item quantity may be 0: the goods are not carried, the line is left out of the load (state EXCLUDED_NIL) and named in a warning — a load of nothing but zeros is refused, never cleared. un_number also takes an ID-prefixed air-only number (e.g. "ID8000") — see Routing.
 
 Multi-variant UNs: a UN number with more than one ADR Table A row (packing group / concentration variant — e.g. UN 1789 PG II vs PG III have different transport categories) needs packing_group (I|II|III) or variant_index (from adr_lookup) to pin one row. A packing_group that still leaves several rows is enough when those rows agree on class, transport category, scope and the 1.1.3.6.3 counted dimension (UN 1790 PG I: two concentration bands, both category 1) — the verdict is returned with items[].equivalent_variants + variant_note naming the rows it holds for; only when the rows DISAGREE (UN 2215 PG III: MOLTEN is category 0, the solid category 3) does it still ask for variant_index, and candidates[] then lists only that packing group's rows. With no disambiguator at all: a single-line call, or a load where EVERY line is ambiguous, returns blocking_errors[AMBIGUOUS_UN_VARIANT] + human_review_required + candidates[] (each candidate's item_index, un_number, variant_index, packing_group, proper_shipping_name, transport_category, multiplier) and NO verdict — blocking_errors is in the text content as well as structuredContent; a MIXED load withholds only the ambiguous line (items[].withheld true, points null, row fields null) while every other line keeps its points; total_points is null (1.1.3.6.4 sums every line, one term is unknown) and exempt is null UNLESS the resolved lines alone already disqualify the load — a CARRIAGE PROHIBITED entry, a category 0 entry, a per-substance maximum exceeded, or a partial sum already over 1,000 — in which case exempt is false with the ladder message (and carriage_prohibited true where that is the reason), because no packing group can undo those. warnings state the resolved lines' partial sum, candidates[] carry expected_unit (the 1.1.3.6.3 counted dimension — the only difference for UN 3375 PG II, liquid in L vs solid in kg), and the envelope carries human_review_required + candidates[] plus one AMBIGUOUS_UN_VARIANT warning per withheld line. Never a silently guessed row. Single-row UNs are unchanged.
 
 Scope verdicts: Table A rows listed "NOT SUBJECT TO ADR" or "CARRIAGE PROHIBITED" never enter the points math. An all-not-subject load (e.g. UN 1845 dry ice) returns not_subject_to_adr true with a dedicated message ("Not subject to ADR (road). Section 5.5.3 applies: ...") and, for dry ice, conditions[] quoting the ADR 2025 section 5.5.3 requirements verbatim (ventilation, package marking, warning mark, documentation, training). A load containing a CARRIAGE PROHIBITED entry returns exempt false with carriage_prohibited true. In a mixed load, not-subject items are excluded from the points and the exclusion is stated in warnings.
 
-Routing: every returned line carries state, in the words the FreightUtils document check uses — COUNTED (evaluated on one Table A row: its points, or a category 0 / CARRIAGE PROHIBITED row that settles the load), AIR_ONLY_ID, NOT_SUBJECT_TO_ADR, or BLOCKED (no points from the line as sent — withheld, basis_mismatch or category_unresolved; the line's own flag says which). AIR_ONLY_ID: an ID-prefixed number such as ID 8000 (consumer commodity) is an air-only identifier with no ADR Table A entry, so it gives no transport category and nothing is counted for it (items[].air_only_id true, row fields null). Each such line carries a warning stating the condition that 0 rests on: it is the ADR answer when the packages are limited quantities to the ICAO Technical Instructions (3.4.9 and 3.4.10 deem them to meet 3.4.1-3.4.4; goods exempted under 1.1.3.4.2 are not taken into account by 1.1.3.6.5) — goods not in such packages must be entered under their own UN numbers. Only the ID prefix makes a line air-only — an ID number is never read as the UN number with the same digits — and an all-air-only load returns total_points 0, exempt true with its own message, never "1.1.3.6 exemption applies" and never not_subject_to_adr.
+Routing: every returned line carries state, in the words the FreightUtils document check uses — COUNTED (evaluated on one Table A row: its points, or a category 0 / CARRIAGE PROHIBITED row that settles the load), AIR_ONLY_ID, NOT_SUBJECT_TO_ADR, BLOCKED (no points from the line as sent — withheld, basis_mismatch, category_unresolved or entry_required; the line's own flag says which) or EXCLUDED_NIL (a stated quantity of 0, read as not carried: left out of every sum and test, items[].nil_quantity true, and named in a warning). An ID-prefixed number such as ID 8000 (consumer commodity) is an air-only identifier with no ADR Table A entry. It is counted out of 1.1.3.6 — AIR_ONLY_ID, nothing counted, items[].air_only_id true, row fields null — only when the request states, with icao_limited_quantity: true on that line, that the packages are limited quantities to the ICAO Technical Instructions (the 3.4.8 mark, or 3.4.10): 3.4.9 and 3.4.10 deem them to meet 3.4.1-3.4.4, and goods exempted under 1.1.3.4.2 are not taken into account by 1.1.3.6.5; goods not in such packages must be entered under their own UN numbers. Without that statement the ID line is BLOCKED (items[].entry_required true) and the load has no verdict unless the other lines settle it. icao_limited_quantity on a UN-numbered line is refused (the API answers 400). Only the ID prefix makes a line air-only — an ID number is never read as the UN number with the same digits — and a load whose every line is a stated air-only line returns total_points 0, exempt true with its own message, never "1.1.3.6 exemption applies" and never not_subject_to_adr.
+
+Gross figures: ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging. A gross mass (basis "gross") on an entry counted by mass is read as an upper bound of the net mass: the load is answered exempt on it only when it clears even on the gross figure — then figure_basis is "upper_bound_gross" and the line carries upper_bound_gross true (its true points are lower). Otherwise, and always for an entry counted in litres, the line gets no points (basis_mismatch): send the net quantity.
+
+ADR 2027 basis: an ADR 2027 answer carries basis — what the verdict rests on: "adr_2027", or, on a stated as_of from 1 January 2027, a transitional measure open on that date that clears a load ADR 2027 itself does not: "1.6.1.61" (the ADR 2025 note-a rule, ×20 with a 50 kg maximum, until 31 December 2030) before "1.6.1.1" (the whole of ADR 2025, until 30 June 2027). Such an answer headlines the transitional basis that clears the load, names it, gives basis_until (the last day it may be applied) and puts the strict ADR 2027 figure beside it (strict_adr_2027: basis, total_points, exempt, has_category_zero, has_quantity_exceedance). Without a stated as_of, the strict ADR 2027 reading stays the headline. transitional_1_6_1_61 (a load with one of the nine note-a UN numbers) and transitional_1_6_1_1 (inside the 1.6.1.1 window, where ADR 2027 itself is not exempt) state the load on each basis: measure, basis, points_on_this_basis, exempt_on_this_basis, until, note.
 
 Behavior: deterministic points arithmetic over ADR 2025 reference data; a UN that cannot be found returns blocking_errors (NOT_FOUND); exempt is the overall verdict. ${UNKNOWN_FIELDS_REFUSED} ${RATE}
 
-Returns: items[] (each with state, packing_group, variant_index, transport_category, multiplier, points, air_only_id on an ID-prefixed line, quantity_unit/quantity_basis/expected_unit when a unit or basis was declared, scope flags where applicable, withheld + ambiguity_reason on an unpinned multi-variant line, and equivalent_variants + variant_note when a packing group resolved by equivalence), total_points (NULL when no verdict was reached), threshold (1000), exempt (NULL when no verdict was reached — never false as a stand-in), has_category_zero, has_quantity_exceedance, warnings, message, human_review_required + candidates[] when any line is withheld, and — on scope verdicts — not_subject_to_adr/conditions_ref/conditions[]/carriage_prohibited under result — or, when every line is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
+Returns: items[] (each with state, packing_group, variant_index, transport_category, multiplier, points, air_only_id + icao_limited_quantity or entry_required on an ID-prefixed line, nil_quantity on a 0 line, upper_bound_gross on a gross mass counted as an upper bound, quantity_unit/quantity_basis/expected_unit when a unit or basis was declared, scope flags where applicable, withheld + ambiguity_reason on an unpinned multi-variant line, and equivalent_variants + variant_note when a packing group resolved by equivalence), total_points (NULL when no verdict was reached), threshold (1000), exempt (NULL when no verdict was reached — never false as a stand-in), has_category_zero, has_quantity_exceedance, warnings, message, figure_basis, and on ADR 2027 answers basis, basis_until, strict_adr_2027, transitional_1_6_1_61, transitional_1_6_1_1, human_review_required + candidates[] when any line is withheld, and — on scope verdicts — not_subject_to_adr/conditions_ref/conditions[]/carriage_prohibited under result — or, when every line is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
 
 Editions: ${EDITIONS}
 
@@ -393,19 +400,24 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
 
   strictKeys: true,
   schema: strictInput({
-    un_number: z.string().regex(EXEMPTION_IDENTIFIER_PATTERN, EXEMPTION_IDENTIFIER_MESSAGE).optional().describe('UN number for a single-substance check — 4 digits, optionally "UN"-prefixed — or an ID-prefixed air-only number such as "ID8000" (routed AIR_ONLY_ID, nothing counted — the warning on that line states the limited-quantity condition). Single-substance form only — sent beside items[] it is refused; send the substance as an item. Example: "1203".'),
+    un_number: z.string().regex(EXEMPTION_IDENTIFIER_PATTERN, EXEMPTION_IDENTIFIER_MESSAGE).optional().describe('UN number for a single-substance check — 4 digits, optionally "UN"-prefixed — or an ID-prefixed air-only number such as "ID8000", which has no ADR Table A entry: counted out of 1.1.3.6 (AIR_ONLY_ID) only with icao_limited_quantity: true; without it the line is BLOCKED. Single-substance form only — sent beside items[] it is refused; send the substance as an item. Example: "1203".'),
     quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').optional().describe('Quantity for the single-substance check, in kg or litres per the substance\'s ADR unit. Single-substance form only — sent beside items[] it is refused. Example: 100.'),
     packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group (I, II or III) — only needed to disambiguate a UN with more than one ADR Table A row (e.g. UN 1789). Ignored for single-row UNs. Single-substance form only — sent beside items[] it is refused; set it on each item.'),
     variant_index: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER, 'variant_index must be a safe integer').optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants that share a packing group (concentration bands). Ignored for single-row UNs. Single-substance form only — sent beside items[] it is refused; set it on each item.'),
     unit: z.enum(['L', 'kg']).optional().describe("OPTIONAL. The dimension `quantity` is stated in. Omit it and the number is taken as already on the ADR 1.1.3.6.3 basis (unchanged behaviour). Supply it and it is CHECKED against the dimension 1.1.3.6.3 counts for that Table A row — litres for liquids and for compressed or adsorbed gases, kilograms for solids, liquefied/refrigerated/dissolved gases and articles. A mismatch returns total_points null, exempt null and items[].basis_mismatch true, naming the dimension the entry is counted in. Single-substance form only — sent beside items[] it is refused; set it on each item."),
-    basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging, so a quantity declared 'gross' returns no points in ANY unit — send the net figure instead. Single-substance form only — sent beside items[] it is refused; set it on each item."),
+    basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. 'net' or 'gross'. ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging. A 'gross' mass on an entry counted by mass is used only as an upper bound of the net mass: the load is answered exempt on it only when it clears even on the gross figure (figure_basis upper_bound_gross); otherwise, and always for an entry counted in litres, no points — send the net quantity. Single-substance form only — sent beside items[] it is refused; set it on each item."),
+    // T2b-2 (website #328, cc-036): the hosted tool's description verbatim. GET cannot carry it, so a
+    // single-substance call that sends it goes as a one-item POST (the hosted tool's own mapping).
+    icao_limited_quantity: z.boolean().optional().describe('OPTIONAL, only with an ID-prefixed un_number (e.g. ID8000): true states that the packages are limited quantities conforming to the ICAO Technical Instructions (the 3.4.8 mark, or 3.4.10). Only then is the line counted out of 1.1.3.6; without it the ID line is BLOCKED and the load has no verdict unless the other lines settle it.'),
     items: z.array(strictInput({
-      un_number: z.string().regex(EXEMPTION_IDENTIFIER_PATTERN, EXEMPTION_IDENTIFIER_MESSAGE).describe('UN number — 4 digits, optionally "UN"-prefixed — or an ID-prefixed air-only number such as "ID8000" (routed AIR_ONLY_ID; the warning on that line states the limited-quantity condition the 0 rests on). Example: "1263".'),
-      quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').describe('Quantity in kg or litres per the substance\'s ADR unit.'),
+      un_number: z.string().regex(EXEMPTION_IDENTIFIER_PATTERN, EXEMPTION_IDENTIFIER_MESSAGE).describe('UN number — 4 digits, optionally "UN"-prefixed — or an ID-prefixed air-only number such as "ID8000" (AIR_ONLY_ID with icao_limited_quantity: true on the item, else BLOCKED). Example: "1263".'),
+      // T2b-2 (cc-042): 0 is accepted — not carried, the line is left out (EXCLUDED_NIL); all zeros is refused by the API.
+      quantity: z.number().nonnegative().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').describe('Quantity in kg or litres per the substance\'s ADR unit. 0 means not carried: the line is left out of the load (EXCLUDED_NIL) and named in a warning; a load of nothing but zeros is refused.'),
       packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group for a multi-variant UN.'),
       variant_index: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER, 'variant_index must be a safe integer').optional().describe('ADR Table A variant index for a multi-variant UN.'),
       unit: z.enum(['L', 'kg']).optional().describe("OPTIONAL. The dimension `quantity` is stated in. Omit it and the number is taken as already on the ADR 1.1.3.6.3 basis (unchanged behaviour). Supply it and it is CHECKED against the dimension 1.1.3.6.3 counts for that Table A row — litres for liquids and for compressed or adsorbed gases, kilograms for solids, liquefied/refrigerated/dissolved gases and articles. A mismatch returns total_points null, exempt null and items[].basis_mismatch true, naming the dimension the entry is counted in."),
-      basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging, so a quantity declared 'gross' returns no points in ANY unit — send the net figure instead."),
+      basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. As the top-level basis: a 'gross' mass is used only as an upper bound on an entry counted by mass, and only when the load clears on it."),
+      icao_limited_quantity: z.boolean().optional().describe('OPTIONAL, ID-prefixed lines only: as the top-level icao_limited_quantity.'),
     }, { hints: EXEMPTION_KEY_HINTS, acceptedLabel: 'Accepted on each item' })).min(1, 'items must hold at least one item').optional().describe('Mixed-load items (use INSTEAD of un_number/quantity).'),
     consignment: z.record(z.string(), z.unknown()).optional().describe('Alternative to the other arguments: the consignment object (https://www.freightutils.com/schema/consignment-object.v1.json) — lines[], journey, vehicle, options. Send it alone; an input this tool needs and the object lacks comes back in missing_inputs.'),
     ...EDITION_SHAPE,
@@ -418,8 +430,9 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
   resultSchema: resultShape({
     items: z.array(loose({
       un_number: z.string(),
-      // The line's route (2.20.0) — the FreightUtils document check's own words.
-      state: z.enum(['COUNTED', 'AIR_ONLY_ID', 'NOT_SUBJECT_TO_ADR', 'BLOCKED']),
+      // The line's route (2.20.0) — the FreightUtils document check's own words. EXCLUDED_NIL (2.28.0,
+      // website #328): a stated quantity of 0, read as not carried.
+      state: z.enum(['COUNTED', 'AIR_ONLY_ID', 'NOT_SUBJECT_TO_ADR', 'BLOCKED', 'EXCLUDED_NIL']),
       proper_shipping_name: z.string(),
       class: z.string(),
       packing_group: z.string(),
@@ -433,6 +446,12 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
       conditions_ref: z.string(),
       // An ID-prefixed air-only line (2.20.0): no Table A entry, never in the points.
       air_only_id: z.boolean(),
+      // 2.28.0 (website #328): an ID line sent without the ICAO limited-quantity statement (BLOCKED),
+      // the statement's echo, a 0 line, and a gross mass counted as an upper bound.
+      entry_required: z.boolean(),
+      icao_limited_quantity: z.boolean(),
+      nil_quantity: z.boolean(),
+      upper_bound_gross: z.boolean(),
     })),
     total_points: z.number(),
     threshold: z.number(),
@@ -447,6 +466,36 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
     threshold_exceeded_by_resolved_items: z.boolean(),
     verdict_basis: z.enum(['all_items', 'resolved_items_alone', 'none']),
     unresolved_item_indexes: z.array(z.number()),
+    // 2.28.0 (website #328): the gross upper bound, and what an ADR 2027 verdict rests on.
+    figure_basis: z.enum(['upper_bound_gross']),
+    basis: z.enum(['adr_2027', '1.6.1.61', '1.6.1.1']),
+    basis_until: z.string(),
+    strict_adr_2027: loose({
+      basis: z.literal('adr_2027'),
+      total_points: z.number(),
+      exempt: z.boolean(),
+      has_category_zero: z.boolean(),
+      has_quantity_exceedance: z.boolean(),
+    }),
+    transitional_1_6_1_61: loose({
+      measure: z.literal('1.6.1.61'),
+      basis: z.string(),
+      un_numbers: z.array(z.string()),
+      max_kg: z.number(),
+      multiplier: z.number(),
+      points_on_this_basis: z.number(),
+      exempt_on_this_basis: z.boolean(),
+      until: z.string(),
+      note: z.string(),
+    }),
+    transitional_1_6_1_1: loose({
+      measure: z.literal('1.6.1.1'),
+      basis: z.string(),
+      points_on_this_basis: z.number(),
+      exempt_on_this_basis: z.boolean(),
+      until: z.string(),
+      note: z.string(),
+    }),
     // Scope-verdict path (Table A "NOT SUBJECT TO ADR" / "CARRIAGE PROHIBITED"):
     // the 1.1.3.6 math is short-circuited; conditions[] quotes ADR 2025
     // carriage conditions verbatim (e.g. section 5.5.3 for UN 1845 dry ice).
@@ -488,6 +537,21 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
         un_number: args.un_number, quantity: args.quantity,
         packing_group: args.packing_group, variant_index: args.variant_index,
         unit: args.unit, basis: args.basis,
+        // Beside items[] the API refuses it by name (2.28.0) — forwarded, never dropped.
+        icao_limited_quantity: args.icao_limited_quantity,
+        edition: args.edition, as_of: args.as_of,
+      }, opts);
+    }
+    if (args.icao_limited_quantity !== undefined) {
+      // GET cannot carry the ICAO limited-quantity statement (website #328): the single substance goes
+      // as a one-item POST — the hosted tool's own mapping, so the answer is the same.
+      return apiPost('adr-calculator', {
+        items: [{
+          un_number: args.un_number, quantity: args.quantity,
+          packing_group: args.packing_group, variant_index: args.variant_index,
+          unit: args.unit, basis: args.basis,
+          icao_limited_quantity: args.icao_limited_quantity,
+        }],
         edition: args.edition, as_of: args.as_of,
       }, opts);
     }
