@@ -1,0 +1,1233 @@
+{
+  "_recorded": "production 2026-11-04T16:53Z, keyed, envelope 1.2 (freightutils.com Run T2b-2 #328 + G2-2 #329; check_id replaced by a synthetic id of the same shape)",
+  "calc_cc029_2027_un1005_25kg_asof_20270201": {
+    "request": "POST /api/adr-calculator?envelope=1.2 {\"items\":[{\"un_number\":\"1005\",\"quantity\":25,\"unit\":\"kg\",\"basis\":\"net\"}],\"edition\":\"2027\",\"as_of\":\"2027-02-01\"}",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2027",
+        "applies_from": "2027-01-01",
+        "may_apply_until": null
+      },
+      "as_of": "2027-02-01",
+      "result": {
+        "items": [
+          {
+            "un_number": "1005",
+            "state": "COUNTED",
+            "proper_shipping_name": "AMMONIA, ANHYDROUS",
+            "class": "2",
+            "packing_group": null,
+            "variant_index": 0,
+            "transport_category": "1",
+            "quantity": 25,
+            "multiplier": 20,
+            "points": 500,
+            "quantity_unit": "kg",
+            "quantity_basis": "net",
+            "expected_unit": "kg"
+          }
+        ],
+        "total_points": 500,
+        "threshold": 1000,
+        "exempt": true,
+        "has_category_zero": false,
+        "has_quantity_exceedance": false,
+        "warnings": [
+          "This verdict rests on transitional measure 1.6.1.61 (the ADR 2025 note-a rule: ×20, 50 kg maximum) on 2027-02-01, and holds only where the load is carried on that basis; it lapses after 31 December 2030. On ADR 2027 itself the load scores 1250 points and is not exempt (strict_adr_2027)."
+        ],
+        "message": "1.1.3.6 exemption applies on the 1.6.1.61 basis (the ADR 2025 note-a rule: ×20, 50 kg maximum), which may be applied until 31 December 2030 — under ADR 2027 itself the load is not exempt (1250 points).",
+        "resolved_subtotal_points": 500,
+        "threshold_exceeded_by_resolved_items": false,
+        "verdict_basis": "all_items",
+        "unresolved_item_indexes": [],
+        "transitional_1_6_1_61": {
+          "measure": "1.6.1.61",
+          "basis": "ADR 2025 note a",
+          "un_numbers": [
+            "1005"
+          ],
+          "max_kg": 50,
+          "multiplier": 20,
+          "points_on_this_basis": 500,
+          "exempt_on_this_basis": true,
+          "until": "2030-12-31",
+          "note": "ADR 2027 deletes 1.1.3.6.3 note a, so UN 1005 counts ×50 with a 20 kg maximum on ADR 2027 itself (strict_adr_2027). Transitional measure 1.6.1.61 allows the ADR 2025 note-a rule (×20, 50 kg maximum) to be applied until 31 December 2030: the verdict above is given on that basis — the load scores 500 points and is exempt."
+        },
+        "basis": "1.6.1.61",
+        "basis_until": "2030-12-31",
+        "strict_adr_2027": {
+          "basis": "adr_2027",
+          "total_points": 1250,
+          "exempt": false,
+          "has_category_zero": false,
+          "has_quantity_exceedance": true
+        },
+        "transitional_1_6_1_1": {
+          "measure": "1.6.1.1",
+          "basis": "ADR 2025",
+          "until": "2027-06-30",
+          "points_on_this_basis": 500,
+          "exempt_on_this_basis": true,
+          "note": "Transitional measure 1.6.1.1 allows the whole of ADR 2025 to be applied until 30 June 2027: on that basis the load scores 500 points and is exempt."
+        },
+        "adr_edition": {
+          "edition": "2027",
+          "name": "ADR 2027",
+          "as_of": "2027-02-01",
+          "selected_by": "edition",
+          "applies_from": "2027-01-01",
+          "may_apply_until": null
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "ADR 1.1.3.6: 500 transport point(s) vs 1000 threshold — exemption applies (1.1.3.6 exemption applies on the 1.6.1.61 basis (the ADR 2025 note-a rule: ×20, 50 kg maximum), which may be applied until 31 December 2030 — under ADR 2027 itself the load is not exempt (1250 points).).",
+        "qualifier": "Deterministic ADR 1.1.3.6 calculation, best-effort — not legal advice; verify against the current UNECE ADR text."
+      },
+      "warnings": [
+        {
+          "code": "EDITION_TRANSITIONAL",
+          "message": "ADR 2027 applies from 1 January 2027; ADR 2025 may still be applied until 30 June 2027 (1.6.1.1). edition=2025 answers on ADR 2025 until then.",
+          "details": {
+            "measure": "1.6.1.1",
+            "adr_2025_may_apply_until": "2027-06-30",
+            "edition_2025_available": true
+          }
+        }
+      ],
+      "_meta": {
+        "check_id": "chk_01synthetic00000000000",
+        "receipt_url": "https://www.freightutils.com/api/receipts/chk_01synthetic00000000000"
+      }
+    }
+  },
+  "calc_cc036_id8000_without_statement": {
+    "request": "POST /api/adr-calculator?envelope=1.2 {\"items\":[{\"un_number\":\"1203\",\"quantity\":100,\"unit\":\"L\",\"basis\":\"net\"},{\"un_number\":\"ID8000\",\"quantity\":50,\"unit\":\"kg\"}],\"edition\":\"2025\",\"as_of\":\"2026-12-10\"}",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2025",
+        "applies_from": "2025-01-01",
+        "may_apply_until": "2027-06-30"
+      },
+      "as_of": "2026-12-10",
+      "result": {
+        "items": [
+          {
+            "un_number": "1203",
+            "state": "COUNTED",
+            "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+            "class": "3",
+            "packing_group": "II",
+            "variant_index": 0,
+            "transport_category": "2",
+            "quantity": 100,
+            "multiplier": 3,
+            "points": 300,
+            "quantity_unit": "L",
+            "quantity_basis": "net",
+            "expected_unit": "L"
+          },
+          {
+            "un_number": "ID8000",
+            "state": "BLOCKED",
+            "proper_shipping_name": null,
+            "class": null,
+            "packing_group": null,
+            "variant_index": null,
+            "transport_category": null,
+            "quantity": 50,
+            "multiplier": null,
+            "points": null,
+            "air_only_id": true,
+            "entry_required": true
+          }
+        ],
+        "total_points": null,
+        "threshold": 1000,
+        "exempt": null,
+        "has_category_zero": false,
+        "has_quantity_exceedance": false,
+        "warnings": [
+          "ID8000 (item 1): an air-only identifier with no ADR Table A entry, and the request does not state that its packages are limited quantities conforming to the ICAO Technical Instructions — the marking alone does not establish 3.4.9 or 3.4.10. No points for this line and no load verdict until it is settled: enter the goods under their UN number(s), or send icao_limited_quantity: true on the line where its packages bear the 3.4.8 mark or meet 3.4.10."
+        ],
+        "message": "No 1.1.3.6 verdict for the load — ID8000 has no ADR Table A entry and the request does not state that the packages are limited quantities to the ICAO Technical Instructions (icao_limited_quantity).",
+        "resolved_subtotal_points": 300,
+        "threshold_exceeded_by_resolved_items": false,
+        "verdict_basis": "none",
+        "unresolved_item_indexes": [
+          1
+        ],
+        "adr_edition": {
+          "edition": "2025",
+          "name": "ADR 2025",
+          "as_of": "2026-12-10",
+          "selected_by": "edition",
+          "applies_from": "2025-01-01",
+          "may_apply_until": "2027-06-30"
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "ADR 1.1.3.6: not calculated — the quantity supplied is not on the basis 1.1.3.6.3 counts for this entry (No 1.1.3.6 verdict for the load — ID8000 has no ADR Table A entry and the request does not state that the packages are limited quantities to the ICAO Technical Instructions (icao_limited_quantity).).",
+        "qualifier": "Deterministic ADR 1.1.3.6 calculation, best-effort — not legal advice; verify against the current UNECE ADR text."
+      },
+      "_meta": {
+        "check_id": "chk_02synthetic00000000000",
+        "receipt_url": "https://www.freightutils.com/api/receipts/chk_02synthetic00000000000"
+      }
+    }
+  },
+  "calc_cc036_id8000_with_statement": {
+    "request": "POST /api/adr-calculator?envelope=1.2 {\"items\":[{\"un_number\":\"1203\",\"quantity\":100,\"unit\":\"L\",\"basis\":\"net\"},{\"un_number\":\"ID8000\",\"quantity\":50,\"unit\":\"kg\",\"icao_limited_quantity\":true}],\"edition\":\"2025\",\"as_of\":\"2026-12-10\"}",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2025",
+        "applies_from": "2025-01-01",
+        "may_apply_until": "2027-06-30"
+      },
+      "as_of": "2026-12-10",
+      "result": {
+        "items": [
+          {
+            "un_number": "1203",
+            "state": "COUNTED",
+            "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+            "class": "3",
+            "packing_group": "II",
+            "variant_index": 0,
+            "transport_category": "2",
+            "quantity": 100,
+            "multiplier": 3,
+            "points": 300,
+            "quantity_unit": "L",
+            "quantity_basis": "net",
+            "expected_unit": "L"
+          },
+          {
+            "un_number": "ID8000",
+            "state": "AIR_ONLY_ID",
+            "proper_shipping_name": null,
+            "class": null,
+            "packing_group": null,
+            "variant_index": null,
+            "transport_category": null,
+            "quantity": 50,
+            "multiplier": null,
+            "points": null,
+            "air_only_id": true,
+            "icao_limited_quantity": true
+          }
+        ],
+        "total_points": 300,
+        "threshold": 1000,
+        "exempt": true,
+        "has_category_zero": false,
+        "has_quantity_exceedance": false,
+        "warnings": [
+          "ID8000 is an air-only identifier (ID-prefixed) with no ADR 2025 Table A entry, so it gives no transport category and is not counted under 1.1.3.6 — the ADR answer when its packages are limited quantities to the ICAO Technical Instructions (3.4.9 or 3.4.10; exempted under 1.1.3.4.2, so not taken into account by 1.1.3.6.5). Goods not in such packages must be entered under their own UN numbers."
+        ],
+        "message": "1.1.3.6 exemption applies",
+        "resolved_subtotal_points": 300,
+        "threshold_exceeded_by_resolved_items": false,
+        "verdict_basis": "all_items",
+        "unresolved_item_indexes": [],
+        "adr_edition": {
+          "edition": "2025",
+          "name": "ADR 2025",
+          "as_of": "2026-12-10",
+          "selected_by": "edition",
+          "applies_from": "2025-01-01",
+          "may_apply_until": "2027-06-30"
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "ADR 1.1.3.6: 300 transport point(s) vs 1000 threshold — exemption applies (1.1.3.6 exemption applies).",
+        "qualifier": "Deterministic ADR 1.1.3.6 calculation, best-effort — not legal advice; verify against the current UNECE ADR text."
+      },
+      "_meta": {
+        "check_id": "chk_03synthetic00000000000",
+        "receipt_url": "https://www.freightutils.com/api/receipts/chk_03synthetic00000000000"
+      }
+    }
+  },
+  "calc_cc040_un3077_520kg_gross": {
+    "request": "POST /api/adr-calculator?envelope=1.2 {\"items\":[{\"un_number\":\"3077\",\"quantity\":520,\"unit\":\"kg\",\"basis\":\"gross\"}],\"edition\":\"2025\",\"as_of\":\"2026-12-15\"}",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2025",
+        "applies_from": "2025-01-01",
+        "may_apply_until": "2027-06-30"
+      },
+      "as_of": "2026-12-15",
+      "result": {
+        "items": [
+          {
+            "un_number": "3077",
+            "state": "COUNTED",
+            "proper_shipping_name": "ENVIRONMENTALLY HAZARDOUS SUBSTANCE, SOLID, N.O.S.",
+            "class": "9",
+            "packing_group": "III",
+            "variant_index": 0,
+            "transport_category": "3",
+            "quantity": 520,
+            "multiplier": 1,
+            "points": 520,
+            "quantity_unit": "kg",
+            "quantity_basis": "gross",
+            "expected_unit": "kg",
+            "upper_bound_gross": true
+          }
+        ],
+        "total_points": 520,
+        "threshold": 1000,
+        "exempt": true,
+        "has_category_zero": false,
+        "has_quantity_exceedance": false,
+        "warnings": [
+          "UN3077: the quantity was declared GROSS. ADR 1.1.3.6.3 counts the goods without their packaging, so the gross mass was counted as an upper bound of the net mass; the load is within 1.1.3.6 even on that upper bound (520 points) and its true points are lower. Send the net quantity for the exact figure."
+        ],
+        "message": "1.1.3.6 exemption applies — on the gross figure as an upper bound of the net mass",
+        "resolved_subtotal_points": 520,
+        "threshold_exceeded_by_resolved_items": false,
+        "verdict_basis": "all_items",
+        "unresolved_item_indexes": [],
+        "figure_basis": "upper_bound_gross",
+        "adr_edition": {
+          "edition": "2025",
+          "name": "ADR 2025",
+          "as_of": "2026-12-15",
+          "selected_by": "edition",
+          "applies_from": "2025-01-01",
+          "may_apply_until": "2027-06-30"
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "ADR 1.1.3.6: 520 transport point(s) vs 1000 threshold — exemption applies (1.1.3.6 exemption applies — on the gross figure as an upper bound of the net mass).",
+        "qualifier": "Deterministic ADR 1.1.3.6 calculation, best-effort — not legal advice; verify against the current UNECE ADR text."
+      },
+      "_meta": {
+        "check_id": "chk_04synthetic00000000000",
+        "receipt_url": "https://www.freightutils.com/api/receipts/chk_04synthetic00000000000"
+      }
+    }
+  },
+  "calc_cc042_un1223_nil_line": {
+    "request": "POST /api/adr-calculator?envelope=1.2 {\"items\":[{\"un_number\":\"1203\",\"quantity\":200,\"unit\":\"L\",\"basis\":\"net\"},{\"un_number\":\"1223\",\"quantity\":0,\"unit\":\"L\",\"basis\":\"net\"}],\"edition\":\"2025\",\"as_of\":\"2026-12-16\"}",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2025",
+        "applies_from": "2025-01-01",
+        "may_apply_until": "2027-06-30"
+      },
+      "as_of": "2026-12-16",
+      "result": {
+        "items": [
+          {
+            "un_number": "1203",
+            "state": "COUNTED",
+            "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+            "class": "3",
+            "packing_group": "II",
+            "variant_index": 0,
+            "transport_category": "2",
+            "quantity": 200,
+            "multiplier": 3,
+            "points": 600,
+            "quantity_unit": "L",
+            "quantity_basis": "net",
+            "expected_unit": "L"
+          },
+          {
+            "un_number": "1223",
+            "state": "EXCLUDED_NIL",
+            "proper_shipping_name": "KEROSENE",
+            "class": "3",
+            "packing_group": "III",
+            "variant_index": 0,
+            "transport_category": null,
+            "quantity": 0,
+            "multiplier": null,
+            "points": null,
+            "nil_quantity": true
+          }
+        ],
+        "total_points": 600,
+        "threshold": 1000,
+        "exempt": true,
+        "has_category_zero": false,
+        "has_quantity_exceedance": false,
+        "warnings": [
+          "UN1223 (item 1): quantity 0 — read as not carried and left out of the load. The verdict holds only if none of UN1223 is on the transport unit; if any quantity is carried, enter it and run the load again."
+        ],
+        "message": "1.1.3.6 exemption applies",
+        "resolved_subtotal_points": 600,
+        "threshold_exceeded_by_resolved_items": false,
+        "verdict_basis": "all_items",
+        "unresolved_item_indexes": [],
+        "adr_edition": {
+          "edition": "2025",
+          "name": "ADR 2025",
+          "as_of": "2026-12-16",
+          "selected_by": "edition",
+          "applies_from": "2025-01-01",
+          "may_apply_until": "2027-06-30"
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "ADR 1.1.3.6: 600 transport point(s) vs 1000 threshold — exemption applies (1.1.3.6 exemption applies).",
+        "qualifier": "Deterministic ADR 1.1.3.6 calculation, best-effort — not legal advice; verify against the current UNECE ADR text."
+      },
+      "_meta": {
+        "check_id": "chk_05synthetic00000000000",
+        "receipt_url": "https://www.freightutils.com/api/receipts/chk_05synthetic00000000000"
+      }
+    }
+  },
+  "calc_icao_lq_on_un_line_400": {
+    "request": "POST /api/adr-calculator?envelope=1.2 {\"items\":[{\"un_number\":\"1203\",\"quantity\":100,\"unit\":\"L\",\"icao_limited_quantity\":true}]}",
+    "status": 400,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": false,
+      "status": "unsupported",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2025",
+        "applies_from": "2025-01-01",
+        "may_apply_until": "2027-06-30"
+      },
+      "as_of": "2026-11-04",
+      "result": {},
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "ADR 1.1.3.6 exemption not computed — check the input."
+      },
+      "blocking_errors": [
+        {
+          "code": "INVALID_INPUT",
+          "message": "icao_limited_quantity was sent on item 1 (UN 1203), which is not an ID-prefixed line. icao_limited_quantity must be true or false, or omitted, and goes only on an ID-prefixed line (e.g. ID8000): true states that its packages are limited quantities conforming to the ICAO Technical Instructions (the 3.4.8 mark, or 3.4.10) — only then is the line counted out of 1.1.3.6. A UN-numbered line is counted on its Table A row; its limited-quantity status is not an input here.",
+          "recovery": {
+            "action": "Provide a valid UN number and a quantity that is a number greater than 0.",
+            "tool": "adr_exemption_calculator",
+            "params": {
+              "un": "1203",
+              "qty": 200
+            }
+          }
+        }
+      ]
+    }
+  },
+  "adr_lookup_un1003_p203_owner_reviewed": {
+    "request": "GET /api/adr?un=1003&include_codes=compact&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2025",
+        "applies_from": "2025-01-01",
+        "may_apply_until": "2027-06-30"
+      },
+      "as_of": "2026-10-28",
+      "result": {
+        "count": 1,
+        "results": [
+          {
+            "verified": false,
+            "verification": {
+              "status": "unverified",
+              "basis": "dataset",
+              "reason": "No row-level audit. Transcribed from the UNECE ADR 2025 Table A and held by the dataset-level checks only (56 anchor rows carry a row-level audit)."
+            },
+            "un_number": "1003",
+            "proper_shipping_name": "AIR, REFRIGERATED LIQUID",
+            "class": "2",
+            "classification_code": "3O",
+            "packing_group": null,
+            "labels": "2.2 +5.1",
+            "special_provisions": null,
+            "limited_quantity": "0",
+            "excepted_quantity": "E0",
+            "packing_instructions": "P203",
+            "special_packing_provisions": null,
+            "mixed_packing_provisions": "MP9",
+            "portable_tank_instructions": "T75",
+            "portable_tank_special_provisions": "TP5 TP22",
+            "tank_code": "RxBN",
+            "tank_special_provisions": "TU7 TU19 TA4 TT9",
+            "vehicle_for_tank_carriage": "AT",
+            "carriage_packages": "V5",
+            "carriage_bulk": null,
+            "carriage_loading_unloading_handling": "CV9 CV11 CV36",
+            "carriage_operation": "S20",
+            "transport_category": "3",
+            "tunnel_restriction_code": "(C/E)",
+            "hazard_identification_number": "225",
+            "variant_index": 0,
+            "variant_count": 1
+          }
+        ],
+        "resolved_codes": [
+          {
+            "code": "2.2",
+            "family": "label",
+            "columns": [
+              "5"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Label model 2.2 (gases: non-flammable, non-toxic gases): gas cylinder, black or white.",
+            "section": "5.2.2.2.2, label model No. 2.2",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "5.1",
+            "family": "label",
+            "columns": [
+              "5"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Label model 5.1 (oxidizing substances): flame over circle, black.",
+            "section": "5.2.2.2.2, label model No. 5.1",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "P203",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Refrigerated liquefied gases in closed cryogenic receptacles (test pressure, 98 % fill, relief devices) or, for listed 3A gases, open ones up to 450 l.",
+            "section": "4.1.4.1, P203",
+            "verification_status": "owner_reviewed"
+          },
+          {
+            "code": "MP9",
+            "family": "mp",
+            "columns": [
+              "9b"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "May share a combination outer packaging with other Class 2 goods, with other classes that permit it, or with non-ADR goods.",
+            "section": "4.1.10.4, MP9",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "T75",
+            "family": "t",
+            "columns": [
+              "10"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Portable tank instruction for refrigerated liquefied gases: the tank follows 4.2.3 and the design rules of 6.7.4.",
+            "section": "4.2.5.2.6, portable tank instruction T75",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "TP5",
+            "family": "tp",
+            "columns": [
+              "11"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "The filling restrictions of 4.2.3.6 must be respected.",
+            "section": "4.2.5.3, TP5",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "TP22",
+            "family": "tp",
+            "columns": [
+              "11"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Lubricant for joints and other devices must be compatible with oxygen.",
+            "section": "4.2.5.3, TP22",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "RxBN",
+            "family": "tank_code",
+            "columns": [
+              "12"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "ADR tank code for Class 2 gases: refrigerated liquefied gas tank, X (test pressure from 4.3.3.2.5), openings B, valves/devices N.",
+            "section": "4.3.3.1.1, tank code RxBN",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "TU7",
+            "family": "tsp",
+            "columns": [
+              "13"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Gaskets and materials used to seal joints or maintain closures must be compatible with the contents.",
+            "section": "4.3.5, TU7",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "TU19",
+            "family": "tsp",
+            "columns": [
+              "13"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Filling up to 98 % allowed, measured at filling temperature and pressure; 4.3.2.3.4 disapplied.",
+            "section": "4.3.5, TU19",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "TA4",
+            "family": "tsp",
+            "columns": [
+              "13"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Conformity assessment under 1.8.7 by the competent authority or an inspection body to 1.8.6.3 accredited to EN ISO/IEC 17020:2012 type A.",
+            "section": "6.8.4 (c), TA4",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "TT9",
+            "family": "tsp",
+            "columns": [
+              "13"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Inspections and tests, including supervision of manufacture, under 1.8.7 by the competent authority or a type A accredited inspection body.",
+            "section": "6.8.4 (d), TT9",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "AT",
+            "family": "vehicle",
+            "columns": [
+              "14"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Tank vehicle for dangerous goods that is not EX/III, FL or a MEMU: tanks over 1 m³ / 3 m³, or battery-vehicle over 1 m³.",
+            "section": "9.1.1.2, AT vehicle",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "3",
+            "family": "transport_category",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Transport category 3: at most 1000 per transport unit under 1.1.3.6 on its own; counts ×1 toward the 1,000-point limit.",
+            "section": "1.1.3.6.3",
+            "verification_status": "verified"
+          },
+          {
+            "code": "(C/E)",
+            "family": "tunnel_code",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Tanks: Prohibited in C, D, E. Other carriage: Prohibited in E.",
+            "section": "8.6.4",
+            "verification_status": "verified"
+          },
+          {
+            "code": "V5",
+            "family": "v",
+            "columns": [
+              "16"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "These packages must not be carried in small containers.",
+            "section": "7.2.4, V5",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "CV9",
+            "family": "cv",
+            "columns": [
+              "18"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Do not throw packages or subject them to impact; stow receptacles so they cannot tip over or fall.",
+            "section": "7.5.11, CV9",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "CV11",
+            "family": "cv",
+            "columns": [
+              "18"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Keep receptacles in their designed position and protect them from damage by other packages.",
+            "section": "7.5.11, CV11",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "CV36",
+            "family": "cv",
+            "columns": [
+              "18"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Prefer open or ventilated units; if closed, isolate the cab from the load and mark doors \"WARNING NO VENTILATION OPEN WITH CAUTION\" (≥ 25 mm).",
+            "section": "7.5.11, CV36",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "S20",
+            "family": "s",
+            "columns": [
+              "19"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Chapter 8.4 supervision applies above 10 000 kg in packages, or above 3 000 litres in tanks.",
+            "section": "8.5, S20",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "225",
+            "family": "hin",
+            "columns": [
+              "20"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Hazard identification number 225 on the orange plate: refrigerated liquefied gas that is oxidizing (fire-intensifying).",
+            "section": "5.3.2.3.2, 225",
+            "verification_status": "machine_reviewed"
+          }
+        ],
+        "meta": {
+          "source": "ADR 2025 (UNECE, ECE/TRANS/352, applicable 1 Jan 2025); given legal effect by EU Directive 2008/68/EC (consolidated). Factual compilation, best-effort — not legal advice, not a regulatory authority.",
+          "edition": "ADR 2025",
+          "entries": 2939
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "UNECE ADR 2025 (ECE/TRANS/352)",
+        "checked": "2026-10-28",
+        "provenance_status": "verified",
+        "source_url": "https://unece.org/adr-2025-files",
+        "dataset_edition": "ADR 2025",
+        "authority_current_edition": "ADR 2025",
+        "checked_at": "2026-11-03"
+      },
+      "citation": {
+        "text": "UN 1003 AIR, REFRIGERATED LIQUID — Class 2, UNECE ADR 2025.",
+        "qualifier": "Factual compilation, not legal advice — verify against the current UNECE ADR text."
+      }
+    }
+  },
+  "adr_lookup_un1098_p602_owner_reviewed": {
+    "request": "GET /api/adr?un=1098&include_codes=compact&envelope=1.2",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2025",
+        "applies_from": "2025-01-01",
+        "may_apply_until": "2027-06-30"
+      },
+      "as_of": "2026-10-28",
+      "result": {
+        "count": 1,
+        "results": [
+          {
+            "verified": false,
+            "verification": {
+              "status": "unverified",
+              "basis": "dataset",
+              "reason": "No row-level audit. Transcribed from the UNECE ADR 2025 Table A and held by the dataset-level checks only (56 anchor rows carry a row-level audit)."
+            },
+            "un_number": "1098",
+            "proper_shipping_name": "ALLYL ALCOHOL",
+            "class": "6.1",
+            "classification_code": "TF1",
+            "packing_group": "I",
+            "labels": "6.1 +3",
+            "special_provisions": "354",
+            "limited_quantity": "0",
+            "excepted_quantity": "E0",
+            "packing_instructions": "P602",
+            "special_packing_provisions": null,
+            "mixed_packing_provisions": "MP8 MP17",
+            "portable_tank_instructions": "T20",
+            "portable_tank_special_provisions": "TP2",
+            "tank_code": "L10CH",
+            "tank_special_provisions": "TU14 TU15 TE19 TE21",
+            "vehicle_for_tank_carriage": "FL",
+            "carriage_packages": null,
+            "carriage_bulk": null,
+            "carriage_loading_unloading_handling": "CV1 CV13 CV28",
+            "carriage_operation": "S2 S9 S14",
+            "transport_category": "1",
+            "tunnel_restriction_code": "(C/D)",
+            "hazard_identification_number": "663",
+            "variant_index": 0,
+            "variant_count": 1
+          }
+        ],
+        "resolved_codes": [
+          {
+            "code": "6.1",
+            "family": "label",
+            "columns": [
+              "5"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Label model 6.1 (toxic substances): skull and crossbones, black.",
+            "section": "5.2.2.2.2, label model No. 6.1",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "3",
+            "family": "label",
+            "columns": [
+              "5"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Label model 3 (flammable liquids): flame, black or white.",
+            "section": "5.2.2.2.2, label model No. 3",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "354",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "The substance is toxic by inhalation.",
+            "section": "3.3.1, special provision 354",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "P602",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Sealed packagings for toxic liquids: canned glass inners (15 kg gross), 5 l inners (75 kg gross), tested drums or composites, or pressure receptacles.",
+            "section": "4.1.4.1, P602",
+            "verification_status": "owner_reviewed"
+          },
+          {
+            "code": "MP8",
+            "family": "mp",
+            "columns": [
+              "9b"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Up to 3 litres per inner packaging may be mixed with same-class goods of other classification codes or with non-ADR goods.",
+            "section": "4.1.10.4, MP8",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "MP17",
+            "family": "mp",
+            "columns": [
+              "9b"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Up to 0.5 litre per inner and 1 litre per package may be mixed with other classes (not Class 7) that permit it, or with non-ADR goods.",
+            "section": "4.1.10.4, MP17",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "T20",
+            "family": "t",
+            "columns": [
+              "10"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Portable tank, Class 1 and 3–9: test 10 bar; shell 8 mm; relief See 6.7.2.8.3; bottom openings Not allowed.",
+            "section": "4.2.5.2.6, portable tank instruction T20",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "TP2",
+            "family": "tp",
+            "columns": [
+              "11"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Portable tank must not be filled beyond the degree of filling set by 4.2.1.9.3 (the 95-based formula).",
+            "section": "4.2.5.3, TP2",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "L10CH",
+            "family": "tank_code",
+            "columns": [
+              "12"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "ADR tank code for Classes 1 and 3–9: liquid tank, 10 bar, openings C, hermetically closed.",
+            "section": "4.3.4.1.1, tank code L10CH",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "TU14",
+            "family": "tsp",
+            "columns": [
+              "13"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Protective caps on the closures must be locked during carriage.",
+            "section": "4.3.5, TU14",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "TU15",
+            "family": "tsp",
+            "columns": [
+              "13"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Tank must not be used to carry foodstuffs, articles of consumption or animal feeds.",
+            "section": "4.3.5, TU15",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "TE19",
+            "family": "tsp",
+            "columns": [
+              "13"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Top fittings recessed, valved or shielded against overturning; bottom fittings recessed 200 mm or rail-protected; rear fittings behind the 9.7.6 bumper.",
+            "section": "6.8.4 (b), TE19",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "TE21",
+            "family": "tsp",
+            "columns": [
+              "13"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Closures must be protected by lockable caps.",
+            "section": "6.8.4 (b), TE21",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "FL",
+            "family": "vehicle",
+            "columns": [
+              "14"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Vehicle for flammable liquids (flash point ≤ 60 °C), flammable gases or UN 2015 > 60 % in tanks above set sizes.",
+            "section": "9.1.1.2, FL vehicle",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "1",
+            "family": "transport_category",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Transport category 1: at most 20 per transport unit under 1.1.3.6 on its own; counts ×50 toward the 1,000-point limit.",
+            "section": "1.1.3.6.3",
+            "verification_status": "verified"
+          },
+          {
+            "code": "(C/D)",
+            "family": "tunnel_code",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Tanks: Prohibited in C, D, E. Other carriage: Prohibited in D, E.",
+            "section": "8.6.4",
+            "verification_status": "verified"
+          },
+          {
+            "code": "CV1",
+            "family": "cv",
+            "columns": [
+              "18"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Public-place loading/unloading: special permission needed inside built-up areas, advance notice to the authorities outside them.",
+            "section": "7.5.11, CV1",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "CV13",
+            "family": "cv",
+            "columns": [
+              "18"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "After a leak or spill, clean (and if needed disinfect or decontaminate) the vehicle or container before reuse; check other goods for contamination.",
+            "section": "7.5.11, CV13",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "CV28",
+            "family": "cv",
+            "columns": [
+              "18"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Pointer: the provisions of 7.5.4 apply.",
+            "section": "7.5.11, CV28",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "S2",
+            "family": "s",
+            "columns": [
+              "19"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Flammable liquids/gases: no ordinary portable lights in closed load compartments; FL heaters off during loading; earth FL vehicles before filling.",
+            "section": "8.5, S2",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "S9",
+            "family": "s",
+            "columns": [
+              "19"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Any quantity: avoid service stops near inhabited or busy places; longer stops there need authority consent.",
+            "section": "8.5, S9",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "S14",
+            "family": "s",
+            "columns": [
+              "19"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Chapter 8.4 vehicle supervision applies for any amount of these substances.",
+            "section": "8.5, S14",
+            "verification_status": "machine_reviewed"
+          },
+          {
+            "code": "663",
+            "family": "hin",
+            "columns": [
+              "20"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Hazard identification number 663 on the orange plate: highly toxic substance that is flammable (flash-point not above 60 °C).",
+            "section": "5.3.2.3.2, 663",
+            "verification_status": "machine_reviewed"
+          }
+        ],
+        "meta": {
+          "source": "ADR 2025 (UNECE, ECE/TRANS/352, applicable 1 Jan 2025); given legal effect by EU Directive 2008/68/EC (consolidated). Factual compilation, best-effort — not legal advice, not a regulatory authority.",
+          "edition": "ADR 2025",
+          "entries": 2939
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "UNECE ADR 2025 (ECE/TRANS/352)",
+        "checked": "2026-10-28",
+        "provenance_status": "verified",
+        "source_url": "https://unece.org/adr-2025-files",
+        "dataset_edition": "ADR 2025",
+        "authority_current_edition": "ADR 2025",
+        "checked_at": "2026-11-03"
+      },
+      "citation": {
+        "text": "UN 1098 ALLYL ALCOHOL — Class 6.1 PG I, UNECE ADR 2025.",
+        "qualifier": "Factual compilation, not legal advice — verify against the current UNECE ADR text."
+      }
+    }
+  }
+}

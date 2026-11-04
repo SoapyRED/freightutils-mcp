@@ -42,7 +42,8 @@ export function envelopeShape(result: z.ZodTypeAny): z.ZodRawShape {
       edition_basis: z.string().optional(),
       receipt: z.object({
         stored: z.literal(false),
-        // 0C (website, 2026-11-04): "quota" — a free key whose account has stored its 25 receipts today.
+        // 2.28.0 (website 0C): "quota" — the key's daily stored-receipt allowance for the day is used up;
+        // the answer is unchanged, nothing is stored.
         reason: z.enum(['key_required', 'quota']),
         schema_version: z.string(),
         receipt_hash: z.string(),

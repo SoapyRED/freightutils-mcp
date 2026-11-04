@@ -1,5 +1,44 @@
 # Changelog
 
+## 2.28.0 — 2026-11-04
+
+Mirrors the website's 4 Nov calculator changes (freightutils.com #328) and its ADR code registry statuses
+(#329), in lock-step with the hosted endpoint, and types the receipt reason the website's free-key receipt
+allowance will send. Additive: new optional arguments and typed answer fields, nothing removed — every 2.27.0
+argument and answer field still validates.
+
+Why a minor release: new documented arguments and answer fields. The engine changes are on the API already, so the
+package's answers had followed; until this release a nil line's `EXCLUDED_NIL` state and the new fields were
+untyped, an item quantity of 0 and `icao_limited_quantity` were refused by the client before they reached the API.
+
+### Added
+
+- **`adr_exemption_calculator`** — `icao_limited_quantity` (boolean, optional, top level for one substance or on
+  each item): on an ID-prefixed line it states that the packages are limited quantities to the ICAO Technical
+  Instructions, and only then is the line counted out of 1.1.3.6 (`AIR_ONLY_ID`); without it the ID line is
+  `BLOCKED` (`items[].entry_required`). On a UN-numbered line the API answers 400. GET cannot carry it, so a
+  single-substance call that sends it goes as a one-item POST.
+- **`adr_exemption_calculator`** — an item quantity of 0 (the goods are not carried): state `EXCLUDED_NIL`,
+  `items[].nil_quantity`, the line named in a warning; a load of nothing but zeros is refused.
+- **`adr_exemption_calculator`** — answer fields typed: `items[].state` gains `EXCLUDED_NIL`;
+  `items[].entry_required`, `items[].icao_limited_quantity`, `items[].nil_quantity`, `items[].upper_bound_gross`;
+  `figure_basis` (`upper_bound_gross` — a gross mass on an entry counted by mass, an upper bound of the net mass,
+  used only when the load clears on it); on ADR 2027 answers `basis` (`adr_2027` / `1.6.1.61` / `1.6.1.1`),
+  `basis_until`, `strict_adr_2027`, `transitional_1_6_1_1`, and `transitional_1_6_1_61` (previously passthrough).
+  ADR 2027 applies from 1 January 2027; a transitional basis is headlined only on a stated `as_of` from that date.
+- **`adr_lookup`** — `verification_status` on `resolved_codes[]` and `statements[]` typed as the registry serves
+  it: `paraphrase_unreviewed`, `machine_reviewed`, `contested`, `owner_reviewed`, `dg_reviewed`, `needs_fix`,
+  `verified`; the description names each.
+- **Envelope** — `_meta.receipt.reason` may be `"quota"` beside `"key_required"`: the key's daily stored-receipt
+  allowance for the day is used up; the answer is unchanged and nothing is stored (#34).
+- Tests: production answers recorded on 2026-11-04 (`test-fixtures/recorded-2.28.0.json`) driven through the
+  validating SDK client and parsed through the typed result schema.
+
+### Changed
+
+- The `adr_exemption_calculator` description's Routing, gross-figure and ADR 2027 paragraphs say what the API now
+  answers; the `basis` argument's description names the gross upper bound.
+
 ## 2.27.0 — 2026-10-31
 
 The npm mirror of freightutils.com Run A2 (airline record v2, the OurAirports refresh, structured failure
