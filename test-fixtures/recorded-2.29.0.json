@@ -1,0 +1,3673 @@
+{
+ "_recorded": "preview 2026-11-04T22:46Z, keyed, envelope 1.2 (freightutils.com build 2a; check_id / receipt_url replaced by synthetic ids of the same shape)",
+ "check_exempt_un1203_300l": {
+  "request": "POST /api/adr/consignment-check?envelope=1.2 {\"lines\":[{\"un_number\":\"1203\",\"packing_group\":\"II\",\"quantity\":{\"value\":300,\"unit\":\"L\",\"basis\":\"net\"},\"packages\":{\"count\":15,\"type\":\"jerrican\"}}],\"journey\":{\"date\":\"2026-11-20\",\"mode\":\"road\"}}",
+  "status": 200,
+  "body": {
+   "envelope_version": "1.2",
+   "ok": true,
+   "status": "ok",
+   "missing_inputs": [],
+   "edition": {
+    "name": "ADR 2025",
+    "applies_from": "2025-01-01",
+    "may_apply_until": "2027-06-30"
+   },
+   "as_of": "2026-11-20",
+   "result": {
+    "status": "pass",
+    "missing_inputs": [
+     {
+      "name": "lines[].inner_packaging",
+      "check": "limited_quantities, excepted_quantities",
+      "what": "optional: the inner packaging { quantity, unit } of a line, to check it against Table A column (7a) / (7b)"
+     },
+     {
+      "name": "journey.tunnels_on_route",
+      "check": "tunnel_restriction",
+      "what": "optional: the tunnel categories (A–E) on the route, to check them against the whole-load code"
+     }
+    ],
+    "checks_performed": [
+     {
+      "name": "exemption_1_1_3_6",
+      "verdict": "pass",
+      "required": true,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+      "citations": [
+       {
+        "section": "1.1.3.6.3, 1.1.3.6.4",
+        "volume": "I",
+        "pdf_page": [
+         30,
+         31
+        ],
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(15) transport category",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.6.2",
+        "volume": "I",
+        "pdf_page": 29,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "may be carried in packages in one transport unit without application of the following provisions"
+       }
+      ]
+     },
+     {
+      "name": "limited_quantities",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the LQ/EQ engine (adr_lq_eq_check, mode lq) on each line's inner_packaging",
+      "citations": [
+       {
+        "section": "3.4.1",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(7a) limited quantity",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.4.2",
+        "volume": "I",
+        "pdf_page": 28,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+       }
+      ]
+     },
+     {
+      "name": "excepted_quantities",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the LQ/EQ engine (adr_lq_eq_check, mode eq) on each line's inner_packaging",
+      "citations": [
+       {
+        "section": "3.5.1.2, Table 3.5.1.2",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(7b) excepted quantity code",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.4.2",
+        "volume": "I",
+        "pdf_page": 28,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+       }
+      ]
+     },
+     {
+      "name": "tunnel_restriction",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3",
+      "citations": [
+       {
+        "section": "8.6.3.1",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "based on the tunnel restriction code of these goods, indicated in Column (15) of Table A of Chapter 3.2"
+       },
+       {
+        "section": "8.6.3.2",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "the most restrictive of these tunnel restriction codes shall be assigned to the whole load."
+       },
+       {
+        "section": "8.6.3.3",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Dangerous goods carried in accordance with 1.1.3 are not subject to the tunnel restrictions"
+       },
+       {
+        "section": "8.6.3.3",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "except if the transport unit is required to be marked in accordance with 3.4.13 subject to 3.4.14."
+       },
+       {
+        "section": "8.6.4",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "to transport units for which an orange-coloured plate marking is required according to 5.3.2"
+       },
+       {
+        "section": "8.6.4",
+        "volume": "II",
+        "pdf_page": 638,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Passage allowed through all tunnels (For UN Nos. 2919 and 3331, see also 8.6.3.1)."
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(15) tunnel restriction code",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       }
+      ]
+     },
+     {
+      "name": "transport_document",
+      "verdict": "pass",
+      "required": true,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the 5.4.1.1.1 particulars (a)–(d), (k) built from Table A columns (1)–(5) and (15) of the pinned row",
+      "citations": [
+       {
+        "section": "5.4.1.1.1 (a)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "The UN number preceded by the letters \"UN\""
+       },
+       {
+        "section": "5.4.1.1.1 (b)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "The proper shipping name supplemented, when applicable (see 3.1.2.8.1) with the technical name in brackets"
+       },
+       {
+        "section": "5.4.1.1.1 (c)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "When more than one label model numbers are given, the numbers following the first one shall be given in brackets."
+       },
+       {
+        "section": "5.4.1.1.1 (d)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Where assigned, the packing group for the substance which may be preceded by the letters \"PG\""
+       },
+       {
+        "section": "5.4.1.1.1 (k)",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "For carriage that includes passage through tunnels with restrictions for carriage of dangerous goods, the tunnel restriction code"
+       },
+       {
+        "section": "5.4.1.1.1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "(a), (b), (c), (d) and (k) shall be shown in the order listed above"
+       },
+       {
+        "section": "5.4.1.1.1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "\"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\""
+       },
+       {
+        "section": "3.1.2.2",
+        "volume": "I",
+        "pdf_page": 289,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "only the most appropriate shall be shown in the transport document and package marks"
+       },
+       {
+        "section": "5.4.1.1.1 (f) NOTE 1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "the total quantity and the calculated value of dangerous goods for each transport category shall be indicated"
+       },
+       {
+        "section": "5.4.1.1.10",
+        "volume": "II",
+        "pdf_page": 275,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "5.4.1.1.10 (Deleted)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(1)–(5), (15)",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       }
+      ]
+     },
+     {
+      "name": "mixed_loading_7_5_2",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2b",
+      "citations": [],
+      "run": "build 2b"
+     },
+     {
+      "name": "placards_and_plates_5_3",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "equipment_8_1",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "driver_training_8_2",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "packaging_code_validity",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2d",
+      "citations": [],
+      "run": "build 2d"
+     }
+    ],
+    "edition": "ADR 2025",
+    "as_of": "2026-11-20",
+    "edition_basis": "adr_2025",
+    "lines": [
+     {
+      "line_index": 0,
+      "un_number": "1203",
+      "dangerous_goods": true
+     }
+    ],
+    "exemption_1_1_3_6": {
+     "verdict": "pass",
+     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+     "conditions": [],
+     "notes": [
+      "1.1.3.6.2: the load may be carried in packages without the provisions it lists (among them Chapter 5.3 and Part 8 except those named); the transport document (5.4.1) is still required."
+     ],
+     "engine": {
+      "items": [
+       {
+        "un_number": "1203",
+        "state": "COUNTED",
+        "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+        "class": "3",
+        "packing_group": "II",
+        "variant_index": 0,
+        "transport_category": "2",
+        "quantity": 300,
+        "multiplier": 3,
+        "points": 900,
+        "quantity_unit": "L",
+        "quantity_basis": "net",
+        "expected_unit": "L"
+       }
+      ],
+      "total_points": 900,
+      "threshold": 1000,
+      "exempt": true,
+      "has_category_zero": false,
+      "has_quantity_exceedance": false,
+      "warnings": [],
+      "message": "1.1.3.6 exemption applies",
+      "resolved_subtotal_points": 900,
+      "threshold_exceeded_by_resolved_items": false,
+      "verdict_basis": "all_items",
+      "unresolved_item_indexes": []
+     }
+    },
+    "limited_quantities": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      }
+     ]
+    },
+    "excepted_quantities": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      }
+     ]
+    },
+    "lq_eq_status_verdict": "not_assessed",
+    "tunnel_restriction": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "column_15": "(D/E)",
+       "counted": true,
+       "carriage": "packages",
+       "forbidden": [
+        "E"
+       ]
+      }
+     ],
+     "whole_load": {
+      "codes": [
+       "(D/E)"
+      ],
+      "forbidden_categories": [
+       "E"
+      ],
+      "complete": true,
+      "ordering": "ADR 8.6.3.2 assigns the most restrictive code to the whole load and names no ranking; this check ranks codes by the categories the 8.6.4 table forbids for the carriage (each a run of categories ending at E), so a code that forbids more categories is the more restrictive."
+     },
+     "route": null,
+     "conditions": [],
+     "needs_info": [],
+     "notes": [
+      "8.6.4: the restrictions apply to transport units for which orange-coloured plate marking is required (5.3.2), by the whole-load code, and to units marked under 3.4.13 (subject to 3.4.14) through tunnels of category E; limited and excepted quantities (1.1.3.4) are not taken into account here — a line is counted unless the 1.1.3.6 check left it out."
+     ]
+    },
+    "transport_document": {
+     "verdict": "pass",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "edition": "ADR 2025",
+       "variant_index": 0,
+       "elements": {
+        "a": "UN 1203",
+        "b": [
+         "MOTOR SPIRIT",
+         "GASOLINE",
+         "PETROL"
+        ],
+        "c": "3",
+        "d": "II",
+        "k": "(D/E)"
+       },
+       "strings": [
+        "UN 1203 MOTOR SPIRIT, 3, II, (D/E)",
+        "UN 1203 GASOLINE, 3, II, (D/E)",
+        "UN 1203 PETROL, 3, II, (D/E)"
+       ],
+       "tunnel_code_required": null,
+       "notes": [
+        "3.1.2.2: the row offers several names joined by \"or\"; only the most appropriate is shown — one string per name",
+        "5.4.1.1.1 (c): the labels are column (5)'s; a special provision of column (6) (243 534 664) may change them — not assessed here"
+       ]
+      }
+     ],
+     "order": "5.4.1.1.1: (a) UN number, (b) proper shipping name, (c) labels / class, (d) packing group, (k) tunnel restriction code — in that order, nothing interspersed; the example form \"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\"",
+     "exemption_1_1_3_6_statement": {
+      "applies": true,
+      "rule": "5.4.1.1.1 (f) NOTE 1: in the case of intended application of 1.1.3.6, the total quantity and the calculated value for each transport category are indicated in the transport document (1.1.3.6.3, 1.1.3.6.4). 5.4.1.1.10, which the plan named, is \"(Deleted)\" in ADR 2025.",
+      "per_transport_category": [
+       {
+        "transport_category": "2",
+        "total_quantity": [
+         {
+          "value": 300,
+          "unit": "L"
+         }
+        ],
+        "calculated_value": 900
+       }
+      ],
+      "wording": "the full wording is the carrier's to copy from the regulation"
+     },
+     "conditions": []
+    },
+    "notes": [],
+    "adr_edition": {
+     "edition": "2025",
+     "name": "ADR 2025",
+     "as_of": "2026-11-20",
+     "selected_by": "as_of",
+     "applies_from": "2025-01-01",
+     "may_apply_until": "2027-06-30"
+    }
+   },
+   "confidence": {
+    "level": "high",
+    "basis": "deterministic"
+   },
+   "_source": {
+    "name": "UNECE ADR 2025 (ECE/TRANS/352)",
+    "checked": "2026-10-28",
+    "provenance_status": "verified",
+    "source_url": "https://unece.org/adr-2025-files",
+    "dataset_edition": "ADR 2025",
+    "authority_current_edition": "ADR 2025",
+    "checked_at": "2026-11-04"
+   },
+   "citation": {
+    "text": "ADR consignment check (version 2a) on ADR 2025, as of 2026-11-20: status pass — exemption_1_1_3_6 pass; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
+   },
+   "normalized_input": {
+    "consignment": {
+     "schema": "consignment-object.v1",
+     "lines_read": [
+      0
+     ],
+     "not_read": []
+    },
+    "as_of_from": "journey.date"
+   },
+   "_meta": {
+    "check_id": "chk_AAAAAAAAAAAAAAAAAAAAAA",
+    "receipt_url": "https://www.freightutils.com/api/receipts/chk_AAAAAAAAAAAAAAAAAAAAAA"
+   }
+  }
+ },
+ "check_mixed_over_1000_fail": {
+  "request": "POST /api/adr/consignment-check?envelope=1.2 {\"lines\":[{\"un_number\":\"1203\",\"packing_group\":\"II\",\"quantity\":{\"value\":200,\"unit\":\"L\",\"basis\":\"net\"},\"packages\":{\"count\":10,\"type\":\"jerrican\"}},{\"un_number\":\"1098\",\"packing_group\":\"I\",\"quantity\":{\"value\":10,\"unit\":\"L\",\"basis\":\"net\"},\"packages\":{\"count\":2,\"type\":\"drum\"}}],\"journey\":{\"date\":\"2026-11-20\",\"mode\":\"road\"}}",
+  "status": 200,
+  "body": {
+   "envelope_version": "1.2",
+   "ok": true,
+   "status": "ok",
+   "missing_inputs": [],
+   "edition": {
+    "name": "ADR 2025",
+    "applies_from": "2025-01-01",
+    "may_apply_until": "2027-06-30"
+   },
+   "as_of": "2026-11-20",
+   "result": {
+    "status": "fail",
+    "missing_inputs": [
+     {
+      "name": "lines[].inner_packaging",
+      "check": "limited_quantities, excepted_quantities",
+      "what": "optional: the inner packaging { quantity, unit } of a line, to check it against Table A column (7a) / (7b)"
+     },
+     {
+      "name": "journey.tunnels_on_route",
+      "check": "tunnel_restriction",
+      "what": "optional: the tunnel categories (A–E) on the route, to check them against the whole-load code"
+     }
+    ],
+    "checks_performed": [
+     {
+      "name": "exemption_1_1_3_6",
+      "verdict": "fail",
+      "required": true,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+      "citations": [
+       {
+        "section": "1.1.3.6.3, 1.1.3.6.4",
+        "volume": "I",
+        "pdf_page": [
+         30,
+         31
+        ],
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(15) transport category",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.6.2",
+        "volume": "I",
+        "pdf_page": 29,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "may be carried in packages in one transport unit without application of the following provisions"
+       }
+      ]
+     },
+     {
+      "name": "limited_quantities",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the LQ/EQ engine (adr_lq_eq_check, mode lq) on each line's inner_packaging",
+      "citations": [
+       {
+        "section": "3.4.1",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(7a) limited quantity",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.4.2",
+        "volume": "I",
+        "pdf_page": 28,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+       }
+      ]
+     },
+     {
+      "name": "excepted_quantities",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the LQ/EQ engine (adr_lq_eq_check, mode eq) on each line's inner_packaging",
+      "citations": [
+       {
+        "section": "3.5.1.2, Table 3.5.1.2",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(7b) excepted quantity code",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.4.2",
+        "volume": "I",
+        "pdf_page": 28,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+       }
+      ]
+     },
+     {
+      "name": "tunnel_restriction",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3",
+      "citations": [
+       {
+        "section": "8.6.3.1",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "based on the tunnel restriction code of these goods, indicated in Column (15) of Table A of Chapter 3.2"
+       },
+       {
+        "section": "8.6.3.2",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "the most restrictive of these tunnel restriction codes shall be assigned to the whole load."
+       },
+       {
+        "section": "8.6.3.3",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Dangerous goods carried in accordance with 1.1.3 are not subject to the tunnel restrictions"
+       },
+       {
+        "section": "8.6.3.3",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "except if the transport unit is required to be marked in accordance with 3.4.13 subject to 3.4.14."
+       },
+       {
+        "section": "8.6.4",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "to transport units for which an orange-coloured plate marking is required according to 5.3.2"
+       },
+       {
+        "section": "8.6.4",
+        "volume": "II",
+        "pdf_page": 638,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Passage allowed through all tunnels (For UN Nos. 2919 and 3331, see also 8.6.3.1)."
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(15) tunnel restriction code",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       }
+      ]
+     },
+     {
+      "name": "transport_document",
+      "verdict": "pass",
+      "required": true,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the 5.4.1.1.1 particulars (a)–(d), (k) built from Table A columns (1)–(5) and (15) of the pinned row",
+      "citations": [
+       {
+        "section": "5.4.1.1.1 (a)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "The UN number preceded by the letters \"UN\""
+       },
+       {
+        "section": "5.4.1.1.1 (b)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "The proper shipping name supplemented, when applicable (see 3.1.2.8.1) with the technical name in brackets"
+       },
+       {
+        "section": "5.4.1.1.1 (c)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "When more than one label model numbers are given, the numbers following the first one shall be given in brackets."
+       },
+       {
+        "section": "5.4.1.1.1 (d)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Where assigned, the packing group for the substance which may be preceded by the letters \"PG\""
+       },
+       {
+        "section": "5.4.1.1.1 (k)",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "For carriage that includes passage through tunnels with restrictions for carriage of dangerous goods, the tunnel restriction code"
+       },
+       {
+        "section": "5.4.1.1.1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "(a), (b), (c), (d) and (k) shall be shown in the order listed above"
+       },
+       {
+        "section": "5.4.1.1.1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "\"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\""
+       },
+       {
+        "section": "3.1.2.2",
+        "volume": "I",
+        "pdf_page": 289,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "only the most appropriate shall be shown in the transport document and package marks"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(1)–(5), (15)",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       }
+      ]
+     },
+     {
+      "name": "mixed_loading_7_5_2",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2b",
+      "citations": [],
+      "run": "build 2b"
+     },
+     {
+      "name": "placards_and_plates_5_3",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "equipment_8_1",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "driver_training_8_2",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "packaging_code_validity",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2d",
+      "citations": [],
+      "run": "build 2d"
+     }
+    ],
+    "edition": "ADR 2025",
+    "as_of": "2026-11-20",
+    "edition_basis": "adr_2025",
+    "lines": [
+     {
+      "line_index": 0,
+      "un_number": "1203",
+      "dangerous_goods": true
+     },
+     {
+      "line_index": 1,
+      "un_number": "1098",
+      "dangerous_goods": true
+     }
+    ],
+    "exemption_1_1_3_6": {
+     "verdict": "fail",
+     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+     "conditions": [],
+     "notes": [],
+     "engine": {
+      "items": [
+       {
+        "un_number": "1203",
+        "state": "COUNTED",
+        "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+        "class": "3",
+        "packing_group": "II",
+        "variant_index": 0,
+        "transport_category": "2",
+        "quantity": 200,
+        "multiplier": 3,
+        "points": 600,
+        "quantity_unit": "L",
+        "quantity_basis": "net",
+        "expected_unit": "L"
+       },
+       {
+        "un_number": "1098",
+        "state": "COUNTED",
+        "proper_shipping_name": "ALLYL ALCOHOL",
+        "class": "6.1",
+        "packing_group": "I",
+        "variant_index": 0,
+        "transport_category": "1",
+        "quantity": 10,
+        "multiplier": 50,
+        "points": 500,
+        "quantity_unit": "L",
+        "quantity_basis": "net",
+        "expected_unit": "L"
+       }
+      ],
+      "total_points": 1100,
+      "threshold": 1000,
+      "exempt": false,
+      "has_category_zero": false,
+      "has_quantity_exceedance": false,
+      "warnings": [],
+      "message": "Total points exceed 1,000 threshold — full ADR compliance required",
+      "resolved_subtotal_points": 1100,
+      "threshold_exceeded_by_resolved_items": true,
+      "verdict_basis": "all_items",
+      "unresolved_item_indexes": []
+     }
+    },
+    "limited_quantities": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      },
+      {
+       "line_index": 1,
+       "un_number": "1098",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      }
+     ]
+    },
+    "excepted_quantities": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      },
+      {
+       "line_index": 1,
+       "un_number": "1098",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      }
+     ]
+    },
+    "lq_eq_status_verdict": "not_assessed",
+    "tunnel_restriction": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "column_15": "(D/E)",
+       "counted": true,
+       "carriage": "packages",
+       "forbidden": [
+        "E"
+       ]
+      },
+      {
+       "line_index": 1,
+       "un_number": "1098",
+       "column_15": "(C/D)",
+       "counted": true,
+       "carriage": "packages",
+       "forbidden": [
+        "D",
+        "E"
+       ]
+      }
+     ],
+     "whole_load": {
+      "codes": [
+       "(C/D)"
+      ],
+      "forbidden_categories": [
+       "D",
+       "E"
+      ],
+      "complete": true,
+      "ordering": "ADR 8.6.3.2 assigns the most restrictive code to the whole load and names no ranking; this check ranks codes by the categories the 8.6.4 table forbids for the carriage (each a run of categories ending at E), so a code that forbids more categories is the more restrictive."
+     },
+     "route": null,
+     "conditions": [],
+     "needs_info": [],
+     "notes": [
+      "8.6.4: the restrictions apply to transport units for which orange-coloured plate marking is required (5.3.2), by the whole-load code, and to units marked under 3.4.13 (subject to 3.4.14) through tunnels of category E; limited and excepted quantities (1.1.3.4) are not taken into account here — a line is counted unless the 1.1.3.6 check left it out."
+     ]
+    },
+    "transport_document": {
+     "verdict": "pass",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "edition": "ADR 2025",
+       "variant_index": 0,
+       "elements": {
+        "a": "UN 1203",
+        "b": [
+         "MOTOR SPIRIT",
+         "GASOLINE",
+         "PETROL"
+        ],
+        "c": "3",
+        "d": "II",
+        "k": "(D/E)"
+       },
+       "strings": [
+        "UN 1203 MOTOR SPIRIT, 3, II, (D/E)",
+        "UN 1203 GASOLINE, 3, II, (D/E)",
+        "UN 1203 PETROL, 3, II, (D/E)"
+       ],
+       "tunnel_code_required": null,
+       "notes": [
+        "3.1.2.2: the row offers several names joined by \"or\"; only the most appropriate is shown — one string per name",
+        "5.4.1.1.1 (c): the labels are column (5)'s; a special provision of column (6) (243 534 664) may change them — not assessed here"
+       ]
+      },
+      {
+       "line_index": 1,
+       "un_number": "1098",
+       "edition": "ADR 2025",
+       "variant_index": 0,
+       "elements": {
+        "a": "UN 1098",
+        "b": [
+         "ALLYL ALCOHOL"
+        ],
+        "c": "6.1 (3)",
+        "d": "I",
+        "k": "(C/D)"
+       },
+       "strings": [
+        "UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)"
+       ],
+       "tunnel_code_required": null,
+       "notes": [
+        "5.4.1.1.1 (c): the labels are column (5)'s; a special provision of column (6) (354) may change them — not assessed here"
+       ]
+      }
+     ],
+     "order": "5.4.1.1.1: (a) UN number, (b) proper shipping name, (c) labels / class, (d) packing group, (k) tunnel restriction code — in that order, nothing interspersed; the example form \"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\"",
+     "exemption_1_1_3_6_statement": null,
+     "conditions": []
+    },
+    "notes": [],
+    "adr_edition": {
+     "edition": "2025",
+     "name": "ADR 2025",
+     "as_of": "2026-11-20",
+     "selected_by": "as_of",
+     "applies_from": "2025-01-01",
+     "may_apply_until": "2027-06-30"
+    }
+   },
+   "confidence": {
+    "level": "high",
+    "basis": "deterministic"
+   },
+   "_source": {
+    "name": "UNECE ADR 2025 (ECE/TRANS/352)",
+    "checked": "2026-10-28",
+    "provenance_status": "verified",
+    "source_url": "https://unece.org/adr-2025-files",
+    "dataset_edition": "ADR 2025",
+    "authority_current_edition": "ADR 2025",
+    "checked_at": "2026-11-04"
+   },
+   "citation": {
+    "text": "ADR consignment check (version 2a) on ADR 2025, as of 2026-11-20: status fail — exemption_1_1_3_6 fail; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
+   },
+   "normalized_input": {
+    "consignment": {
+     "schema": "consignment-object.v1",
+     "lines_read": [
+      0,
+      1
+     ],
+     "not_read": []
+    },
+    "as_of_from": "journey.date"
+   },
+   "_meta": {
+    "check_id": "chk_AAAAAAAAAAAAAAAAAAAAAB",
+    "receipt_url": "https://www.freightutils.com/api/receipts/chk_AAAAAAAAAAAAAAAAAAAAAB"
+   }
+  }
+ },
+ "check_2027_un1005_conditional_1_6_1_61": {
+  "request": "POST /api/adr/consignment-check?envelope=1.2 {\"lines\":[{\"un_number\":\"1005\",\"quantity\":{\"value\":25,\"unit\":\"kg\",\"basis\":\"net\"},\"packages\":{\"count\":1,\"type\":\"cylinder\"}}],\"journey\":{\"date\":\"2027-02-01\",\"mode\":\"road\"},\"edition\":\"2027\"}",
+  "status": 200,
+  "body": {
+   "envelope_version": "1.2",
+   "ok": true,
+   "status": "ok",
+   "missing_inputs": [],
+   "edition": {
+    "name": "ADR 2027",
+    "applies_from": "2027-01-01",
+    "may_apply_until": null
+   },
+   "as_of": "2027-02-01",
+   "result": {
+    "status": "conditional",
+    "missing_inputs": [
+     {
+      "name": "lines[].inner_packaging",
+      "check": "limited_quantities, excepted_quantities",
+      "what": "optional: the inner packaging { quantity, unit } of a line, to check it against Table A column (7a) / (7b)"
+     },
+     {
+      "name": "journey.tunnels_on_route",
+      "check": "tunnel_restriction",
+      "what": "optional: the tunnel categories (A–E) on the route, to check them against the whole-load code"
+     }
+    ],
+    "checks_performed": [
+     {
+      "name": "exemption_1_1_3_6",
+      "verdict": "conditional",
+      "required": true,
+      "edition": "ADR 2027",
+      "as_of": "2027-02-01",
+      "basis": "1.6.1.61",
+      "citations": [
+       {
+        "section": "1.1.3.6.3, 1.1.3.6.4",
+        "volume": "I",
+        "pdf_page": [
+         30,
+         31
+        ],
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(15) transport category",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.6.2",
+        "volume": "I",
+        "pdf_page": 29,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "may be carried in packages in one transport unit without application of the following provisions"
+       }
+      ]
+     },
+     {
+      "name": "limited_quantities",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2027",
+      "as_of": "2027-02-01",
+      "basis": "the LQ/EQ engine (adr_lq_eq_check, mode lq) on each line's inner_packaging",
+      "citations": [
+       {
+        "section": "3.4.1",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(7a) limited quantity",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.4.2",
+        "volume": "I",
+        "pdf_page": 28,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+       }
+      ]
+     },
+     {
+      "name": "excepted_quantities",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2027",
+      "as_of": "2027-02-01",
+      "basis": "the LQ/EQ engine (adr_lq_eq_check, mode eq) on each line's inner_packaging",
+      "citations": [
+       {
+        "section": "3.5.1.2, Table 3.5.1.2",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(7b) excepted quantity code",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.4.2",
+        "volume": "I",
+        "pdf_page": 28,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+       }
+      ]
+     },
+     {
+      "name": "tunnel_restriction",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2027",
+      "as_of": "2027-02-01",
+      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3",
+      "citations": [
+       {
+        "section": "8.6.3.1",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "based on the tunnel restriction code of these goods, indicated in Column (15) of Table A of Chapter 3.2"
+       },
+       {
+        "section": "8.6.3.2",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "the most restrictive of these tunnel restriction codes shall be assigned to the whole load."
+       },
+       {
+        "section": "8.6.3.3",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Dangerous goods carried in accordance with 1.1.3 are not subject to the tunnel restrictions"
+       },
+       {
+        "section": "8.6.3.3",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "except if the transport unit is required to be marked in accordance with 3.4.13 subject to 3.4.14."
+       },
+       {
+        "section": "8.6.4",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "to transport units for which an orange-coloured plate marking is required according to 5.3.2"
+       },
+       {
+        "section": "8.6.4",
+        "volume": "II",
+        "pdf_page": 638,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Passage allowed through all tunnels (For UN Nos. 2919 and 3331, see also 8.6.3.1)."
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(15) tunnel restriction code",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       }
+      ]
+     },
+     {
+      "name": "transport_document",
+      "verdict": "pass",
+      "required": true,
+      "edition": "ADR 2027",
+      "as_of": "2027-02-01",
+      "basis": "the 5.4.1.1.1 particulars (a)–(d), (k) built from Table A columns (1)–(5) and (15) of the pinned row",
+      "citations": [
+       {
+        "section": "5.4.1.1.1 (a)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "The UN number preceded by the letters \"UN\""
+       },
+       {
+        "section": "5.4.1.1.1 (b)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "The proper shipping name supplemented, when applicable (see 3.1.2.8.1) with the technical name in brackets"
+       },
+       {
+        "section": "5.4.1.1.1 (c)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "When more than one label model numbers are given, the numbers following the first one shall be given in brackets."
+       },
+       {
+        "section": "5.4.1.1.1 (d)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Where assigned, the packing group for the substance which may be preceded by the letters \"PG\""
+       },
+       {
+        "section": "5.4.1.1.1 (k)",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "For carriage that includes passage through tunnels with restrictions for carriage of dangerous goods, the tunnel restriction code"
+       },
+       {
+        "section": "5.4.1.1.1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "(a), (b), (c), (d) and (k) shall be shown in the order listed above"
+       },
+       {
+        "section": "5.4.1.1.1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "\"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\""
+       },
+       {
+        "section": "3.1.2.2",
+        "volume": "I",
+        "pdf_page": 289,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "only the most appropriate shall be shown in the transport document and package marks"
+       },
+       {
+        "section": "5.4.1.1.1 (f) NOTE 1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "the total quantity and the calculated value of dangerous goods for each transport category shall be indicated"
+       },
+       {
+        "section": "5.4.1.1.10",
+        "volume": "II",
+        "pdf_page": 275,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "5.4.1.1.10 (Deleted)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(1)–(5), (15)",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       }
+      ]
+     },
+     {
+      "name": "mixed_loading_7_5_2",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2027-02-01",
+      "basis": "not in version 2a — planned for build 2b",
+      "citations": [],
+      "run": "build 2b"
+     },
+     {
+      "name": "placards_and_plates_5_3",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2027-02-01",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "equipment_8_1",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2027-02-01",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "driver_training_8_2",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2027-02-01",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "packaging_code_validity",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2027-02-01",
+      "basis": "not in version 2a — planned for build 2d",
+      "citations": [],
+      "run": "build 2d"
+     }
+    ],
+    "edition": "ADR 2027",
+    "as_of": "2027-02-01",
+    "edition_basis": "1.6.1.61",
+    "lines": [
+     {
+      "line_index": 0,
+      "un_number": "1005",
+      "dangerous_goods": true
+     }
+    ],
+    "exemption_1_1_3_6": {
+     "verdict": "conditional",
+     "basis": "1.6.1.61",
+     "conditions": [
+      "exempt on transitional measure 1.6.1.61 until 2030-12-31, not on ADR 2027 itself (strict_adr_2027) — the carriage must be made on that basis"
+     ],
+     "notes": [
+      "1.1.3.6.2: the load may be carried in packages without the provisions it lists (among them Chapter 5.3 and Part 8 except those named); the transport document (5.4.1) is still required."
+     ],
+     "engine": {
+      "items": [
+       {
+        "un_number": "1005",
+        "state": "COUNTED",
+        "proper_shipping_name": "AMMONIA, ANHYDROUS",
+        "class": "2",
+        "packing_group": null,
+        "variant_index": 0,
+        "transport_category": "1",
+        "quantity": 25,
+        "multiplier": 20,
+        "points": 500,
+        "quantity_unit": "kg",
+        "quantity_basis": "net",
+        "expected_unit": "kg"
+       }
+      ],
+      "total_points": 500,
+      "threshold": 1000,
+      "exempt": true,
+      "has_category_zero": false,
+      "has_quantity_exceedance": false,
+      "warnings": [
+       "This verdict rests on transitional measure 1.6.1.61 (the ADR 2025 note-a rule: ×20, 50 kg maximum) on 2027-02-01, and holds only where the load is carried on that basis; it lapses after 31 December 2030. On ADR 2027 itself the load scores 1250 points and is not exempt (strict_adr_2027)."
+      ],
+      "message": "1.1.3.6 exemption applies on the 1.6.1.61 basis (the ADR 2025 note-a rule: ×20, 50 kg maximum), which may be applied until 31 December 2030 — under ADR 2027 itself the load is not exempt (1250 points).",
+      "resolved_subtotal_points": 500,
+      "threshold_exceeded_by_resolved_items": false,
+      "verdict_basis": "all_items",
+      "unresolved_item_indexes": [],
+      "transitional_1_6_1_61": {
+       "measure": "1.6.1.61",
+       "basis": "ADR 2025 note a",
+       "un_numbers": [
+        "1005"
+       ],
+       "max_kg": 50,
+       "multiplier": 20,
+       "points_on_this_basis": 500,
+       "exempt_on_this_basis": true,
+       "until": "2030-12-31",
+       "note": "ADR 2027 deletes 1.1.3.6.3 note a, so UN 1005 counts ×50 with a 20 kg maximum on ADR 2027 itself (strict_adr_2027). Transitional measure 1.6.1.61 allows the ADR 2025 note-a rule (×20, 50 kg maximum) to be applied until 31 December 2030: the verdict above is given on that basis — the load scores 500 points and is exempt."
+      },
+      "basis": "1.6.1.61",
+      "basis_until": "2030-12-31",
+      "strict_adr_2027": {
+       "basis": "adr_2027",
+       "total_points": 1250,
+       "exempt": false,
+       "has_category_zero": false,
+       "has_quantity_exceedance": true
+      },
+      "transitional_1_6_1_1": {
+       "measure": "1.6.1.1",
+       "basis": "ADR 2025",
+       "until": "2027-06-30",
+       "points_on_this_basis": 500,
+       "exempt_on_this_basis": true,
+       "note": "Transitional measure 1.6.1.1 allows the whole of ADR 2025 to be applied until 30 June 2027: on that basis the load scores 500 points and is exempt."
+      }
+     }
+    },
+    "limited_quantities": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1005",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      }
+     ]
+    },
+    "excepted_quantities": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1005",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      }
+     ]
+    },
+    "lq_eq_status_verdict": "not_assessed",
+    "tunnel_restriction": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1005",
+       "column_15": "(C/D)",
+       "counted": true,
+       "carriage": "packages",
+       "forbidden": [
+        "D",
+        "E"
+       ]
+      }
+     ],
+     "whole_load": {
+      "codes": [
+       "(C/D)"
+      ],
+      "forbidden_categories": [
+       "D",
+       "E"
+      ],
+      "complete": true,
+      "ordering": "ADR 8.6.3.2 assigns the most restrictive code to the whole load and names no ranking; this check ranks codes by the categories the 8.6.4 table forbids for the carriage (each a run of categories ending at E), so a code that forbids more categories is the more restrictive."
+     },
+     "route": null,
+     "conditions": [],
+     "needs_info": [],
+     "notes": [
+      "8.6.4: the restrictions apply to transport units for which orange-coloured plate marking is required (5.3.2), by the whole-load code, and to units marked under 3.4.13 (subject to 3.4.14) through tunnels of category E; limited and excepted quantities (1.1.3.4) are not taken into account here — a line is counted unless the 1.1.3.6 check left it out."
+     ]
+    },
+    "transport_document": {
+     "verdict": "pass",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1005",
+       "edition": "ADR 2027",
+       "variant_index": 0,
+       "elements": {
+        "a": "UN 1005",
+        "b": [
+         "AMMONIA, ANHYDROUS"
+        ],
+        "c": "2.3 (8)",
+        "d": null,
+        "k": "(C/D)"
+       },
+       "strings": [
+        "UN 1005 AMMONIA, ANHYDROUS, 2.3 (8), (C/D)"
+       ],
+       "tunnel_code_required": null,
+       "notes": [
+        "5.4.1.1.1 (c): the labels are column (5)'s; a special provision of column (6) (23 379) may change them — not assessed here"
+       ]
+      }
+     ],
+     "order": "5.4.1.1.1: (a) UN number, (b) proper shipping name, (c) labels / class, (d) packing group, (k) tunnel restriction code — in that order, nothing interspersed; the example form \"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\"",
+     "exemption_1_1_3_6_statement": {
+      "applies": true,
+      "rule": "5.4.1.1.1 (f) NOTE 1: in the case of intended application of 1.1.3.6, the total quantity and the calculated value for each transport category are indicated in the transport document (1.1.3.6.3, 1.1.3.6.4). 5.4.1.1.10, which the plan named, is \"(Deleted)\" in ADR 2025.",
+      "per_transport_category": [
+       {
+        "transport_category": "1",
+        "total_quantity": [
+         {
+          "value": 25,
+          "unit": "kg"
+         }
+        ],
+        "calculated_value": 500
+       }
+      ],
+      "wording": "the full wording is the carrier's to copy from the regulation"
+     },
+     "conditions": []
+    },
+    "notes": [],
+    "adr_edition": {
+     "edition": "2027",
+     "name": "ADR 2027",
+     "as_of": "2027-02-01",
+     "selected_by": "edition",
+     "applies_from": "2027-01-01",
+     "may_apply_until": null
+    }
+   },
+   "confidence": {
+    "level": "high",
+    "basis": "deterministic"
+   },
+   "_source": {
+    "name": "UNECE ADR 2027 (ADR 2025, ECE/TRANS/352, as amended by ECE/TRANS/WP.15/274, Add.1 and Corr.1)",
+    "checked": "2026-10-30",
+    "provenance_status": "verified",
+    "source_url": "https://documents.un.org/api/symbol/access?s=ECE/TRANS/WP.15/274&l=E",
+    "dataset_edition": "ADR 2027"
+   },
+   "citation": {
+    "text": "ADR consignment check (version 2a) on ADR 2027, as of 2027-02-01: status conditional — exemption_1_1_3_6 conditional; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
+   },
+   "normalized_input": {
+    "consignment": {
+     "schema": "consignment-object.v1",
+     "lines_read": [
+      0
+     ],
+     "not_read": []
+    },
+    "as_of_from": "journey.date"
+   },
+   "warnings": [
+    {
+     "code": "EDITION_TRANSITIONAL",
+     "message": "ADR 2027 applies from 1 January 2027; ADR 2025 may still be applied until 30 June 2027 (1.6.1.1). edition=2025 answers on ADR 2025 until then.",
+     "details": {
+      "measure": "1.6.1.1",
+      "adr_2025_may_apply_until": "2027-06-30",
+      "edition_2025_available": true
+     }
+    }
+   ],
+   "_meta": {
+    "check_id": "chk_AAAAAAAAAAAAAAAAAAAAAC",
+    "receipt_url": "https://www.freightutils.com/api/receipts/chk_AAAAAAAAAAAAAAAAAAAAAC"
+   }
+  }
+ },
+ "check_tunnel_whole_load_c_d_fail": {
+  "request": "POST /api/adr/consignment-check?envelope=1.2 {\"lines\":[{\"un_number\":\"1203\",\"packing_group\":\"II\",\"quantity\":{\"value\":200,\"unit\":\"L\",\"basis\":\"net\"},\"packages\":{\"count\":10,\"type\":\"jerrican\"}},{\"un_number\":\"1098\",\"packing_group\":\"I\",\"quantity\":{\"value\":10,\"unit\":\"L\",\"basis\":\"net\"},\"packages\":{\"count\":2,\"type\":\"drum\"}}],\"journey\":{\"date\":\"2026-11-20\",\"mode\":\"road\",\"tunnels_on_route\":[\"C\",\"D\"]}}",
+  "status": 200,
+  "body": {
+   "envelope_version": "1.2",
+   "ok": true,
+   "status": "ok",
+   "missing_inputs": [],
+   "edition": {
+    "name": "ADR 2025",
+    "applies_from": "2025-01-01",
+    "may_apply_until": "2027-06-30"
+   },
+   "as_of": "2026-11-20",
+   "result": {
+    "status": "fail",
+    "missing_inputs": [
+     {
+      "name": "lines[].inner_packaging",
+      "check": "limited_quantities, excepted_quantities",
+      "what": "optional: the inner packaging { quantity, unit } of a line, to check it against Table A column (7a) / (7b)"
+     }
+    ],
+    "checks_performed": [
+     {
+      "name": "exemption_1_1_3_6",
+      "verdict": "fail",
+      "required": true,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+      "citations": [
+       {
+        "section": "1.1.3.6.3, 1.1.3.6.4",
+        "volume": "I",
+        "pdf_page": [
+         30,
+         31
+        ],
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(15) transport category",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.6.2",
+        "volume": "I",
+        "pdf_page": 29,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "may be carried in packages in one transport unit without application of the following provisions"
+       }
+      ]
+     },
+     {
+      "name": "limited_quantities",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the LQ/EQ engine (adr_lq_eq_check, mode lq) on each line's inner_packaging",
+      "citations": [
+       {
+        "section": "3.4.1",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(7a) limited quantity",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.4.2",
+        "volume": "I",
+        "pdf_page": 28,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+       }
+      ]
+     },
+     {
+      "name": "excepted_quantities",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the LQ/EQ engine (adr_lq_eq_check, mode eq) on each line's inner_packaging",
+      "citations": [
+       {
+        "section": "3.5.1.2, Table 3.5.1.2",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(7b) excepted quantity code",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.4.2",
+        "volume": "I",
+        "pdf_page": 28,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+       }
+      ]
+     },
+     {
+      "name": "tunnel_restriction",
+      "verdict": "fail",
+      "required": true,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3",
+      "citations": [
+       {
+        "section": "8.6.3.1",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "based on the tunnel restriction code of these goods, indicated in Column (15) of Table A of Chapter 3.2"
+       },
+       {
+        "section": "8.6.3.2",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "the most restrictive of these tunnel restriction codes shall be assigned to the whole load."
+       },
+       {
+        "section": "8.6.3.3",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Dangerous goods carried in accordance with 1.1.3 are not subject to the tunnel restrictions"
+       },
+       {
+        "section": "8.6.3.3",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "except if the transport unit is required to be marked in accordance with 3.4.13 subject to 3.4.14."
+       },
+       {
+        "section": "8.6.4",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "to transport units for which an orange-coloured plate marking is required according to 5.3.2"
+       },
+       {
+        "section": "8.6.4",
+        "volume": "II",
+        "pdf_page": 638,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Passage allowed through all tunnels (For UN Nos. 2919 and 3331, see also 8.6.3.1)."
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(15) tunnel restriction code",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       }
+      ]
+     },
+     {
+      "name": "transport_document",
+      "verdict": "pass",
+      "required": true,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the 5.4.1.1.1 particulars (a)–(d), (k) built from Table A columns (1)–(5) and (15) of the pinned row",
+      "citations": [
+       {
+        "section": "5.4.1.1.1 (a)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "The UN number preceded by the letters \"UN\""
+       },
+       {
+        "section": "5.4.1.1.1 (b)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "The proper shipping name supplemented, when applicable (see 3.1.2.8.1) with the technical name in brackets"
+       },
+       {
+        "section": "5.4.1.1.1 (c)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "When more than one label model numbers are given, the numbers following the first one shall be given in brackets."
+       },
+       {
+        "section": "5.4.1.1.1 (d)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Where assigned, the packing group for the substance which may be preceded by the letters \"PG\""
+       },
+       {
+        "section": "5.4.1.1.1 (k)",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "For carriage that includes passage through tunnels with restrictions for carriage of dangerous goods, the tunnel restriction code"
+       },
+       {
+        "section": "5.4.1.1.1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "(a), (b), (c), (d) and (k) shall be shown in the order listed above"
+       },
+       {
+        "section": "5.4.1.1.1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "\"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\""
+       },
+       {
+        "section": "3.1.2.2",
+        "volume": "I",
+        "pdf_page": 289,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "only the most appropriate shall be shown in the transport document and package marks"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(1)–(5), (15)",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       }
+      ]
+     },
+     {
+      "name": "mixed_loading_7_5_2",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2b",
+      "citations": [],
+      "run": "build 2b"
+     },
+     {
+      "name": "placards_and_plates_5_3",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "equipment_8_1",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "driver_training_8_2",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "packaging_code_validity",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2d",
+      "citations": [],
+      "run": "build 2d"
+     }
+    ],
+    "edition": "ADR 2025",
+    "as_of": "2026-11-20",
+    "edition_basis": "adr_2025",
+    "lines": [
+     {
+      "line_index": 0,
+      "un_number": "1203",
+      "dangerous_goods": true
+     },
+     {
+      "line_index": 1,
+      "un_number": "1098",
+      "dangerous_goods": true
+     }
+    ],
+    "exemption_1_1_3_6": {
+     "verdict": "fail",
+     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+     "conditions": [],
+     "notes": [],
+     "engine": {
+      "items": [
+       {
+        "un_number": "1203",
+        "state": "COUNTED",
+        "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+        "class": "3",
+        "packing_group": "II",
+        "variant_index": 0,
+        "transport_category": "2",
+        "quantity": 200,
+        "multiplier": 3,
+        "points": 600,
+        "quantity_unit": "L",
+        "quantity_basis": "net",
+        "expected_unit": "L"
+       },
+       {
+        "un_number": "1098",
+        "state": "COUNTED",
+        "proper_shipping_name": "ALLYL ALCOHOL",
+        "class": "6.1",
+        "packing_group": "I",
+        "variant_index": 0,
+        "transport_category": "1",
+        "quantity": 10,
+        "multiplier": 50,
+        "points": 500,
+        "quantity_unit": "L",
+        "quantity_basis": "net",
+        "expected_unit": "L"
+       }
+      ],
+      "total_points": 1100,
+      "threshold": 1000,
+      "exempt": false,
+      "has_category_zero": false,
+      "has_quantity_exceedance": false,
+      "warnings": [],
+      "message": "Total points exceed 1,000 threshold — full ADR compliance required",
+      "resolved_subtotal_points": 1100,
+      "threshold_exceeded_by_resolved_items": true,
+      "verdict_basis": "all_items",
+      "unresolved_item_indexes": []
+     }
+    },
+    "limited_quantities": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      },
+      {
+       "line_index": 1,
+       "un_number": "1098",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      }
+     ]
+    },
+    "excepted_quantities": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      },
+      {
+       "line_index": 1,
+       "un_number": "1098",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      }
+     ]
+    },
+    "lq_eq_status_verdict": "not_assessed",
+    "tunnel_restriction": {
+     "verdict": "fail",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "column_15": "(D/E)",
+       "counted": true,
+       "carriage": "packages",
+       "forbidden": [
+        "E"
+       ]
+      },
+      {
+       "line_index": 1,
+       "un_number": "1098",
+       "column_15": "(C/D)",
+       "counted": true,
+       "carriage": "packages",
+       "forbidden": [
+        "D",
+        "E"
+       ]
+      }
+     ],
+     "whole_load": {
+      "codes": [
+       "(C/D)"
+      ],
+      "forbidden_categories": [
+       "D",
+       "E"
+      ],
+      "complete": true,
+      "ordering": "ADR 8.6.3.2 assigns the most restrictive code to the whole load and names no ranking; this check ranks codes by the categories the 8.6.4 table forbids for the carriage (each a run of categories ending at E), so a code that forbids more categories is the more restrictive."
+     },
+     "route": {
+      "tunnels_on_route": [
+       "C",
+       "D"
+      ],
+      "without_1_1_3_6_relief": {
+       "forbidden_on_route": [
+        "D"
+       ],
+       "allowed_on_route": [
+        "C"
+       ]
+      },
+      "with_1_1_3_6_relief": {
+       "applies": false,
+       "reason": "the load is not within 1.1.3.6"
+      }
+     },
+     "conditions": [],
+     "needs_info": [],
+     "notes": [
+      "8.6.4: the restrictions apply to transport units for which orange-coloured plate marking is required (5.3.2), by the whole-load code, and to units marked under 3.4.13 (subject to 3.4.14) through tunnels of category E; limited and excepted quantities (1.1.3.4) are not taken into account here — a line is counted unless the 1.1.3.6 check left it out."
+     ]
+    },
+    "transport_document": {
+     "verdict": "pass",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "edition": "ADR 2025",
+       "variant_index": 0,
+       "elements": {
+        "a": "UN 1203",
+        "b": [
+         "MOTOR SPIRIT",
+         "GASOLINE",
+         "PETROL"
+        ],
+        "c": "3",
+        "d": "II",
+        "k": "(D/E)"
+       },
+       "strings": [
+        "UN 1203 MOTOR SPIRIT, 3, II, (D/E)",
+        "UN 1203 GASOLINE, 3, II, (D/E)",
+        "UN 1203 PETROL, 3, II, (D/E)"
+       ],
+       "tunnel_code_required": true,
+       "notes": [
+        "3.1.2.2: the row offers several names joined by \"or\"; only the most appropriate is shown — one string per name",
+        "5.4.1.1.1 (c): the labels are column (5)'s; a special provision of column (6) (243 534 664) may change them — not assessed here"
+       ]
+      },
+      {
+       "line_index": 1,
+       "un_number": "1098",
+       "edition": "ADR 2025",
+       "variant_index": 0,
+       "elements": {
+        "a": "UN 1098",
+        "b": [
+         "ALLYL ALCOHOL"
+        ],
+        "c": "6.1 (3)",
+        "d": "I",
+        "k": "(C/D)"
+       },
+       "strings": [
+        "UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)"
+       ],
+       "tunnel_code_required": true,
+       "notes": [
+        "5.4.1.1.1 (c): the labels are column (5)'s; a special provision of column (6) (354) may change them — not assessed here"
+       ]
+      }
+     ],
+     "order": "5.4.1.1.1: (a) UN number, (b) proper shipping name, (c) labels / class, (d) packing group, (k) tunnel restriction code — in that order, nothing interspersed; the example form \"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\"",
+     "exemption_1_1_3_6_statement": null,
+     "conditions": []
+    },
+    "notes": [],
+    "adr_edition": {
+     "edition": "2025",
+     "name": "ADR 2025",
+     "as_of": "2026-11-20",
+     "selected_by": "as_of",
+     "applies_from": "2025-01-01",
+     "may_apply_until": "2027-06-30"
+    }
+   },
+   "confidence": {
+    "level": "high",
+    "basis": "deterministic"
+   },
+   "_source": {
+    "name": "UNECE ADR 2025 (ECE/TRANS/352)",
+    "checked": "2026-10-28",
+    "provenance_status": "verified",
+    "source_url": "https://unece.org/adr-2025-files",
+    "dataset_edition": "ADR 2025",
+    "authority_current_edition": "ADR 2025",
+    "checked_at": "2026-11-04"
+   },
+   "citation": {
+    "text": "ADR consignment check (version 2a) on ADR 2025, as of 2026-11-20: status fail — exemption_1_1_3_6 fail; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction fail; transport_document pass. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
+   },
+   "normalized_input": {
+    "consignment": {
+     "schema": "consignment-object.v1",
+     "lines_read": [
+      0,
+      1
+     ],
+     "not_read": []
+    },
+    "as_of_from": "journey.date"
+   },
+   "_meta": {
+    "check_id": "chk_AAAAAAAAAAAAAAAAAAAAAD",
+    "receipt_url": "https://www.freightutils.com/api/receipts/chk_AAAAAAAAAAAAAAAAAAAAAD"
+   }
+  }
+ },
+ "check_tunnel_relief_conditional": {
+  "request": "POST /api/adr/consignment-check?envelope=1.2 {\"lines\":[{\"un_number\":\"1203\",\"packing_group\":\"II\",\"quantity\":{\"value\":300,\"unit\":\"L\",\"basis\":\"net\"},\"packages\":{\"count\":15,\"type\":\"jerrican\"}}],\"journey\":{\"date\":\"2026-11-20\",\"mode\":\"road\",\"tunnels_on_route\":[\"B\",\"E\"]}}",
+  "status": 200,
+  "body": {
+   "envelope_version": "1.2",
+   "ok": true,
+   "status": "ok",
+   "missing_inputs": [],
+   "edition": {
+    "name": "ADR 2025",
+    "applies_from": "2025-01-01",
+    "may_apply_until": "2027-06-30"
+   },
+   "as_of": "2026-11-20",
+   "result": {
+    "status": "conditional",
+    "missing_inputs": [
+     {
+      "name": "lines[].inner_packaging",
+      "check": "limited_quantities, excepted_quantities",
+      "what": "optional: the inner packaging { quantity, unit } of a line, to check it against Table A column (7a) / (7b)"
+     }
+    ],
+    "checks_performed": [
+     {
+      "name": "exemption_1_1_3_6",
+      "verdict": "pass",
+      "required": true,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+      "citations": [
+       {
+        "section": "1.1.3.6.3, 1.1.3.6.4",
+        "volume": "I",
+        "pdf_page": [
+         30,
+         31
+        ],
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(15) transport category",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.6.2",
+        "volume": "I",
+        "pdf_page": 29,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "may be carried in packages in one transport unit without application of the following provisions"
+       }
+      ]
+     },
+     {
+      "name": "limited_quantities",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the LQ/EQ engine (adr_lq_eq_check, mode lq) on each line's inner_packaging",
+      "citations": [
+       {
+        "section": "3.4.1",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(7a) limited quantity",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.4.2",
+        "volume": "I",
+        "pdf_page": 28,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+       }
+      ]
+     },
+     {
+      "name": "excepted_quantities",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the LQ/EQ engine (adr_lq_eq_check, mode eq) on each line's inner_packaging",
+      "citations": [
+       {
+        "section": "3.5.1.2, Table 3.5.1.2",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(7b) excepted quantity code",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.4.2",
+        "volume": "I",
+        "pdf_page": 28,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+       }
+      ]
+     },
+     {
+      "name": "tunnel_restriction",
+      "verdict": "conditional",
+      "required": true,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3",
+      "citations": [
+       {
+        "section": "8.6.3.1",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "based on the tunnel restriction code of these goods, indicated in Column (15) of Table A of Chapter 3.2"
+       },
+       {
+        "section": "8.6.3.2",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "the most restrictive of these tunnel restriction codes shall be assigned to the whole load."
+       },
+       {
+        "section": "8.6.3.3",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Dangerous goods carried in accordance with 1.1.3 are not subject to the tunnel restrictions"
+       },
+       {
+        "section": "8.6.3.3",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "except if the transport unit is required to be marked in accordance with 3.4.13 subject to 3.4.14."
+       },
+       {
+        "section": "8.6.4",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "to transport units for which an orange-coloured plate marking is required according to 5.3.2"
+       },
+       {
+        "section": "8.6.4",
+        "volume": "II",
+        "pdf_page": 638,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Passage allowed through all tunnels (For UN Nos. 2919 and 3331, see also 8.6.3.1)."
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(15) tunnel restriction code",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       }
+      ]
+     },
+     {
+      "name": "transport_document",
+      "verdict": "pass",
+      "required": true,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the 5.4.1.1.1 particulars (a)–(d), (k) built from Table A columns (1)–(5) and (15) of the pinned row",
+      "citations": [
+       {
+        "section": "5.4.1.1.1 (a)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "The UN number preceded by the letters \"UN\""
+       },
+       {
+        "section": "5.4.1.1.1 (b)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "The proper shipping name supplemented, when applicable (see 3.1.2.8.1) with the technical name in brackets"
+       },
+       {
+        "section": "5.4.1.1.1 (c)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "When more than one label model numbers are given, the numbers following the first one shall be given in brackets."
+       },
+       {
+        "section": "5.4.1.1.1 (d)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Where assigned, the packing group for the substance which may be preceded by the letters \"PG\""
+       },
+       {
+        "section": "5.4.1.1.1 (k)",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "For carriage that includes passage through tunnels with restrictions for carriage of dangerous goods, the tunnel restriction code"
+       },
+       {
+        "section": "5.4.1.1.1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "(a), (b), (c), (d) and (k) shall be shown in the order listed above"
+       },
+       {
+        "section": "5.4.1.1.1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "\"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\""
+       },
+       {
+        "section": "3.1.2.2",
+        "volume": "I",
+        "pdf_page": 289,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "only the most appropriate shall be shown in the transport document and package marks"
+       },
+       {
+        "section": "5.4.1.1.1 (f) NOTE 1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "the total quantity and the calculated value of dangerous goods for each transport category shall be indicated"
+       },
+       {
+        "section": "5.4.1.1.10",
+        "volume": "II",
+        "pdf_page": 275,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "5.4.1.1.10 (Deleted)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(1)–(5), (15)",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       }
+      ]
+     },
+     {
+      "name": "mixed_loading_7_5_2",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2b",
+      "citations": [],
+      "run": "build 2b"
+     },
+     {
+      "name": "placards_and_plates_5_3",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "equipment_8_1",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "driver_training_8_2",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "packaging_code_validity",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2d",
+      "citations": [],
+      "run": "build 2d"
+     }
+    ],
+    "edition": "ADR 2025",
+    "as_of": "2026-11-20",
+    "edition_basis": "adr_2025",
+    "lines": [
+     {
+      "line_index": 0,
+      "un_number": "1203",
+      "dangerous_goods": true
+     }
+    ],
+    "exemption_1_1_3_6": {
+     "verdict": "pass",
+     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+     "conditions": [],
+     "notes": [
+      "1.1.3.6.2: the load may be carried in packages without the provisions it lists (among them Chapter 5.3 and Part 8 except those named); the transport document (5.4.1) is still required."
+     ],
+     "engine": {
+      "items": [
+       {
+        "un_number": "1203",
+        "state": "COUNTED",
+        "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+        "class": "3",
+        "packing_group": "II",
+        "variant_index": 0,
+        "transport_category": "2",
+        "quantity": 300,
+        "multiplier": 3,
+        "points": 900,
+        "quantity_unit": "L",
+        "quantity_basis": "net",
+        "expected_unit": "L"
+       }
+      ],
+      "total_points": 900,
+      "threshold": 1000,
+      "exempt": true,
+      "has_category_zero": false,
+      "has_quantity_exceedance": false,
+      "warnings": [],
+      "message": "1.1.3.6 exemption applies",
+      "resolved_subtotal_points": 900,
+      "threshold_exceeded_by_resolved_items": false,
+      "verdict_basis": "all_items",
+      "unresolved_item_indexes": []
+     }
+    },
+    "limited_quantities": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      }
+     ]
+    },
+    "excepted_quantities": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      }
+     ]
+    },
+    "lq_eq_status_verdict": "not_assessed",
+    "tunnel_restriction": {
+     "verdict": "conditional",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "column_15": "(D/E)",
+       "counted": true,
+       "carriage": "packages",
+       "forbidden": [
+        "E"
+       ]
+      }
+     ],
+     "whole_load": {
+      "codes": [
+       "(D/E)"
+      ],
+      "forbidden_categories": [
+       "E"
+      ],
+      "complete": true,
+      "ordering": "ADR 8.6.3.2 assigns the most restrictive code to the whole load and names no ranking; this check ranks codes by the categories the 8.6.4 table forbids for the carriage (each a run of categories ending at E), so a code that forbids more categories is the more restrictive."
+     },
+     "route": {
+      "tunnels_on_route": [
+       "B",
+       "E"
+      ],
+      "without_1_1_3_6_relief": {
+       "forbidden_on_route": [
+        "E"
+       ],
+       "allowed_on_route": [
+        "B"
+       ]
+      },
+      "with_1_1_3_6_relief": {
+       "applies": true,
+       "forbidden_on_route": [],
+       "allowed_on_route": [
+        "B",
+        "E"
+       ],
+       "condition": "not if the transport unit is required to be marked in accordance with 3.4.13 subject to 3.4.14 (8.6.3.3)"
+      }
+     },
+     "conditions": [
+      "the load is carried under 1.1.3.6 (8.6.3.3); without that relief it may not pass through tunnels of category E",
+      "8.6.3.3: the relief does not hold if the transport unit is required to be marked in accordance with 3.4.13 (subject to 3.4.14) — not assessed in this version"
+     ],
+     "needs_info": [],
+     "notes": [
+      "8.6.4: the restrictions apply to transport units for which orange-coloured plate marking is required (5.3.2), by the whole-load code, and to units marked under 3.4.13 (subject to 3.4.14) through tunnels of category E; limited and excepted quantities (1.1.3.4) are not taken into account here — a line is counted unless the 1.1.3.6 check left it out."
+     ]
+    },
+    "transport_document": {
+     "verdict": "pass",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "edition": "ADR 2025",
+       "variant_index": 0,
+       "elements": {
+        "a": "UN 1203",
+        "b": [
+         "MOTOR SPIRIT",
+         "GASOLINE",
+         "PETROL"
+        ],
+        "c": "3",
+        "d": "II",
+        "k": "(D/E)"
+       },
+       "strings": [
+        "UN 1203 MOTOR SPIRIT, 3, II, (D/E)",
+        "UN 1203 GASOLINE, 3, II, (D/E)",
+        "UN 1203 PETROL, 3, II, (D/E)"
+       ],
+       "tunnel_code_required": true,
+       "notes": [
+        "3.1.2.2: the row offers several names joined by \"or\"; only the most appropriate is shown — one string per name",
+        "5.4.1.1.1 (c): the labels are column (5)'s; a special provision of column (6) (243 534 664) may change them — not assessed here"
+       ]
+      }
+     ],
+     "order": "5.4.1.1.1: (a) UN number, (b) proper shipping name, (c) labels / class, (d) packing group, (k) tunnel restriction code — in that order, nothing interspersed; the example form \"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\"",
+     "exemption_1_1_3_6_statement": {
+      "applies": true,
+      "rule": "5.4.1.1.1 (f) NOTE 1: in the case of intended application of 1.1.3.6, the total quantity and the calculated value for each transport category are indicated in the transport document (1.1.3.6.3, 1.1.3.6.4). 5.4.1.1.10, which the plan named, is \"(Deleted)\" in ADR 2025.",
+      "per_transport_category": [
+       {
+        "transport_category": "2",
+        "total_quantity": [
+         {
+          "value": 300,
+          "unit": "L"
+         }
+        ],
+        "calculated_value": 900
+       }
+      ],
+      "wording": "the full wording is the carrier's to copy from the regulation"
+     },
+     "conditions": []
+    },
+    "notes": [],
+    "adr_edition": {
+     "edition": "2025",
+     "name": "ADR 2025",
+     "as_of": "2026-11-20",
+     "selected_by": "as_of",
+     "applies_from": "2025-01-01",
+     "may_apply_until": "2027-06-30"
+    }
+   },
+   "confidence": {
+    "level": "high",
+    "basis": "deterministic"
+   },
+   "_source": {
+    "name": "UNECE ADR 2025 (ECE/TRANS/352)",
+    "checked": "2026-10-28",
+    "provenance_status": "verified",
+    "source_url": "https://unece.org/adr-2025-files",
+    "dataset_edition": "ADR 2025",
+    "authority_current_edition": "ADR 2025",
+    "checked_at": "2026-11-04"
+   },
+   "citation": {
+    "text": "ADR consignment check (version 2a) on ADR 2025, as of 2026-11-20: status conditional — exemption_1_1_3_6 pass; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction conditional; transport_document pass. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
+   },
+   "normalized_input": {
+    "consignment": {
+     "schema": "consignment-object.v1",
+     "lines_read": [
+      0
+     ],
+     "not_read": []
+    },
+    "as_of_from": "journey.date"
+   },
+   "_meta": {
+    "check_id": "chk_AAAAAAAAAAAAAAAAAAAAAE",
+    "receipt_url": "https://www.freightutils.com/api/receipts/chk_AAAAAAAAAAAAAAAAAAAAAE"
+   }
+  }
+ },
+ "check_id8000_without_statement_insufficient": {
+  "request": "POST /api/adr/consignment-check?envelope=1.2 {\"lines\":[{\"un_number\":\"ID 8000\",\"quantity\":{\"value\":20,\"unit\":\"kg\",\"basis\":\"net\"},\"packages\":{\"count\":4,\"type\":\"carton\"}}],\"journey\":{\"date\":\"2026-11-20\",\"mode\":\"road\"}}",
+  "status": 200,
+  "body": {
+   "envelope_version": "1.2",
+   "ok": true,
+   "status": "partial",
+   "missing_inputs": [
+    "lines[0].icao_limited_quantity"
+   ],
+   "edition": {
+    "name": "ADR 2025",
+    "applies_from": "2025-01-01",
+    "may_apply_until": "2027-06-30"
+   },
+   "as_of": "2026-11-20",
+   "result": {
+    "status": "insufficient_data",
+    "missing_inputs": [
+     {
+      "name": "lines[0].icao_limited_quantity",
+      "check": "exemption_1_1_3_6",
+      "what": "an ID-prefixed (air-only) line is counted out of 1.1.3.6 only on the statement that its packages are limited quantities to the ICAO Technical Instructions — send icao_limited_quantity: true if they are, or the line's UN number"
+     },
+     {
+      "name": "lines[].inner_packaging",
+      "check": "limited_quantities, excepted_quantities",
+      "what": "optional: the inner packaging { quantity, unit } of a line, to check it against Table A column (7a) / (7b)"
+     },
+     {
+      "name": "journey.tunnels_on_route",
+      "check": "tunnel_restriction",
+      "what": "optional: the tunnel categories (A–E) on the route, to check them against the whole-load code"
+     }
+    ],
+    "checks_performed": [
+     {
+      "name": "exemption_1_1_3_6",
+      "verdict": "insufficient_data",
+      "required": true,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+      "citations": [
+       {
+        "section": "1.1.3.6.3, 1.1.3.6.4",
+        "volume": "I",
+        "pdf_page": [
+         30,
+         31
+        ],
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(15) transport category",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.6.2",
+        "volume": "I",
+        "pdf_page": 29,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "may be carried in packages in one transport unit without application of the following provisions"
+       }
+      ]
+     },
+     {
+      "name": "limited_quantities",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the LQ/EQ engine (adr_lq_eq_check, mode lq) on each line's inner_packaging",
+      "citations": [
+       {
+        "section": "3.4.1",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(7a) limited quantity",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.4.2",
+        "volume": "I",
+        "pdf_page": 28,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+       }
+      ]
+     },
+     {
+      "name": "excepted_quantities",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the LQ/EQ engine (adr_lq_eq_check, mode eq) on each line's inner_packaging",
+      "citations": [
+       {
+        "section": "3.5.1.2, Table 3.5.1.2",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(7b) excepted quantity code",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.4.2",
+        "volume": "I",
+        "pdf_page": 28,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+       }
+      ]
+     },
+     {
+      "name": "tunnel_restriction",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3",
+      "citations": [
+       {
+        "section": "8.6.3.1",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "based on the tunnel restriction code of these goods, indicated in Column (15) of Table A of Chapter 3.2"
+       },
+       {
+        "section": "8.6.3.2",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "the most restrictive of these tunnel restriction codes shall be assigned to the whole load."
+       },
+       {
+        "section": "8.6.3.3",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Dangerous goods carried in accordance with 1.1.3 are not subject to the tunnel restrictions"
+       },
+       {
+        "section": "8.6.3.3",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "except if the transport unit is required to be marked in accordance with 3.4.13 subject to 3.4.14."
+       },
+       {
+        "section": "8.6.4",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "to transport units for which an orange-coloured plate marking is required according to 5.3.2"
+       },
+       {
+        "section": "8.6.4",
+        "volume": "II",
+        "pdf_page": 638,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Passage allowed through all tunnels (For UN Nos. 2919 and 3331, see also 8.6.3.1)."
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(15) tunnel restriction code",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       }
+      ]
+     },
+     {
+      "name": "transport_document",
+      "verdict": "not_applicable",
+      "required": true,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the 5.4.1.1.1 particulars (a)–(d), (k) built from Table A columns (1)–(5) and (15) of the pinned row",
+      "citations": [
+       {
+        "section": "5.4.1.1.1 (a)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "The UN number preceded by the letters \"UN\""
+       },
+       {
+        "section": "5.4.1.1.1 (b)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "The proper shipping name supplemented, when applicable (see 3.1.2.8.1) with the technical name in brackets"
+       },
+       {
+        "section": "5.4.1.1.1 (c)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "When more than one label model numbers are given, the numbers following the first one shall be given in brackets."
+       },
+       {
+        "section": "5.4.1.1.1 (d)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Where assigned, the packing group for the substance which may be preceded by the letters \"PG\""
+       },
+       {
+        "section": "5.4.1.1.1 (k)",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "For carriage that includes passage through tunnels with restrictions for carriage of dangerous goods, the tunnel restriction code"
+       },
+       {
+        "section": "5.4.1.1.1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "(a), (b), (c), (d) and (k) shall be shown in the order listed above"
+       },
+       {
+        "section": "5.4.1.1.1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "\"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\""
+       },
+       {
+        "section": "3.1.2.2",
+        "volume": "I",
+        "pdf_page": 289,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "only the most appropriate shall be shown in the transport document and package marks"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(1)–(5), (15)",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       }
+      ]
+     },
+     {
+      "name": "mixed_loading_7_5_2",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2b",
+      "citations": [],
+      "run": "build 2b"
+     },
+     {
+      "name": "placards_and_plates_5_3",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "equipment_8_1",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "driver_training_8_2",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "packaging_code_validity",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2d",
+      "citations": [],
+      "run": "build 2d"
+     }
+    ],
+    "edition": "ADR 2025",
+    "as_of": "2026-11-20",
+    "edition_basis": "adr_2025",
+    "lines": [
+     {
+      "line_index": 0,
+      "un_number": "ID 8000",
+      "dangerous_goods": true
+     }
+    ],
+    "exemption_1_1_3_6": {
+     "verdict": "insufficient_data",
+     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+     "conditions": [],
+     "notes": [],
+     "engine": {
+      "items": [
+       {
+        "un_number": "ID8000",
+        "state": "BLOCKED",
+        "proper_shipping_name": null,
+        "class": null,
+        "packing_group": null,
+        "variant_index": null,
+        "transport_category": null,
+        "quantity": 20,
+        "multiplier": null,
+        "points": null,
+        "air_only_id": true,
+        "entry_required": true
+       }
+      ],
+      "total_points": null,
+      "threshold": 1000,
+      "exempt": null,
+      "has_category_zero": false,
+      "has_quantity_exceedance": false,
+      "warnings": [
+       "ID8000 (item 0): an air-only identifier with no ADR Table A entry, and the request does not state that its packages are limited quantities conforming to the ICAO Technical Instructions — the marking alone does not establish 3.4.9 or 3.4.10. No points for this line and no load verdict until it is settled: enter the goods under their UN number(s), or send icao_limited_quantity: true on the line where its packages bear the 3.4.8 mark or meet 3.4.10."
+      ],
+      "message": "No 1.1.3.6 verdict for the load — ID8000 has no ADR Table A entry and the request does not state that the packages are limited quantities to the ICAO Technical Instructions (icao_limited_quantity).",
+      "resolved_subtotal_points": 0,
+      "threshold_exceeded_by_resolved_items": false,
+      "verdict_basis": "none",
+      "unresolved_item_indexes": [
+       0
+      ]
+     }
+    },
+    "limited_quantities": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "ID 8000",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      }
+     ]
+    },
+    "excepted_quantities": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "ID 8000",
+       "assessed": false,
+       "reason": "no inner_packaging on the line"
+      }
+     ]
+    },
+    "lq_eq_status_verdict": "not_assessed",
+    "tunnel_restriction": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "ID 8000",
+       "column_15": null,
+       "counted": false,
+       "reason": "an ID-prefixed (air-only) number has no ADR Table A row and no column (15) code"
+      }
+     ],
+     "whole_load": {
+      "codes": [],
+      "forbidden_categories": [],
+      "complete": true,
+      "ordering": "ADR 8.6.3.2 assigns the most restrictive code to the whole load and names no ranking; this check ranks codes by the categories the 8.6.4 table forbids for the carriage (each a run of categories ending at E), so a code that forbids more categories is the more restrictive."
+     },
+     "route": null,
+     "conditions": [],
+     "needs_info": [],
+     "notes": [
+      "8.6.4: the restrictions apply to transport units for which orange-coloured plate marking is required (5.3.2), by the whole-load code, and to units marked under 3.4.13 (subject to 3.4.14) through tunnels of category E; limited and excepted quantities (1.1.3.4) are not taken into account here — a line is counted unless the 1.1.3.6 check left it out."
+     ]
+    },
+    "transport_document": {
+     "verdict": "not_applicable",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "ID 8000",
+       "entry": null,
+       "reason": "an ID-prefixed (air-only) number has no ADR Table A row; 5.4.1.1.1 is not assessed for it"
+      }
+     ],
+     "order": "5.4.1.1.1: (a) UN number, (b) proper shipping name, (c) labels / class, (d) packing group, (k) tunnel restriction code — in that order, nothing interspersed; the example form \"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\"",
+     "exemption_1_1_3_6_statement": null,
+     "conditions": []
+    },
+    "notes": [],
+    "adr_edition": {
+     "edition": "2025",
+     "name": "ADR 2025",
+     "as_of": "2026-11-20",
+     "selected_by": "as_of",
+     "applies_from": "2025-01-01",
+     "may_apply_until": "2027-06-30"
+    }
+   },
+   "confidence": {
+    "level": "medium",
+    "basis": "deterministic"
+   },
+   "_source": {
+    "name": "UNECE ADR 2025 (ECE/TRANS/352)",
+    "checked": "2026-10-28",
+    "provenance_status": "verified",
+    "source_url": "https://unece.org/adr-2025-files",
+    "dataset_edition": "ADR 2025",
+    "authority_current_edition": "ADR 2025",
+    "checked_at": "2026-11-04"
+   },
+   "citation": {
+    "text": "ADR consignment check (version 2a) on ADR 2025, as of 2026-11-20: status insufficient_data — exemption_1_1_3_6 insufficient_data; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document not_applicable. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
+   },
+   "normalized_input": {
+    "consignment": {
+     "schema": "consignment-object.v1",
+     "lines_read": [
+      0
+     ],
+     "not_read": []
+    },
+    "as_of_from": "journey.date"
+   },
+   "_meta": {
+    "check_id": "chk_AAAAAAAAAAAAAAAAAAAAAF",
+    "receipt_url": "https://www.freightutils.com/api/receipts/chk_AAAAAAAAAAAAAAAAAAAAAF"
+   }
+  }
+ },
+ "check_lq_inner_over_limit_fail": {
+  "request": "POST /api/adr/consignment-check?envelope=1.2 {\"lines\":[{\"un_number\":\"1203\",\"packing_group\":\"II\",\"quantity\":{\"value\":50,\"unit\":\"L\",\"basis\":\"net\"},\"packages\":{\"count\":10,\"type\":\"box\"},\"inner_packaging\":{\"quantity\":5,\"unit\":\"L\",\"regime\":\"lq\"}}],\"journey\":{\"date\":\"2026-11-20\",\"mode\":\"road\"}}",
+  "status": 200,
+  "body": {
+   "envelope_version": "1.2",
+   "ok": true,
+   "status": "ok",
+   "missing_inputs": [],
+   "edition": {
+    "name": "ADR 2025",
+    "applies_from": "2025-01-01",
+    "may_apply_until": "2027-06-30"
+   },
+   "as_of": "2026-11-20",
+   "result": {
+    "status": "fail",
+    "missing_inputs": [
+     {
+      "name": "journey.tunnels_on_route",
+      "check": "tunnel_restriction",
+      "what": "optional: the tunnel categories (A–E) on the route, to check them against the whole-load code"
+     }
+    ],
+    "checks_performed": [
+     {
+      "name": "exemption_1_1_3_6",
+      "verdict": "pass",
+      "required": true,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+      "citations": [
+       {
+        "section": "1.1.3.6.3, 1.1.3.6.4",
+        "volume": "I",
+        "pdf_page": [
+         30,
+         31
+        ],
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(15) transport category",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.6.2",
+        "volume": "I",
+        "pdf_page": 29,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "may be carried in packages in one transport unit without application of the following provisions"
+       }
+      ]
+     },
+     {
+      "name": "limited_quantities",
+      "verdict": "fail",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the LQ/EQ engine (adr_lq_eq_check, mode lq) on each line's inner_packaging",
+      "citations": [
+       {
+        "section": "3.4.1",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(7a) limited quantity",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.4.2",
+        "volume": "I",
+        "pdf_page": 28,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+       }
+      ]
+     },
+     {
+      "name": "excepted_quantities",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the LQ/EQ engine (adr_lq_eq_check, mode eq) on each line's inner_packaging",
+      "citations": [
+       {
+        "section": "3.5.1.2, Table 3.5.1.2",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(7b) excepted quantity code",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       },
+       {
+        "section": "1.1.3.4.2",
+        "volume": "I",
+        "pdf_page": 28,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+       }
+      ]
+     },
+     {
+      "name": "tunnel_restriction",
+      "verdict": "not_assessed",
+      "required": false,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3",
+      "citations": [
+       {
+        "section": "8.6.3.1",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "based on the tunnel restriction code of these goods, indicated in Column (15) of Table A of Chapter 3.2"
+       },
+       {
+        "section": "8.6.3.2",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "the most restrictive of these tunnel restriction codes shall be assigned to the whole load."
+       },
+       {
+        "section": "8.6.3.3",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Dangerous goods carried in accordance with 1.1.3 are not subject to the tunnel restrictions"
+       },
+       {
+        "section": "8.6.3.3",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "except if the transport unit is required to be marked in accordance with 3.4.13 subject to 3.4.14."
+       },
+       {
+        "section": "8.6.4",
+        "volume": "II",
+        "pdf_page": 637,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "to transport units for which an orange-coloured plate marking is required according to 5.3.2"
+       },
+       {
+        "section": "8.6.4",
+        "volume": "II",
+        "pdf_page": 638,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Passage allowed through all tunnels (For UN Nos. 2919 and 3331, see also 8.6.3.1)."
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(15) tunnel restriction code",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       }
+      ]
+     },
+     {
+      "name": "transport_document",
+      "verdict": "pass",
+      "required": true,
+      "edition": "ADR 2025",
+      "as_of": "2026-11-20",
+      "basis": "the 5.4.1.1.1 particulars (a)–(d), (k) built from Table A columns (1)–(5) and (15) of the pinned row",
+      "citations": [
+       {
+        "section": "5.4.1.1.1 (a)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "The UN number preceded by the letters \"UN\""
+       },
+       {
+        "section": "5.4.1.1.1 (b)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "The proper shipping name supplemented, when applicable (see 3.1.2.8.1) with the technical name in brackets"
+       },
+       {
+        "section": "5.4.1.1.1 (c)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "When more than one label model numbers are given, the numbers following the first one shall be given in brackets."
+       },
+       {
+        "section": "5.4.1.1.1 (d)",
+        "volume": "II",
+        "pdf_page": 271,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "Where assigned, the packing group for the substance which may be preceded by the letters \"PG\""
+       },
+       {
+        "section": "5.4.1.1.1 (k)",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "For carriage that includes passage through tunnels with restrictions for carriage of dangerous goods, the tunnel restriction code"
+       },
+       {
+        "section": "5.4.1.1.1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "(a), (b), (c), (d) and (k) shall be shown in the order listed above"
+       },
+       {
+        "section": "5.4.1.1.1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "\"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\""
+       },
+       {
+        "section": "3.1.2.2",
+        "volume": "I",
+        "pdf_page": 289,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "only the most appropriate shall be shown in the transport document and package marks"
+       },
+       {
+        "section": "5.4.1.1.1 (f) NOTE 1",
+        "volume": "II",
+        "pdf_page": 272,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "the total quantity and the calculated value of dangerous goods for each transport category shall be indicated"
+       },
+       {
+        "section": "5.4.1.1.10",
+        "volume": "II",
+        "pdf_page": 275,
+        "document": "ECE/TRANS/352 (ADR 2025)",
+        "quote": "5.4.1.1.10 (Deleted)"
+       },
+       {
+        "section": "Table A (3.2.1)",
+        "table_a_columns": "(1)–(5), (15)",
+        "document": "ECE/TRANS/352 (ADR 2025)"
+       }
+      ]
+     },
+     {
+      "name": "mixed_loading_7_5_2",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2b",
+      "citations": [],
+      "run": "build 2b"
+     },
+     {
+      "name": "placards_and_plates_5_3",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "equipment_8_1",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "driver_training_8_2",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2c",
+      "citations": [],
+      "run": "build 2c"
+     },
+     {
+      "name": "packaging_code_validity",
+      "verdict": "not_in_this_version",
+      "required": false,
+      "edition": null,
+      "as_of": "2026-11-20",
+      "basis": "not in version 2a — planned for build 2d",
+      "citations": [],
+      "run": "build 2d"
+     }
+    ],
+    "edition": "ADR 2025",
+    "as_of": "2026-11-20",
+    "edition_basis": "adr_2025",
+    "lines": [
+     {
+      "line_index": 0,
+      "un_number": "1203",
+      "dangerous_goods": true
+     }
+    ],
+    "exemption_1_1_3_6": {
+     "verdict": "pass",
+     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+     "conditions": [],
+     "notes": [
+      "1.1.3.6.2: the load may be carried in packages without the provisions it lists (among them Chapter 5.3 and Part 8 except those named); the transport document (5.4.1) is still required."
+     ],
+     "engine": {
+      "items": [
+       {
+        "un_number": "1203",
+        "state": "COUNTED",
+        "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+        "class": "3",
+        "packing_group": "II",
+        "variant_index": 0,
+        "transport_category": "2",
+        "quantity": 50,
+        "multiplier": 3,
+        "points": 150,
+        "quantity_unit": "L",
+        "quantity_basis": "net",
+        "expected_unit": "L"
+       }
+      ],
+      "total_points": 150,
+      "threshold": 1000,
+      "exempt": true,
+      "has_category_zero": false,
+      "has_quantity_exceedance": false,
+      "warnings": [],
+      "message": "1.1.3.6 exemption applies",
+      "resolved_subtotal_points": 150,
+      "threshold_exceeded_by_resolved_items": false,
+      "verdict_basis": "all_items",
+      "unresolved_item_indexes": []
+     }
+    },
+    "limited_quantities": {
+     "verdict": "fail",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "assessed": true,
+       "answer": {
+        "un_number": "1203",
+        "variant_index": 0,
+        "substance": "MOTOR SPIRIT or GASOLINE or PETROL",
+        "class": "3",
+        "packing_group": "II",
+        "lq_limit": "1 L",
+        "lq_limit_value": 1,
+        "lq_limit_unit": "L",
+        "eq_code": "E2",
+        "quantity_entered": 5,
+        "unit_entered": "L",
+        "status": "exceeds_limit",
+        "reason": "5 L exceeds the LQ limit of 1 L per inner packaging"
+       },
+       "overall_status": "does_not_qualify"
+      }
+     ]
+    },
+    "excepted_quantities": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "assessed": false,
+       "reason": "inner_packaging.regime is \"lq\""
+      }
+     ]
+    },
+    "lq_eq_status_verdict": "fail",
+    "tunnel_restriction": {
+     "verdict": "not_assessed",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "column_15": "(D/E)",
+       "counted": true,
+       "carriage": "packages",
+       "forbidden": [
+        "E"
+       ]
+      }
+     ],
+     "whole_load": {
+      "codes": [
+       "(D/E)"
+      ],
+      "forbidden_categories": [
+       "E"
+      ],
+      "complete": true,
+      "ordering": "ADR 8.6.3.2 assigns the most restrictive code to the whole load and names no ranking; this check ranks codes by the categories the 8.6.4 table forbids for the carriage (each a run of categories ending at E), so a code that forbids more categories is the more restrictive."
+     },
+     "route": null,
+     "conditions": [],
+     "needs_info": [],
+     "notes": [
+      "8.6.4: the restrictions apply to transport units for which orange-coloured plate marking is required (5.3.2), by the whole-load code, and to units marked under 3.4.13 (subject to 3.4.14) through tunnels of category E; limited and excepted quantities (1.1.3.4) are not taken into account here — a line is counted unless the 1.1.3.6 check left it out."
+     ]
+    },
+    "transport_document": {
+     "verdict": "pass",
+     "lines": [
+      {
+       "line_index": 0,
+       "un_number": "1203",
+       "edition": "ADR 2025",
+       "variant_index": 0,
+       "elements": {
+        "a": "UN 1203",
+        "b": [
+         "MOTOR SPIRIT",
+         "GASOLINE",
+         "PETROL"
+        ],
+        "c": "3",
+        "d": "II",
+        "k": "(D/E)"
+       },
+       "strings": [
+        "UN 1203 MOTOR SPIRIT, 3, II, (D/E)",
+        "UN 1203 GASOLINE, 3, II, (D/E)",
+        "UN 1203 PETROL, 3, II, (D/E)"
+       ],
+       "tunnel_code_required": null,
+       "notes": [
+        "3.1.2.2: the row offers several names joined by \"or\"; only the most appropriate is shown — one string per name",
+        "5.4.1.1.1 (c): the labels are column (5)'s; a special provision of column (6) (243 534 664) may change them — not assessed here"
+       ]
+      }
+     ],
+     "order": "5.4.1.1.1: (a) UN number, (b) proper shipping name, (c) labels / class, (d) packing group, (k) tunnel restriction code — in that order, nothing interspersed; the example form \"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\"",
+     "exemption_1_1_3_6_statement": {
+      "applies": true,
+      "rule": "5.4.1.1.1 (f) NOTE 1: in the case of intended application of 1.1.3.6, the total quantity and the calculated value for each transport category are indicated in the transport document (1.1.3.6.3, 1.1.3.6.4). 5.4.1.1.10, which the plan named, is \"(Deleted)\" in ADR 2025.",
+      "per_transport_category": [
+       {
+        "transport_category": "2",
+        "total_quantity": [
+         {
+          "value": 50,
+          "unit": "L"
+         }
+        ],
+        "calculated_value": 150
+       }
+      ],
+      "wording": "the full wording is the carrier's to copy from the regulation"
+     },
+     "conditions": []
+    },
+    "notes": [],
+    "adr_edition": {
+     "edition": "2025",
+     "name": "ADR 2025",
+     "as_of": "2026-11-20",
+     "selected_by": "as_of",
+     "applies_from": "2025-01-01",
+     "may_apply_until": "2027-06-30"
+    }
+   },
+   "confidence": {
+    "level": "high",
+    "basis": "deterministic"
+   },
+   "_source": {
+    "name": "UNECE ADR 2025 (ECE/TRANS/352)",
+    "checked": "2026-10-28",
+    "provenance_status": "verified",
+    "source_url": "https://unece.org/adr-2025-files",
+    "dataset_edition": "ADR 2025",
+    "authority_current_edition": "ADR 2025",
+    "checked_at": "2026-11-04"
+   },
+   "citation": {
+    "text": "ADR consignment check (version 2a) on ADR 2025, as of 2026-11-20: status fail — exemption_1_1_3_6 pass; limited_quantities fail; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
+   },
+   "normalized_input": {
+    "consignment": {
+     "schema": "consignment-object.v1",
+     "lines_read": [
+      0
+     ],
+     "not_read": []
+    },
+    "as_of_from": "journey.date"
+   },
+   "_meta": {
+    "check_id": "chk_AAAAAAAAAAAAAAAAAAAAAG",
+    "receipt_url": "https://www.freightutils.com/api/receipts/chk_AAAAAAAAAAAAAAAAAAAAAG"
+   }
+  }
+ },
+ "check_all_zero_400": {
+  "request": "POST /api/adr/consignment-check?envelope=1.2 {\"lines\":[{\"un_number\":\"1203\",\"packing_group\":\"II\",\"quantity\":{\"value\":0,\"unit\":\"L\",\"basis\":\"net\"}}]}",
+  "status": 400,
+  "body": {
+   "envelope_version": "1.2",
+   "ok": false,
+   "status": "unsupported",
+   "missing_inputs": [],
+   "edition": {
+    "name": "ADR 2025",
+    "applies_from": "2025-01-01",
+    "may_apply_until": "2027-06-30"
+   },
+   "as_of": "2026-11-04",
+   "result": {},
+   "confidence": {
+    "level": "high",
+    "basis": "deterministic"
+   },
+   "_source": {
+    "name": "UNECE ADR 2025 (ECE/TRANS/352)",
+    "checked": "2026-10-28",
+    "provenance_status": "verified",
+    "source_url": "https://unece.org/adr-2025-files",
+    "dataset_edition": "ADR 2025",
+    "authority_current_edition": "ADR 2025",
+    "checked_at": "2026-11-04"
+   },
+   "citation": {
+    "text": "Not computed — Every item has quantity 0: no dangerous goods are entered for this load, so no ADR 1.1.3.6 verdict is given. Enter the quantity carried on at least one item."
+   },
+   "blocking_errors": [
+    {
+     "code": "INVALID_INPUT",
+     "message": "Every item has quantity 0: no dangerous goods are entered for this load, so no ADR 1.1.3.6 verdict is given. Enter the quantity carried on at least one item.",
+     "recovery": {
+      "action": "POST the consignment object (lines[] required) with edition / as_of beside it.",
+      "tool": "adr_consignment_check",
+      "params": {
+       "lines": [
+        {
+         "un_number": "1203",
+         "packing_group": "II",
+         "quantity": {
+          "value": 200,
+          "unit": "L",
+          "basis": "net"
+         },
+         "packages": {
+          "count": 10,
+          "type": "jerrycan"
+         }
+        }
+       ],
+       "journey": {
+        "date": "2026-11-20",
+        "mode": "road",
+        "tunnels_on_route": [
+         "C",
+         "E"
+        ]
+       }
+      }
+     }
+    }
+   ]
+  }
+ }
+}

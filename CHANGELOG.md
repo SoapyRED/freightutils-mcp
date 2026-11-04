@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.29.0 — unreleased
+
+Mirrors the website's new check, POST /api/adr/consignment-check (freightutils.com build 2a). Additive: one new tool,
+nothing removed — every 2.28.0 argument and answer field still validates. Not released: the release run bumps the
+version, dates this heading and tags it; the hosted endpoint gains the tool with the website's pin of this release.
+
+Why a minor release: a new tool.
+
+### Added
+
+- **`adr_consignment_check`** — one call on the consignment object (`lines[]`, `journey`, `vehicle`, `options`,
+  with `edition` / `as_of` beside it; `journey.date` is the default `as_of`): the 1.1.3.6 verdict (the
+  `adr_exemption_calculator` answer, whole), the limited / excepted quantity check of each line with
+  `inner_packaging` (the `adr_lq_eq_check` answer), the whole-load tunnel code against `journey.tunnels_on_route`
+  with and without the 1.1.3.6 relief (ADR 8.6.3 / 8.6.4), and the 5.4.1.1.1 transport-document entries. Answers
+  `status` (`pass` | `fail` | `conditional` | `insufficient_data`), `missing_inputs[]` ({ name, check, what })
+  and `checks_performed[]` (verdict, edition, as_of, basis, citations with the ADR section and PDF page). Strict
+  input (an unknown key is a tool error naming it); every answer field typed, loose where the website's shape may grow.
+  A keyed call carries `_meta.check_id`; without a key, `_meta.receipt` (the hash, nothing stored).
+- Scope `dg` (`--scope dg` / `FREIGHTUTILS_SCOPE=dg`) and the default list include it.
+
 ## 2.28.0 — 2026-11-04
 
 Mirrors the website's 4 Nov calculator changes (freightutils.com #328) and its ADR code registry statuses
