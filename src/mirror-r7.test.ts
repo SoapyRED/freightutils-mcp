@@ -70,3 +70,26 @@ test('R7: _meta.receipt is typed — a receipt claiming stored: true is refused 
     await close();
   });
 });
+
+test('0C: a free key past its 25 stored receipts a day — reason "quota" — validates and passes through', async () => {
+  const quota = { ...RECORDED.body, _meta: { ...RECORDED.body._meta, receipt: { ...RECORDED.body._meta.receipt, reason: 'quota' } } };
+  await withApi(quota, async () => {
+    const { client, close } = await connect();
+    const r = await client.callTool({ name: 'adr_exemption_calculator', arguments: { un_number: '1203', quantity: 300, unit: 'L' } });
+    assert.ok(!r.isError, JSON.stringify(r).slice(0, 400));
+    const sc = r.structuredContent as Record<string, unknown> & { _meta: Record<string, unknown> & { receipt: Record<string, unknown> } };
+    assert.equal(sc._meta.receipt.reason, 'quota');
+    assert.equal(recompute(sc), RECORDED.body._meta.receipt.receipt_hash, 'reason is not hashed: the hash still recomputes');
+    await close();
+  });
+});
+
+test('0C: reason stays typed — an unknown reason is refused by the client', async () => {
+  const bad = { ...RECORDED.body, _meta: { ...RECORDED.body._meta, receipt: { ...RECORDED.body._meta.receipt, reason: 'something_else' } } };
+  await withApi(bad, async () => {
+    const { client, close } = await connect();
+    const r = await client.callTool({ name: 'adr_exemption_calculator', arguments: { un_number: '1203', quantity: 300, unit: 'L' } }).catch((e: unknown) => ({ rejected: e }));
+    assert.ok('rejected' in r || (r as { isError?: boolean }).isError === true, `accepted: ${JSON.stringify(r).slice(0, 300)}`);
+    await close();
+  });
+});
