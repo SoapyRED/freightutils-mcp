@@ -1,5 +1,29 @@
 # Changelog
 
+## 2.30.0 — 2026-11-05
+
+Mirrors build 2b of the website's POST /api/adr/consignment-check: `adr_consignment_check` now checks mixed loading.
+Additive: nothing removed, no default changed — every 2.29.0 argument and answer field still validates.
+
+Why a minor release: a new optional input field and a new typed answer block.
+
+### Added
+
+- `adr_consignment_check` input: `vehicle.foodstuffs_carried` (boolean, optional) — foodstuffs, other articles of
+  consumption or animal feeds carried in the same vehicle or container (ADR 7.5.4, read for goods with CV28).
+- `adr_consignment_check` result: the typed `mixed_loading_7_5_2` block — `verdict`, `basis`, `lines[]` (labels,
+  classification code, compatibility group), `pairs[]` and `class_1.pairs[]` (`permitted` true | false | "conditional",
+  the deciding `cell`, the quoted `note`, `source_ref`), `foodstuffs` (`engaged`, `lines[]`, `input`, `verdict`),
+  `conditions[]`, `needs_info[]`, `notes[]`. Proved by `test-fixtures/recorded-2.30.0.json` (six answers recorded on the
+  website's build-2b preview, keyed, synthetic check_ids) through the typed branch.
+
+### Changed
+
+- The description says mixed loading is checked; its Limitations name what is left (5.3, 8.1, 8.2.1 in build 2c;
+  packaging codes in build 2d) and the foodstuffs input. The `vehicle` argument's description says only
+  `foodstuffs_carried` is read.
+- Nothing removed, no default changed: every 2.29.0 argument and answer field still validates.
+
 ## 2.29.0 — 2026-11-05
 
 Mirrors the website's new check, POST /api/adr/consignment-check (freightutils.com build 2a), and types two
