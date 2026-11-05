@@ -64,7 +64,7 @@ test('2.31.0: the description names the vehicle side, its inputs and the 2c limi
   assert.match(t.description, /equipment_8_1 \{verdict/);
   assert.match(t.description, /driver_training_8_2 \{verdict/);
   assert.match(t.description, /crew \{adr_training_certificate, specialisations\[\]/);
-  assert.match(t.description, /Limitations: version 2c does not yet check packaging codes \(build 2d\)/);
+  assert.match(t.description, /Limitations: the packaging check reads the mark, not the packaging kind/); // since 2.32.0 (build 2d)
   assert.doesNotMatch(t.description, /does not yet check plates and placards/);
   // website run 2x: what fail, not_applicable and regime mean
   assert.match(t.description, /regime \("1\.1\.3\.6" \| "full_adr" \| "undetermined"/);
