@@ -1399,7 +1399,7 @@ const CC_LINE = strictInput({
     quantity: z.number().positive().max(1_000_000).describe('The quantity in ONE inner packaging.'),
     unit: z.enum(['ml', 'L', 'g', 'kg']),
     per_outer: z.number().int().min(1).max(100_000).optional().describe('Inner packagings in one outer packaging (default 1) — the excepted-quantity outer limit.'),
-    regime: z.enum(['lq', 'eq']).optional().describe('The exemption the line is meant to use; omitted, both are checked and the line fails only when it fits neither.'),
+    regime: z.enum(['lq', 'eq']).optional().describe('The exemption the line is meant to use; a stated regime that is missed fails. Omitted, both are checked, and a line that fits neither is not_applicable (the full requirements apply).'),
   }, { acceptedLabel: 'Accepted in inner_packaging' }).optional().describe('The inner packaging, for the limited / excepted quantity check (Table A columns (7a) / (7b)).'),
 }, { acceptedLabel: 'Accepted on each line' });
 
@@ -1407,21 +1407,29 @@ const CC_CITATION = loose({ section: z.string(), volume: z.string(), pdf_page: z
 const CC_VERDICT = z.enum(['pass', 'fail', 'conditional', 'insufficient_data', 'not_applicable', 'not_assessed', 'not_in_this_version']);
 /** build 2b: one pair of mixed_loading_7_5_2 — permitted true | false | "conditional"; the deciding cell "<row> × <column>". */
 const CC_MIX_PAIR = loose({ a: z.number(), b: z.number(), labels_a: z.array(z.string()), labels_b: z.array(z.string()), permitted: z.union([z.boolean(), z.literal('conditional')]), cell: z.string(), note: z.string(), source_ref: CC_CITATION, conditions: z.array(z.string()), compatibility_groups: z.array(z.string()) });
-const CC_QTY_LINE = loose({ line_index: z.number(), un_number: z.string(), assessed: z.boolean(), reason: z.string(), answer: z.record(z.string(), z.unknown()), overall_status: z.string() });
+const CC_QTY_LINE = loose({ line_index: z.number(), un_number: z.string(), assessed: z.boolean(), verdict: CC_VERDICT, reason: z.string(), answer: z.record(z.string(), z.unknown()), overall_status: z.string() });
+/** build 2c: the vehicle side — a requirement's `applies` (true | false | "under_relief_only" | "conditional") and a requirement's outcome against its input. */
+const CC_APPLIES = z.union([z.boolean(), z.enum(['under_relief_only', 'conditional'])]);
+const CC_OUTCOME = z.enum(['pass', 'fail', 'conditional', 'unanswered', 'not_required']);
+const CC_NEEDS = z.array(loose({ line_index: z.number(), question: z.string() }));
+const CC_REQUIREMENT = loose({ id: z.string(), applies: CC_APPLIES, basis: z.string(), quantity: z.string(), specification: z.string(), lines: z.array(z.number()), source_ref: CC_CITATION });
+const CC_EQUIPMENT_ITEM = loose({ item: z.string(), printed: z.string(), per: z.enum(['vehicle', 'transport_unit', 'crew_member']), applies: CC_APPLIES, basis: z.string(), for_labels: z.array(z.string()), lines: z.array(z.number()), on_board: z.boolean(), outcome: CC_OUTCOME, source_ref: CC_CITATION });
+const CC_EXT_BAND = loose({ transport_unit_maximum_permissible_mass: z.string(), minimum_number: z.number(), minimum_total_kg: z.number(), engine_or_cab_minimum_kg: z.number(), additional_minimum_kg: z.number(), cells: z.array(z.string()) });
+const EQUIPMENT_8_1_5_ITEMS = ['wheel_chock', 'warning_signs', 'eye_rinsing_liquid', 'warning_vest', 'portable_lighting', 'protective_gloves', 'eye_protection', 'emergency_escape_mask', 'shovel', 'drain_seal', 'collecting_container'] as const;
 
 const adrConsignmentCheck: ToolDef = {
   name: 'adr_consignment_check',
-  description: `One call on the consignment object for the ADR picture of a road load: the 1.1.3.6 small-load verdict, the limited / excepted quantity check of each line, the tunnel restriction code of the whole load against the tunnels on the route, each line's transport-document entry, and mixed loading (7.5.2, with the foodstuffs precautions of 7.5.4). The rules are page-cited to the free UNECE ADR 2025 publication.
+  description: `One call on the consignment object for the ADR picture of a road load: the 1.1.3.6 small-load verdict, the limited / excepted quantity check of each line, the tunnel restriction code of the whole load against the tunnels on the route, each line's transport-document entry, mixed loading (7.5.2, with the foodstuffs precautions of 7.5.4), and the vehicle side — orange-coloured plates and placards (5.3), the documents, fire extinguishers and equipment on the transport unit (8.1), and driver training (8.2). The rules are page-cited to the free UNECE ADR 2025 publication.
 
-Provide lines[] — each dangerous-goods line with un_number, quantity {value, unit, basis} and, where it applies, packing_group / variant_index, packages {count, type}, inner_packaging {quantity, unit, per_outer?, regime?} and (ID lines only) icao_limited_quantity — and optionally journey {date, tunnels_on_route (A–E), mode}, vehicle {foodstuffs_carried} (foodstuffs, other articles of consumption or animal feeds in the same vehicle or container — ADR 7.5.4), edition and as_of. journey.date is the default as_of; an as_of that contradicts it is refused.
+Provide lines[] — each dangerous-goods line with un_number, quantity {value, unit, basis} and, where it applies, packing_group / variant_index, packages {count, type, gross_kg}, inner_packaging {quantity, unit, per_outer?, regime?} and (ID lines only) icao_limited_quantity — and optionally journey {date, tunnels_on_route (A–E), mode}, vehicle {max_mass_t (the transport unit's maximum permissible mass — the 8.1.4.1 band, 3.4.13), foodstuffs_carried (ADR 7.5.4), fire_extinguishers_kg[], orange_plates_displayed, placards_displayed, equipment_8_1_5[] (the 8.1.5 items by name), instructions_in_writing}, crew {adr_training_certificate, specialisations[] (class_1, class_7, tanks), photo_identification, awareness_training_1_3}, edition and as_of. journey.date is the default as_of; an as_of that contradicts it is refused.
 
-Behavior: deterministic. The 1.1.3.6 check is the adr_exemption_calculator's answer, whole (basis, basis_until, strict_adr_2027, items[].state incl. EXCLUDED_NIL / BLOCKED / AIR_ONLY_ID). The LQ / EQ checks are the adr_lq_eq_check answer per line with inner_packaging. The tunnel check assigns the whole load the most restrictive code (8.6.3.2, ranked by the categories the 8.6.4 table forbids for the carriage), gives which tunnels on the route the load may use without and with the 1.1.3.6 relief (8.6.3.3: goods carried under 1.1.3 are not subject to tunnel restrictions unless the unit must bear the 3.4.13 mark), and computes the net explosive mass for B1000C / C5000D. The document entries follow 5.4.1.1.1 (a), (b), (c), (d), (k) in that order, from Table A columns (1)–(5) and (15) — e.g. "UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)"; a row whose name joins names by "or" gives one entry per name (3.1.2.2); for a load within 1.1.3.6 the total quantity and calculated value per transport category (NOTE 1 to 5.4.1.1.1 (f)). Mixed loading reads the lines as one load in one transport unit: every pair of lines against the 7.5.2.1 table by the labels of Table A column (5) (subsidiary labels included; "4.1 + 1" / "5.2 + 1" as printed), Class 1 pairs against the 7.5.2.2 table by compatibility group; a lettered note the rows settle is settled (1.4S; UN 2990 / 3072 / 3268; UN 0503 with 3268), one that turns on a fact the object does not carry answers conditional with the note quoted; a line whose LQ / EQ check passes is still read as a package of its row, with the 3.4.1 / 3.5.1.1 relief and 7.5.2.4 stated as conditions; a load within 1.1.3.6 is checked all the same (1.1.3.6.2 does not lift 7.5.2); goods with CV28 engage 7.5.4 (ADR 2027: as amended). Where the text does not settle a case (a code that splits tank and other carriage on a line with no packages; a Class 1 line not in net kg) the check asks instead of assuming. ${RATE}
+Behavior: deterministic. The 1.1.3.6 check is the adr_exemption_calculator's answer, whole (basis, basis_until, strict_adr_2027, items[].state incl. EXCLUDED_NIL / BLOCKED / AIR_ONLY_ID). The LQ / EQ checks are the adr_lq_eq_check answer per line with inner_packaging. The tunnel check assigns the whole load the most restrictive code (8.6.3.2, ranked by the categories the 8.6.4 table forbids for the carriage), gives which tunnels on the route the load may use without and with the 1.1.3.6 relief (8.6.3.3: goods carried under 1.1.3 are not subject to tunnel restrictions unless the unit must bear the 3.4.13 mark), and computes the net explosive mass for B1000C / C5000D. The document entries follow 5.4.1.1.1 (a), (b), (c), (d), (k) in that order, from Table A columns (1)–(5) and (15) — e.g. "UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)"; a row whose name joins names by "or" gives one entry per name (3.1.2.2); for a load within 1.1.3.6 the total quantity and calculated value per transport category (NOTE 1 to 5.4.1.1.1 (f)). Mixed loading reads the lines as one load in one transport unit: every pair of lines against the 7.5.2.1 table by the labels of Table A column (5) (subsidiary labels included; "4.1 + 1" / "5.2 + 1" as printed), Class 1 pairs against the 7.5.2.2 table by compatibility group; a lettered note the rows settle is settled (1.4S; UN 2990 / 3072 / 3268; UN 0503 with 3268), one that turns on a fact the object does not carry answers conditional with the note quoted; a line whose LQ / EQ check passes is still read as a package of its row, with the 3.4.1 / 3.5.1.1 relief and 7.5.2.4 stated as conditions; a load within 1.1.3.6 is checked all the same (1.1.3.6.2 does not lift 7.5.2); goods with CV28 engage 7.5.4 (ADR 2027: as amended). The vehicle side lists, per check, the requirements the load puts on the vehicle — read from the Table A rows (class, classification code, column (5) labels, column (19) S-provisions) and the 1.1.3.6 verdict — and checks each against its input: met → pass, not met → fail with the rule quoted, not sent → conditional (the input named, optional, in missing_inputs). Plates: two plain orange-coloured plates (5.3.2.1.1); placards on a vehicle carrying packages only for Class 1 other than 1.4S and Class 7 other than excepted packages (5.3.1.5), the model by 5.3.1.1.2; the 5.3.6 mark with placards; the 3.4.13 LQ mark as a condition on a unit over 12 t. Equipment: the 8.1.2.1 documents, the 8.1.4.1 extinguisher table by mass, the 8.1.5 items by danger label. Training: the 8.2.1 certificate and the Class 1 / Class 7 specialisation (8.2.1.4). Under 1.1.3.6 they read 1.1.3.6.2: no Chapter 5.3, one 2 kg extinguisher (8.1.4.2), the transport document, training per Chapter 1.3 (8.2.3) for a driver without the certificate. Where the text does not settle a case (a code that splits tank and other carriage on a line with no packages; a Class 1 line not in net kg) the check asks instead of assuming. fail means a check the load does not meet; a relief that does not apply is not_applicable, not fail, and does not change the status — a load outside 1.1.3.6 (the full requirements apply, and the other checks answer for a fully regulated load) or a line with no stated regime that fits neither LQ nor EQ; a stated regime that is missed, and a CARRIAGE PROHIBITED entry, still fail. regime names the rules the checks answered under: "1.1.3.6" (the load is within it — the vehicle side reads 1.1.3.6.2), "full_adr" (it is not — a fully regulated load), "undetermined" (the 1.1.3.6 check gave no verdict). ${RATE}
 
-Returns: status (pass | fail | conditional | insufficient_data), missing_inputs[] ({name, check, what}), checks_performed[] ({name, verdict, required, edition, as_of, basis, citations[] — section, volume, PDF page, a short quotation}), edition, as_of, edition_basis, lines[], exemption_1_1_3_6 {verdict, basis, conditions, engine}, limited_quantities and excepted_quantities {verdict, lines[]}, tunnel_restriction {verdict, lines[], whole_load {codes, forbidden_categories, complete}, route {tunnels_on_route, without_1_1_3_6_relief, with_1_1_3_6_relief}, needs_info[]}, transport_document {verdict, lines[] (elements a–k, strings), exemption_1_1_3_6_statement}, mixed_loading_7_5_2 {verdict, basis, lines[] {line_index, un_number, labels[], classification_code, compatibility_group}, pairs[] {a, b, labels_a, labels_b, permitted (true | false | "conditional"), cell, note, source_ref}, class_1 {assessed, pairs[]}, foodstuffs {engaged, lines[], input, verdict}, conditions[], needs_info[], notes[]} — all under result — ${ENV} A call made with an API key stores a check receipt (_meta.check_id); without one the answer carries the receipt hash (_meta.receipt) and nothing is stored.
+Returns: status (pass | fail | conditional | insufficient_data), regime ("1.1.3.6" | "full_adr" | "undetermined" — the rules the checks answered under; null without dangerous goods), missing_inputs[] ({name, check, what}), checks_performed[] ({name, verdict, required, edition, as_of, basis, citations[] — section, volume, PDF page, a short quotation}), edition, as_of, edition_basis, lines[], exemption_1_1_3_6 {verdict, basis, conditions, engine}, limited_quantities and excepted_quantities {verdict, lines[] {line_index, verdict, reason, answer}}, tunnel_restriction {verdict, lines[], whole_load {codes, forbidden_categories, complete}, route {tunnels_on_route, without_1_1_3_6_relief, with_1_1_3_6_relief}, needs_info[]}, transport_document {verdict, lines[] (elements a–k, strings), exemption_1_1_3_6_statement}, mixed_loading_7_5_2 {verdict, basis, lines[] {line_index, un_number, labels[], classification_code, compatibility_group}, pairs[] {a, b, labels_a, labels_b, permitted (true | false | "conditional"), cell, note, source_ref}, class_1 {assessed, pairs[]}, foodstuffs {engaged, lines[], input, verdict}, conditions[], needs_info[], notes[]}, placards_and_plates_5_3 {verdict, basis, requirements[] {id, applies (true | false | "under_relief_only" | "conditional"), basis, quantity, specification, lines[], source_ref}, orange_plates {required, numbered}, placards {required, lines[] {line_index, placards[]}}, marks[], lq_mark {applies, condition}, conditions[], needs_info[], notes[]}, equipment_8_1 {verdict, basis, requirements[], fire_extinguishers {band, minimum_total_kg, minimum_largest_kg, small_load_rule, on_board, verdict}, general_equipment[] and label_specific_equipment[] {item, applies, lines[], on_board, outcome}, documents[], conditions[], needs_info[], notes[]}, driver_training_8_2 {verdict, basis, requirements[], certificate {required, under_relief, specialisations[], outcome}, awareness_training_1_3 {applies, outcome}, conditions[], needs_info[], notes[]} — all under result — ${ENV} A call made with an API key stores a check receipt (_meta.check_id); without one the answer carries the receipt hash (_meta.receipt) and nothing is stored.
 
 Editions: ${EDITIONS}
 
-Limitations: version 2b does not yet check plates and placards (5.3), vehicle equipment (8.1) or driver training (8.2.1) (build 2c), or packaging codes (build 2d) — each is listed in checks_performed as not_in_this_version until its build ships; the foodstuffs part of mixed loading needs vehicle.foodstuffs_carried (without it, a condition); column (6) special provisions that change the labels are not applied; limited / excepted quantities are not taken out of the tunnel code (the object does not say a line is carried so); not legal advice, verify against the current UNECE ADR text.
+Limitations: version 2c does not yet check packaging codes (build 2d) — listed in checks_performed as not_in_this_version until it ships; the vehicle-side checks read the load, so without the vehicle.* / crew.* inputs a dangerous-goods load is conditional (the requirements listed); the vehicle side does not assess the vehicle approval of Part 9, the elevated temperature mark (5.3.3 — the object carries no temperature), handling and stowage (7.5.7) or national equivalent training; a limited / excepted quantity relief is stated as a condition, never applied; the foodstuffs part of mixed loading needs vehicle.foodstuffs_carried (without it, a condition); column (6) special provisions that change the labels are not applied; limited / excepted quantities are not taken out of the tunnel code (the object does not say a line is carried so); not legal advice, verify against the current UNECE ADR text.
 
 Related: adr_exemption_calculator (the 1.1.3.6 check alone), adr_lq_eq_check (LQ / EQ alone), adr_lookup (a row's columns).`,
 
@@ -1435,7 +1443,23 @@ Related: adr_exemption_calculator (the 1.1.3.6 check alone), adr_lq_eq_check (LQ
       tunnels_on_route: z.array(z.enum(['A', 'B', 'C', 'D', 'E'])).max(20).optional().describe('ADR tunnel categories on the route (A–E).'),
       mode: z.enum(['road', 'air', 'sea', 'multimodal']).optional(),
     }, { acceptedLabel: 'Accepted in journey' }).optional(),
-    vehicle: strictInput({ type: z.string().max(60).optional(), max_mass_t: z.number().positive().max(100).optional(), axles: z.number().int().min(1).max(12).optional(), foodstuffs_carried: z.boolean().optional().describe('Foodstuffs, other articles of consumption or animal feeds are carried in the same vehicle or container (ADR 7.5.4, read for goods with CV28).') }, { acceptedLabel: 'Accepted in vehicle' }).optional().describe('Only foodstuffs_carried is read (mixed loading, 7.5.4).'),
+    vehicle: strictInput({
+      type: z.string().max(60).optional(),
+      max_mass_t: z.number().positive().max(100).optional().describe('The transport unit\'s maximum permissible mass, tonnes (ADR 8.1.4.1 column (1); 3.4.13).'),
+      axles: z.number().int().min(1).max(12).optional(),
+      foodstuffs_carried: z.boolean().optional().describe('Foodstuffs, other articles of consumption or animal feeds are carried in the same vehicle or container (ADR 7.5.4, read for goods with CV28).'),
+      fire_extinguishers_kg: z.array(z.number().positive().max(100)).max(20).optional().describe('Each portable fire extinguisher on board, kg dry powder or equivalent (ADR 8.1.4.1 / 8.1.4.2).'),
+      orange_plates_displayed: z.boolean().optional().describe('The two orange-coloured plates, front and rear (ADR 5.3.2.1.1).'),
+      placards_displayed: z.boolean().optional().describe('The placards ADR 5.3.1.5 requires (Class 1 other than 1.4S; Class 7), both sides and the rear.'),
+      equipment_8_1_5: z.array(z.enum(EQUIPMENT_8_1_5_ITEMS)).max(EQUIPMENT_8_1_5_ITEMS.length).optional().describe('The ADR 8.1.5.2 / 8.1.5.3 items on board, by name; an item not listed is read as not on board.'),
+      instructions_in_writing: z.boolean().optional().describe('The instructions in writing of ADR 5.4.3 in the driver\'s cab (8.1.2.1 (b)).'),
+    }, { acceptedLabel: 'Accepted in vehicle' }).optional().describe('Read: max_mass_t (8.1.4.1, 3.4.13), foodstuffs_carried (7.5.4) and the vehicle-side inputs (5.3, 8.1).'),
+    crew: strictInput({
+      adr_training_certificate: z.boolean().optional().describe('The driver holds the ADR 8.2.1 training certificate.'),
+      specialisations: z.array(z.enum(['class_1', 'class_7', 'tanks'])).max(3).optional().describe('The specialisations on the certificate (8.2.1.3, 8.2.1.4).'),
+      photo_identification: z.boolean().optional().describe('Each crew member carries identification with a photograph (8.1.2.1 (d)).'),
+      awareness_training_1_3: z.boolean().optional().describe('The driver is trained according to Chapter 1.3 (8.2.3) — what a 1.1.3.6 load keeps for a driver without the certificate.'),
+    }, { acceptedLabel: 'Accepted in crew' }).optional().describe('The vehicle crew, for the driver-training and document checks (ADR 8.2, 8.1.2). Facts only — no name.'),
     options: z.record(z.string(), z.unknown()).optional().describe('The consignment object\'s options; not read by this check.'),
     ...EDITION_SHAPE,
   }, {
@@ -1446,6 +1470,7 @@ Related: adr_exemption_calculator (the 1.1.3.6 check alone), adr_lq_eq_check (LQ
 
   resultSchema: resultShape({
     status: z.enum(['pass', 'fail', 'conditional', 'insufficient_data']),
+    regime: z.enum(['1.1.3.6', 'full_adr', 'undetermined']),
     missing_inputs: z.array(loose({ name: z.string(), check: z.string(), what: z.string() })),
     checks_performed: z.array(loose({ name: z.string(), verdict: CC_VERDICT, required: z.boolean(), edition: z.string(), as_of: z.string(), basis: z.string(), citations: z.array(CC_CITATION), run: z.string() })),
     edition: z.string(),
@@ -1483,6 +1508,45 @@ Related: adr_exemption_calculator (the 1.1.3.6 check alone), adr_lq_eq_check (LQ
       needs_info: z.array(loose({ line_index: z.number(), question: z.string() })),
       notes: z.array(z.string()),
     }),
+    placards_and_plates_5_3: loose({
+      verdict: CC_VERDICT,
+      basis: z.string(),
+      requirements: z.array(CC_REQUIREMENT),
+      orange_plates: loose({ required: z.boolean(), numbered: z.union([z.boolean(), z.literal('conditional')]), basis: z.string(), hazard_identification_numbers: z.array(loose({ line_index: z.number(), un_number: z.string(), column_20: z.string() })) }),
+      placards: loose({ required: z.boolean(), lines: z.array(loose({ line_index: z.number(), un_number: z.string(), class: z.string(), classification_code: z.string(), labels: z.array(z.string()), placards: z.array(z.string()) })), basis: z.string(), notes: z.array(z.string()) }),
+      marks: z.array(loose({ mark: z.string(), applies: CC_APPLIES, basis: z.string(), lines: z.array(z.number()), source_ref: CC_CITATION })),
+      lq_mark: loose({ applies: CC_APPLIES, condition: z.string(), basis: z.string() }),
+      inputs: z.record(z.string(), z.unknown()),
+      outcomes: loose({ orange_plates: CC_OUTCOME, placards: CC_OUTCOME }),
+      conditions: z.array(z.string()),
+      needs_info: CC_NEEDS,
+      notes: z.array(z.string()),
+    }),
+    equipment_8_1: loose({
+      verdict: CC_VERDICT,
+      basis: z.string(),
+      requirements: z.array(CC_REQUIREMENT),
+      fire_extinguishers: loose({ band: CC_EXT_BAND, bands: z.array(CC_EXT_BAND), minimum_total_kg: z.number(), minimum_largest_kg: z.number(), small_load_rule: loose({ applies: CC_APPLIES, minimum_number: z.number(), minimum_capacity_kg: z.number(), basis: z.string() }), on_board: z.array(z.number()), verdict: z.string(), why: z.string(), s3: z.string() }),
+      general_equipment: z.array(CC_EQUIPMENT_ITEM),
+      label_specific_equipment: z.array(CC_EQUIPMENT_ITEM),
+      documents: z.array(loose({ document: z.string(), applies: CC_APPLIES, basis: z.string(), answered_by: z.string(), verdict: CC_VERDICT, input: z.boolean(), outcome: CC_OUTCOME, source_ref: CC_CITATION })),
+      inputs: z.record(z.string(), z.unknown()),
+      missing_items: z.array(z.string()),
+      conditions: z.array(z.string()),
+      needs_info: CC_NEEDS,
+      notes: z.array(z.string()),
+    }),
+    driver_training_8_2: loose({
+      verdict: CC_VERDICT,
+      basis: z.string(),
+      requirements: z.array(CC_REQUIREMENT),
+      certificate: loose({ required: CC_APPLIES, under_relief: z.boolean(), specialisations: z.array(loose({ specialisation: z.enum(['class_1', 'class_7']), applies: CC_APPLIES, lines: z.array(z.number()), held: z.boolean(), outcome: CC_OUTCOME })), held: z.boolean(), outcome: CC_OUTCOME }),
+      awareness_training_1_3: loose({ applies: z.boolean(), for_driver: z.boolean(), basis: z.string(), held: z.boolean(), outcome: CC_OUTCOME }),
+      inputs: z.record(z.string(), z.unknown()),
+      conditions: z.array(z.string()),
+      needs_info: CC_NEEDS,
+      notes: z.array(z.string()),
+    }),
     notes: z.array(z.string()),
     adr_edition: z.record(z.string(), z.unknown()),
   }),
@@ -1490,7 +1554,7 @@ Related: adr_exemption_calculator (the 1.1.3.6 check alone), adr_lq_eq_check (LQ
   annotations: readOnlyAnnotations('ADR Consignment Check'),
 
   handler: async (args, opts) =>
-    apiPost('adr/consignment-check', { lines: args.lines, journey: args.journey, vehicle: args.vehicle, options: args.options, edition: args.edition, as_of: args.as_of }, opts),
+    apiPost('adr/consignment-check', { lines: args.lines, journey: args.journey, vehicle: args.vehicle, crew: args.crew, options: args.options, edition: args.edition, as_of: args.as_of }, opts),
 };
 
 // ─────────────────────────────────────────────────────────────

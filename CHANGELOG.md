@@ -1,5 +1,42 @@
 # Changelog
 
+## 2.31.0 — 2026-11-05
+
+Mirrors build 2c and run 2x of the website's POST /api/adr/consignment-check: `adr_consignment_check` now answers the
+vehicle side — orange-coloured plates and placards (ADR 5.3), the documents, fire extinguishers and equipment of 8.1, and
+driver training (8.2) — and says which rules it answered under (`result.regime`). Nothing removed, no default changed —
+every 2.30.0 argument and answer field still validates.
+
+Why a minor release: new optional input fields (and a new optional `crew` object), three new typed answer blocks and a
+new typed `regime` field. One answer reading changed (below, under Changed) — the server's, mirrored here, not a schema
+break: every value it now returns was already a declared verdict.
+
+### Added
+
+- `adr_consignment_check` inputs (all optional, strict): `vehicle.fire_extinguishers_kg` (number[]), `vehicle.orange_plates_displayed`,
+  `vehicle.placards_displayed`, `vehicle.instructions_in_writing` (booleans), `vehicle.equipment_8_1_5` (the 8.1.5 items by name),
+  and a top-level `crew { adr_training_certificate, specialisations (class_1 | class_7 | tanks), photo_identification, awareness_training_1_3 }`.
+- Typed result blocks `placards_and_plates_5_3`, `equipment_8_1`, `driver_training_8_2`: each lists `requirements[]`
+  (`applies` true | false | "under_relief_only" | "conditional", the rule quoted, `source_ref`) and the outcome of each
+  against its input (pass | fail | conditional | unanswered | not_required).
+- Typed: `result.regime` ("1.1.3.6" | "full_adr" | "undetermined"; null without dangerous goods) and the per-line
+  `verdict` of `limited_quantities` / `excepted_quantities` (tolerant, like every result field).
+
+### Changed
+
+- **The verdict for a relief that does not apply is `not_applicable`, not `fail`** (website run 2x). A load outside
+  1.1.3.6 answers `exemption_1_1_3_6: not_applicable` — the full requirements apply and the other checks answer for a
+  fully regulated load — where it answered `fail`; a line with no stated `inner_packaging.regime` that fits neither LQ
+  nor EQ is `not_applicable` on both quantity checks. `not_applicable` does not change the status, so such a load now
+  reads `pass` / `conditional` with `regime: "full_adr"` where it read `fail`. A stated regime that is missed, and a
+  CARRIAGE PROHIBITED entry, still fail.
+- The description: Returns names the three blocks and `regime`; Behavior describes the requirement-list reading, the
+  1.1.3.6.2 answers and what `fail` / `not_applicable` / `regime` mean; Limitations: packaging codes (build 2d) remain,
+  without the vehicle-side inputs a dangerous-goods load is conditional, and the vehicle side does not assess the Part 9
+  vehicle approval, the 5.3.3 elevated temperature mark or handling and stowage (7.5.7). The `inner_packaging.regime`
+  input text says the new reading.
+- `vehicle.max_mass_t` is described as the transport unit's maximum permissible mass (the 8.1.4.1 band, 3.4.13).
+
 ## 2.30.0 — 2026-11-05
 
 Mirrors build 2b of the website's POST /api/adr/consignment-check: `adr_consignment_check` now checks mixed loading.
