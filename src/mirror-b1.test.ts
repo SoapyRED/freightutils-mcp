@@ -37,7 +37,7 @@ const env = (result: Record<string, unknown>) => ({
   warnings: [{ code: 'EDITION_TRANSITIONAL', message: 'ADR 2025 may still be applied until 30 June 2027 (1.6.1.1).' }],
 });
 
-// 2.29.0 (pending): adr_consignment_check is the sixth tool that reads ADR data and takes edition / as_of.
+// 2.29.0: adr_consignment_check is the sixth tool that reads ADR data and takes edition / as_of.
 const FIVE = ['adr_lookup', 'adr_exemption_calculator', 'adr_lq_eq_check', 'consignment_calculator', 'shipment_summary', 'adr_consignment_check'];
 
 test('the ADR tools (five, and adr_consignment_check from 2.29.0) declare edition (2025 | 2027) and as_of, and their descriptions name them', async () => {

@@ -386,11 +386,11 @@ Routing: every returned line carries state, in the words the FreightUtils docume
 
 Gross figures: ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging. A gross mass (basis "gross") on an entry counted by mass is read as an upper bound of the net mass: the load is answered exempt on it only when it clears even on the gross figure — then figure_basis is "upper_bound_gross" and the line carries upper_bound_gross true (its true points are lower). Otherwise, and always for an entry counted in litres, the line gets no points (basis_mismatch): send the net quantity.
 
-ADR 2027 basis: an ADR 2027 answer carries basis — what the verdict rests on: "adr_2027", or, on a stated as_of from 1 January 2027, a transitional measure open on that date that clears a load ADR 2027 itself does not: "1.6.1.61" (the ADR 2025 note-a rule, ×20 with a 50 kg maximum, until 31 December 2030) before "1.6.1.1" (the whole of ADR 2025, until 30 June 2027). Such an answer headlines the transitional basis that clears the load, names it, gives basis_until (the last day it may be applied) and puts the strict ADR 2027 figure beside it (strict_adr_2027: basis, total_points, exempt, has_category_zero, has_quantity_exceedance). Without a stated as_of, the strict ADR 2027 reading stays the headline. transitional_1_6_1_61 (a load with one of the nine note-a UN numbers) and transitional_1_6_1_1 (inside the 1.6.1.1 window, where ADR 2027 itself is not exempt) state the load on each basis: measure, basis, points_on_this_basis, exempt_on_this_basis, until, note.
+ADR 2027 basis: an ADR 2027 answer carries basis — what the verdict rests on: "adr_2027", or, on a stated as_of from 1 January 2027, a transitional measure open on that date that clears a load ADR 2027 itself does not: "1.6.1.61" (the ADR 2025 note-a rule, ×20 with a 50 kg maximum, until 31 December 2030) before "1.6.1.1" (the whole of ADR 2025, until 30 June 2027). Such an answer headlines the transitional basis that clears the load, names it, gives basis_until (the last day it may be applied) and puts the strict ADR 2027 figure beside it (strict_adr_2027: basis, total_points, exempt, has_category_zero, has_quantity_exceedance). A line whose entry is deleted in ADR 2027 (e.g. UN 2941) has no ADR 2027 figure at all: on a stated as_of from 2027-01-01 to 2027-06-30 the whole load is answered on ADR 2025 under 1.6.1.1 (basis "1.6.1.1", every line edition_basis "2025") and strict_adr_2027 carries entry_deleted true, deleted_un_numbers and message, its four figures null; outside that window, or without a stated as_of, the call is refused naming the deleted entry. Without a stated as_of, the strict ADR 2027 reading stays the headline. transitional_1_6_1_61 (a load with one of the nine note-a UN numbers) and transitional_1_6_1_1 (inside the 1.6.1.1 window, where ADR 2027 itself is not exempt) state the load on each basis: measure, basis, points_on_this_basis, exempt_on_this_basis, until, note.
 
 Behavior: deterministic points arithmetic over ADR 2025 reference data; a UN that cannot be found returns blocking_errors (NOT_FOUND); exempt is the overall verdict. ${UNKNOWN_FIELDS_REFUSED} ${RATE}
 
-Returns: items[] (each with state, packing_group, variant_index, transport_category, multiplier, points, air_only_id + icao_limited_quantity or entry_required on an ID-prefixed line, nil_quantity on a 0 line, upper_bound_gross on a gross mass counted as an upper bound, quantity_unit/quantity_basis/expected_unit when a unit or basis was declared, scope flags where applicable, withheld + ambiguity_reason on an unpinned multi-variant line, and equivalent_variants + variant_note when a packing group resolved by equivalence), total_points (NULL when no verdict was reached), threshold (1000), exempt (NULL when no verdict was reached — never false as a stand-in), has_category_zero, has_quantity_exceedance, warnings, message, figure_basis, and on ADR 2027 answers basis, basis_until, strict_adr_2027, transitional_1_6_1_61, transitional_1_6_1_1, human_review_required + candidates[] when any line is withheld, and — on scope verdicts — not_subject_to_adr/conditions_ref/conditions[]/carriage_prohibited under result — or, when every line is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
+Returns: items[] (each with state, packing_group, variant_index, transport_category, multiplier, points, air_only_id + icao_limited_quantity or entry_required on an ID-prefixed line, nil_quantity on a 0 line, upper_bound_gross on a gross mass counted as an upper bound, edition_basis on an answer resting on 1.6.1.1 for an entry deleted in ADR 2027, quantity_unit/quantity_basis/expected_unit when a unit or basis was declared, scope flags where applicable, withheld + ambiguity_reason on an unpinned multi-variant line, and equivalent_variants + variant_note when a packing group resolved by equivalence), total_points (NULL when no verdict was reached), threshold (1000), exempt (NULL when no verdict was reached — never false as a stand-in), has_category_zero, has_quantity_exceedance, warnings, message, figure_basis, and on ADR 2027 answers basis, basis_until, strict_adr_2027 (with entry_deleted, deleted_un_numbers and message when an entry is deleted in ADR 2027), transitional_1_6_1_61, transitional_1_6_1_1, human_review_required + candidates[] when any line is withheld, and — on scope verdicts — not_subject_to_adr/conditions_ref/conditions[]/carriage_prohibited under result — or, when every line is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
 
 Editions: ${EDITIONS}
 
@@ -452,6 +452,9 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
       icao_limited_quantity: z.boolean(),
       nil_quantity: z.boolean(),
       upper_bound_gross: z.boolean(),
+      // 2.29.0 (website T2b-3 #332): the edition the line was counted on — "2025" on every line of an
+      // ADR 2027 answer that rests on 1.6.1.1 because an entry is deleted in ADR 2027.
+      edition_basis: z.enum(['2025', '2027']),
     })),
     total_points: z.number(),
     threshold: z.number(),
@@ -476,6 +479,11 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
       exempt: z.boolean(),
       has_category_zero: z.boolean(),
       has_quantity_exceedance: z.boolean(),
+      // 2.29.0 (website T2b-3 #332): the line's ADR 2027 entry is deleted — no ADR 2027 total and no
+      // ADR 2027 verdict (the four figures above are null), the load answered on 1.6.1.1 inside its window.
+      entry_deleted: z.boolean(),
+      deleted_un_numbers: z.array(z.string()),
+      message: z.string(),
     }),
     transitional_1_6_1_61: loose({
       measure: z.literal('1.6.1.61'),
@@ -1362,7 +1370,7 @@ Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exempt
 };
 
 // ─────────────────────────────────────────────────────────────
-//  ADR Consignment Check (2.29.0 — pending; freightutils.com build 2a)
+//  ADR Consignment Check (2.29.0; freightutils.com build 2a)
 // ─────────────────────────────────────────────────────────────
 
 const CC_PLACE = z.string().regex(/^[A-Za-z]{2}(?:\s?[A-Za-z2-9]{3})?$/, 'a place is a 5-character UN/LOCODE (e.g. "NLRTM") or a 2-letter ISO country code (e.g. "NL") — never an address');
@@ -1411,7 +1419,7 @@ Returns: status (pass | fail | conditional | insufficient_data), missing_inputs[
 
 Editions: ${EDITIONS}
 
-Limitations: version 2a does not check mixed loading (7.5.2), plates and placards (5.3), vehicle equipment (8.1), driver training (8.2.1) or packaging codes — each is listed in checks_performed as not_in_this_version; limited / excepted quantities are not taken out of the tunnel code (the object does not say a line is carried so); not legal advice, verify against the current UNECE ADR text.
+Limitations: version 2a does not yet check mixed loading (7.5.2; build 2b), plates and placards (5.3), vehicle equipment (8.1) or driver training (8.2.1) (build 2c), or packaging codes (build 2d) — each is listed in checks_performed as not_in_this_version until its build ships; limited / excepted quantities are not taken out of the tunnel code (the object does not say a line is carried so); not legal advice, verify against the current UNECE ADR text.
 
 Related: adr_exemption_calculator (the 1.1.3.6 check alone), adr_lq_eq_check (LQ / EQ alone), adr_lookup (a row's columns).`,
 

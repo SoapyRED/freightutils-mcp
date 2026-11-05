@@ -1,5 +1,5 @@
 {
- "_recorded": "preview 2026-11-04T22:46Z, keyed, envelope 1.2 (freightutils.com build 2a; check_id / receipt_url replaced by synthetic ids of the same shape)",
+ "_recorded": "preview 2026-11-04T22:46Z, keyed, envelope 1.2 (freightutils.com build 2a; check_id / receipt_url replaced by synthetic ids of the same shape); calc_cc032_* from production 3958080 on 2026-11-05 (T2b-3 #332), keyed; the eight check answers re-recorded from production that day matched these except the day-dated as_of of the all-zero refusal",
  "check_exempt_un1203_300l": {
   "request": "POST /api/adr/consignment-check?envelope=1.2 {\"lines\":[{\"un_number\":\"1203\",\"packing_group\":\"II\",\"quantity\":{\"value\":300,\"unit\":\"L\",\"basis\":\"net\"},\"packages\":{\"count\":15,\"type\":\"jerrican\"}}],\"journey\":{\"date\":\"2026-11-20\",\"mode\":\"road\"}}",
   "status": 200,
@@ -3668,6 +3668,114 @@
      }
     }
    ]
+  }
+ },
+ "calc_cc032_un2941_2027_entry_deleted_asof_20270315": {
+  "request": "POST /api/adr-calculator?envelope=1.2 {\"items\":[{\"un_number\":\"2941\",\"quantity\":100,\"unit\":\"L\",\"basis\":\"net\"}],\"edition\":\"2027\",\"as_of\":\"2027-03-15\"}",
+  "status": 200,
+  "body": {
+   "envelope_version": "1.2",
+   "ok": true,
+   "status": "ok",
+   "missing_inputs": [],
+   "edition": {
+    "name": "ADR 2027",
+    "applies_from": "2027-01-01",
+    "may_apply_until": null
+   },
+   "as_of": "2027-03-15",
+   "result": {
+    "items": [
+     {
+      "un_number": "2941",
+      "state": "COUNTED",
+      "proper_shipping_name": "FLUOROANILINES",
+      "class": "6.1",
+      "packing_group": "III",
+      "variant_index": 0,
+      "transport_category": "2",
+      "quantity": 100,
+      "multiplier": 3,
+      "points": 300,
+      "quantity_unit": "L",
+      "quantity_basis": "net",
+      "expected_unit": "L",
+      "edition_basis": "2025"
+     }
+    ],
+    "total_points": 300,
+    "threshold": 1000,
+    "exempt": true,
+    "has_category_zero": false,
+    "has_quantity_exceedance": false,
+    "warnings": [
+     "UN 2941: the ADR 2027 Table A entry is deleted (ECE/TRANS/WP.15/274) and the amendment names no successor entry. This answer counts the ADR 2025 row under transitional measure 1.6.1.1 on 2027-03-15, which allows the whole of ADR 2025 to be applied until 30 June 2027 — all of ADR 2025 then applies to the carriage. The ADR 2027 entry for these goods must be established before 1 July 2027; from that date the load is not answered until it is entered under its ADR 2027 UN number (strict_adr_2027)."
+    ],
+    "message": "1.1.3.6 exemption applies — on the 1.6.1.1 basis (ADR 2025 as a whole), which may be applied until 30 June 2027; UN 2941 has no entry in ADR 2027.",
+    "resolved_subtotal_points": 300,
+    "threshold_exceeded_by_resolved_items": false,
+    "verdict_basis": "all_items",
+    "unresolved_item_indexes": [],
+    "basis": "1.6.1.1",
+    "basis_until": "2027-06-30",
+    "strict_adr_2027": {
+     "basis": "adr_2027",
+     "total_points": null,
+     "exempt": null,
+     "has_category_zero": null,
+     "has_quantity_exceedance": null,
+     "entry_deleted": true,
+     "deleted_un_numbers": [
+      "2941"
+     ],
+     "message": "UN 2941 has no Table A entry in ADR 2027 (deleted by ECE/TRANS/WP.15/274, which names no successor entry), so ADR 2027 itself gives no 1.1.3.6 total and no verdict for this load."
+    },
+    "transitional_1_6_1_1": {
+     "measure": "1.6.1.1",
+     "basis": "ADR 2025",
+     "until": "2027-06-30",
+     "points_on_this_basis": 300,
+     "exempt_on_this_basis": true,
+     "note": "Transitional measure 1.6.1.1 allows the whole of ADR 2025 to be applied until 30 June 2027: on that basis the load scores 300 points and is exempt, and that is the verdict above."
+    },
+    "adr_edition": {
+     "edition": "2027",
+     "name": "ADR 2027",
+     "as_of": "2027-03-15",
+     "selected_by": "edition",
+     "applies_from": "2027-01-01",
+     "may_apply_until": null
+    }
+   },
+   "confidence": {
+    "level": "high",
+    "basis": "deterministic"
+   },
+   "_source": {
+    "name": "FreightUtils published methodology",
+    "checked": "request-time",
+    "provenance_status": "computed",
+    "source_url": "https://www.freightutils.com/methodology"
+   },
+   "citation": {
+    "text": "ADR 1.1.3.6: 300 transport point(s) vs 1000 threshold — exemption applies (1.1.3.6 exemption applies — on the 1.6.1.1 basis (ADR 2025 as a whole), which may be applied until 30 June 2027; UN 2941 has no entry in ADR 2027.).",
+    "qualifier": "Deterministic ADR 1.1.3.6 calculation, best-effort — not legal advice; verify against the current UNECE ADR text."
+   },
+   "warnings": [
+    {
+     "code": "EDITION_TRANSITIONAL",
+     "message": "ADR 2027 applies from 1 January 2027; ADR 2025 may still be applied until 30 June 2027 (1.6.1.1). edition=2025 answers on ADR 2025 until then.",
+     "details": {
+      "measure": "1.6.1.1",
+      "adr_2025_may_apply_until": "2027-06-30",
+      "edition_2025_available": true
+     }
+    }
+   ],
+   "_meta": {
+    "check_id": "chk_cc032SyntheticRecorded",
+    "receipt_url": "https://www.freightutils.com/api/receipts/chk_cc032SyntheticRecorded"
+   }
   }
  }
 }

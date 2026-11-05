@@ -1,5 +1,5 @@
 /**
- * 2.29.0 (pending): adr_consignment_check — answers of the website's POST /api/adr/consignment-check recorded on
+ * 2.29.0: adr_consignment_check — answers of the website's POST /api/adr/consignment-check recorded on
  * its build-2a preview (test-fixtures/recorded-2.29.0.json, keyed, envelope 1.2; check_ids synthetic), driven
  * through the real server and the SDK's validating Client, and parsed through the TYPED branch of the tool's
  * result schema (resultShape falls back to a plain record, so only the typed branch proves a field is typed).
@@ -19,7 +19,7 @@ const FX = JSON.parse(readFileSync(new URL('../test-fixtures/recorded-2.29.0.jso
 const NAME = 'adr_consignment_check';
 const bodyOf = (rec: Recorded) => JSON.parse(rec.request.slice(rec.request.indexOf(' {') + 1)) as Record<string, unknown>;
 
-async function call(rec: Recorded, args: Record<string, unknown>) {
+async function call(rec: Recorded, args: Record<string, unknown>, name: string = NAME) {
   const real = globalThis.fetch;
   const sent: Array<{ url: string; method: string; body: unknown }> = [];
   globalThis.fetch = (async (u: string | URL, init?: RequestInit) => {
@@ -32,7 +32,7 @@ async function call(rec: Recorded, args: Record<string, unknown>) {
   await Promise.all([server.connect(a), client.connect(b)]);
   try {
     await client.listTools();
-    const res = await client.callTool({ name: NAME, arguments: args });
+    const res = await client.callTool({ name, arguments: args });
     return { res, sc: res.structuredContent as Record<string, unknown> & { result: Record<string, unknown> }, sent };
   } finally {
     globalThis.fetch = real;
@@ -41,16 +41,16 @@ async function call(rec: Recorded, args: Record<string, unknown>) {
   }
 }
 
-function typed(): z.ZodTypeAny {
-  const t = ALL_TOOLS.find((x) => x.name === NAME);
+function typed(name: string = NAME): z.ZodTypeAny {
+  const t = ALL_TOOLS.find((x) => x.name === name);
   assert.ok(t?.resultSchema);
   const u = t.resultSchema as unknown as { options?: z.ZodTypeAny[]; def?: { options?: z.ZodTypeAny[] } };
   const opts = u.options ?? u.def?.options;
   assert.ok(opts && opts.length === 2);
   return opts[0];
 }
-function parsesTyped(result: unknown) {
-  const r = typed().safeParse(result);
+function parsesTyped(result: unknown, name: string = NAME) {
+  const r = typed(name).safeParse(result);
   assert.ok(r.success, `typed branch refused: ${JSON.stringify(r.error?.issues ?? null).slice(0, 600)}`);
 }
 type Check = { name: string; verdict: string; citations: Array<{ section: string; pdf_page?: unknown }> };
@@ -61,7 +61,8 @@ test('2.29.0: adr_consignment_check is registered, strict, in scope dg and the d
   assert.equal(t.strictKeys, true);
   assert.ok(SCOPE_TOOLS.dg.includes(NAME));
   assert.match(t.description, /not_in_this_version/);
-  assert.match(t.description, /mixed loading \(7\.5\.2\)/);
+  assert.match(t.description, /mixed loading \(7\.5\.2; build 2b\)/);
+  assert.match(t.description, /\(build 2c\), or packaging codes \(build 2d\)/);
 });
 
 test('recorded: the exempt petrol load — pass, 900 points, the document entries, the POST and its body', async () => {
@@ -150,4 +151,41 @@ test('input: an unknown key and an ID line with a bad pattern are refused before
   const b = await call(rec, { lines: [{ un_number: 'X1203', quantity: { value: 1, unit: 'L' } }] });
   assert.equal(b.res.isError, true);
   assert.equal(b.sent.length, 0);
+});
+
+// 2.29.0: the T2b-3 calculator fields (website #332), typed — cc-032, an entry deleted in ADR 2027.
+test('recorded: cc-032 — UN 2941 on ADR 2027, as_of 2027-03-15: exempt 300 on 1.6.1.1, entry_deleted, edition_basis "2025", typed', async () => {
+  const rec = FX.calc_cc032_un2941_2027_entry_deleted_asof_20270315;
+  const args = bodyOf(rec);
+  const { res, sc, sent } = await call(rec, args, 'adr_exemption_calculator');
+  assert.notEqual(res.isError, true, JSON.stringify(res).slice(0, 300));
+  assert.equal((sent[0].body as { edition: string }).edition, '2027');
+  assert.equal((sent[0].body as { as_of: string }).as_of, '2027-03-15');
+  const r = sc.result as { exempt: boolean; total_points: number; basis: string; basis_until: string; strict_adr_2027: Record<string, unknown>; items: Array<{ edition_basis: string; state: string }> };
+  assert.equal(r.exempt, true);
+  assert.equal(r.total_points, 300);
+  assert.equal(r.basis, '1.6.1.1');
+  assert.equal(r.basis_until, '2027-06-30');
+  assert.equal(r.strict_adr_2027.entry_deleted, true);
+  assert.deepEqual(r.strict_adr_2027.deleted_un_numbers, ['2941']);
+  assert.equal(r.strict_adr_2027.exempt, null);
+  assert.equal(r.strict_adr_2027.total_points, null);
+  assert.match(String(r.strict_adr_2027.message), /UN 2941/);
+  assert.deepEqual(r.items.map((i) => i.edition_basis), ['2025']);
+  assert.equal(r.items[0].state, 'COUNTED');
+  parsesTyped(r, 'adr_exemption_calculator');
+});
+
+test('typed branch: entry_deleted must be a boolean and edition_basis one of the two editions', () => {
+  const r = FX.calc_cc032_un2941_2027_entry_deleted_asof_20270315.body.result as Record<string, unknown>;
+  const t = typed('adr_exemption_calculator');
+  const badFlag = JSON.parse(JSON.stringify(r)); badFlag.strict_adr_2027.entry_deleted = 'yes';
+  assert.equal(t.safeParse(badFlag).success, false);
+  const badEd = JSON.parse(JSON.stringify(r)); badEd.items[0].edition_basis = '2023';
+  assert.equal(t.safeParse(badEd).success, false);
+});
+
+test('description: adr_exemption_calculator names entry_deleted, deleted_un_numbers and edition_basis (no long-form 2027 date for them)', () => {
+  const d = ALL_TOOLS.find((x) => x.name === 'adr_exemption_calculator')!.description;
+  for (const w of ['entry_deleted', 'deleted_un_numbers', 'edition_basis', 'UN 2941', '2027-01-01 to 2027-06-30']) assert.ok(d.includes(w), w);
 });
