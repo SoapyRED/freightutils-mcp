@@ -59,7 +59,8 @@ test('2.30.0: the description says mixed loading is checked and names the later 
   const t = ALL_TOOLS.find((x) => x.name === NAME)!;
   assert.match(t.description, /mixed loading \(7\.5\.2, with the foodstuffs precautions of 7\.5\.4\)/);
   assert.match(t.description, /mixed_loading_7_5_2 \{verdict, basis, lines\[\]/);
-  assert.match(t.description, /Limitations: version 2b does not yet check plates and placards \(5\.3\), vehicle equipment \(8\.1\) or driver training \(8\.2\.1\) \(build 2c\), or packaging codes \(build 2d\)/);
+  // Since 2.31.0 (build 2c) plates, equipment and training are checked; recorded-2-31-0.test.ts asserts the 2c Limitations.
+  assert.match(t.description, /packaging codes \(build 2d\)/);
   assert.match(t.description, /vehicle\.foodstuffs_carried/);
   assert.doesNotMatch(t.description, /does not yet check mixed loading/);
 });

@@ -1,5 +1,28 @@
 # Changelog
 
+## 2.31.0 — unreleased
+
+Mirrors build 2c of the website's POST /api/adr/consignment-check: `adr_consignment_check` now answers the vehicle side —
+orange-coloured plates and placards (ADR 5.3), the documents, fire extinguishers and equipment of 8.1, and driver
+training (8.2). Additive: nothing removed, no default changed — every 2.30.0 argument and answer field still validates.
+
+Why a minor release: new optional input fields (and a new optional `crew` object) and three new typed answer blocks.
+
+### Added
+
+- `adr_consignment_check` inputs (all optional, strict): `vehicle.fire_extinguishers_kg` (number[]), `vehicle.orange_plates_displayed`,
+  `vehicle.placards_displayed`, `vehicle.instructions_in_writing` (booleans), `vehicle.equipment_8_1_5` (the 8.1.5 items by name),
+  and `crew { adr_training_certificate, specialisations (class_1 | class_7 | tanks), photo_identification, awareness_training_1_3 }`.
+- Typed result blocks `placards_and_plates_5_3`, `equipment_8_1`, `driver_training_8_2`: each lists `requirements[]`
+  (`applies` true | false | "under_relief_only" | "conditional", the rule quoted, `source_ref`) and the outcome of each
+  against its input (pass | fail | conditional | unanswered | not_required).
+
+### Changed
+
+- The description: Returns names the three blocks; Behavior describes the requirement-list reading and the 1.1.3.6.2 answers;
+  Limitations: packaging codes (build 2d) remain; without the vehicle-side inputs a dangerous-goods load is conditional.
+- `vehicle.max_mass_t` is described as the transport unit's maximum permissible mass (the 8.1.4.1 band, 3.4.13).
+
 ## 2.30.0 — 2026-11-05
 
 Mirrors build 2b of the website's POST /api/adr/consignment-check: `adr_consignment_check` now checks mixed loading.
