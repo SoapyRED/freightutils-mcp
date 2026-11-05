@@ -1,28 +1,41 @@
 # Changelog
 
-## 2.32.0 — unreleased
+## 2.32.0 — 2026-11-05
 
 Mirrors build 2d of the website's POST /api/adr/consignment-check: `adr_consignment_check` now reads the UN packaging
 mark of each line (ADR 6.1.3.1) and leaves a limited / excepted quantity line whose stated regime is met out of the
 1.1.3.6 total (ADR 1.1.3.6.5). Nothing removed, no default changed — every 2.31.0 argument and answer field still
-validates.
+validates. A minor: one optional input and one typed result block are added, and the server's answers moved in four
+places stated below; nothing a 2.31.0 caller sends is refused.
 
 ### Added
 
-- Input `lines[].packages.un_mark` (string, ≤ 80): the UN packaging mark as printed, e.g. `UN 4G/Y145/S/02/NL/VL823`.
+- Input `lines[].packages.un_mark` (string, 1–80 characters, strict like every other key): the UN packaging mark as
+  printed, e.g. `UN 4G/Y145/S/02/NL/VL823`, described in the order of 6.1.3.1 (a) to (g).
 - Typed result block `packaging_code_validity {verdict, basis, lines[] {line_index, un_number, verdict, mark, field,
   parsed, reason, notes}, notes}`: the mark read field by field ((a) symbol, (b) the 6.1.2.7 code, (c) the X / Y / Z
   letter and the density or gross mass, (d) S or the test pressure, (e) year, (f) State, (g) maker) and its letter held
-  against the line's packing group. No mark → conditional; malformed, or a letter that does not cover the packing group →
-  fail with the field named; IBC / large-packaging marks named and not read; the packaging kind is not checked.
-- The description's Behavior / Returns / Limitations lines say so, and name `exemption_1_1_3_6.engine.excluded_lines`.
+  against the line's packing group. Malformed, or a letter that does not cover the packing group → fail with the field
+  named; no mark → conditional; a line within its stated LQ / EQ regime without a mark → not_applicable; a Class 7
+  package or a Class 2 gas in P200 / P203 receptacles → not_applicable (marked under 6.4 / 6.2), other Class 2 →
+  not_assessed; an ID line → insufficient_data; a row without a packing group, or an IBC / large-packaging mark →
+  conditional (not read).
+- `exemption_1_1_3_6.engine.excluded_lines` named in the description ({line_index, un_number, regime, reason}; the
+  engine block stays an open record). `transport_document.lines[].entry` (null where no entry is written) typed.
+- `test-fixtures/recorded-2.32.0.json`: eight build 2d answers recorded on production plus the six 2.31.0 vehicle-side
+  requests re-sent (every one moved: the packaging check now answers).
 
 ### Changed (the server's answer, mirrored here)
 
 - `packaging_code_validity` is a real check: it no longer answers `not_in_this_version`. A load that passed with every
   vehicle-side input now reads `conditional` until its packages' marks are sent.
-- A line that states `inner_packaging.regime` and meets it is not counted in the 1.1.3.6 total (1.1.3.6.5); a line that
-  states no regime is still counted.
+- 1.1.3.6.5: a line that states `inner_packaging.regime` and meets it is not counted in the 1.1.3.6 total; a line that
+  states no regime is still counted; a load whose every line is so excluded is exempt on 0 points.
+- The transport document: a generic or N.O.S. entry assigned SP 274 or 318 is `conditional` until its technical name is
+  added (3.1.2.8.1); a CARRIAGE PROHIBITED line gets no entry (it wrote one before); an ID line without the ICAO
+  limited-quantity statement leaves the document `insufficient_data` (no Table A row).
+- The description's Limitations no longer say packaging codes are not checked; they say what the mark check does not do
+  (the packaging kind against the packing instruction, IBC / large-packaging marks, a row without a packing group).
 
 ## 2.31.0 — 2026-11-05
 
