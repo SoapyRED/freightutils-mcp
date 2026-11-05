@@ -60,9 +60,10 @@ test('2.29.0: adr_consignment_check is registered, strict, in scope dg and the d
   assert.ok(t, 'registered');
   assert.equal(t.strictKeys, true);
   assert.ok(SCOPE_TOOLS.dg.includes(NAME));
-  assert.match(t.description, /not_in_this_version/);
+  // Since 2.32.0 (build 2d) no check is not_in_this_version: the description names the packaging mark instead.
+  assert.match(t.description, /the UN packaging mark of each line \(6\.1\.3\.1\)/);
   // Since 2.30.0 (build 2b) mixed loading is checked; recorded-2-30-0.test.ts asserts its Limitations.
-  assert.match(t.description, /packaging codes \(build 2d\)/); // since 2.31.0 only packaging codes remain (recorded-2-31-0.test.ts)
+  assert.match(t.description, /packaging_code_validity/); // since 2.32.0 the packaging mark is checked (build 2d)
 });
 
 test('recorded: the exempt petrol load — pass, 900 points, the document entries, the POST and its body', async () => {

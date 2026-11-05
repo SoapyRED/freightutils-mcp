@@ -60,7 +60,7 @@ test('2.30.0: the description says mixed loading is checked and names the later 
   assert.match(t.description, /mixed loading \(7\.5\.2, with the foodstuffs precautions of 7\.5\.4\)/);
   assert.match(t.description, /mixed_loading_7_5_2 \{verdict, basis, lines\[\]/);
   // Since 2.31.0 (build 2c) plates, equipment and training are checked; recorded-2-31-0.test.ts asserts the 2c Limitations.
-  assert.match(t.description, /packaging codes \(build 2d\)/);
+  assert.match(t.description, /the packaging check reads the mark, not the packaging kind/); // since 2.32.0 (build 2d)
   assert.match(t.description, /vehicle\.foodstuffs_carried/);
   assert.doesNotMatch(t.description, /does not yet check mixed loading/);
 });
