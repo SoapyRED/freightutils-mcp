@@ -70,6 +70,17 @@ test('2.31.0: the description names the vehicle side, its inputs and the 2c limi
   assert.match(t.description, /regime \("1\.1\.3\.6" \| "full_adr" \| "undetermined"/);
   assert.match(t.description, /a relief that does not apply is not_applicable, not fail, and does not change the status/);
   assert.doesNotMatch(t.description, /the line fails only when it fits neither/);
+  assert.match(t.description, /regime names the rules the checks answered under: "1\.1\.3\.6" .*"full_adr" .*"undetermined"/);
+  // what the vehicle side does not check
+  assert.match(t.description, /the vehicle side does not assess the vehicle approval of Part 9, the elevated temperature mark \(5\.3\.3/);
+  assert.match(t.description, /handling and stowage \(7\.5\.7\)/);
+  // the regime input says the new reading in the schema too
+  const line = (t.schema.shape.lines as unknown as { element: z.ZodObject }).element;
+  const ip = (line.shape.inner_packaging as unknown as { unwrap(): z.ZodObject }).unwrap();
+  const regimeText = (ip.shape.regime as unknown as { description?: string }).description ?? '';
+  assert.match(regimeText, /a stated regime that is missed fails/);
+  assert.match(regimeText, /a line that fits neither is not_applicable/);
+  assert.doesNotMatch(regimeText, /fails only when it fits neither/);
 });
 
 test('2.31.0: the vehicle-side inputs and crew are accepted, sent through, and refused when mistyped', async () => {
