@@ -61,7 +61,7 @@ test('2.29.0: adr_consignment_check is registered, strict, in scope dg and the d
   assert.equal(t.strictKeys, true);
   assert.ok(SCOPE_TOOLS.dg.includes(NAME));
   assert.match(t.description, /not_in_this_version/);
-  assert.match(t.description, /mixed loading \(7\.5\.2; build 2b\)/);
+  // Since 2.30.0 (build 2b) mixed loading is checked; recorded-2-30-0.test.ts asserts its Limitations.
   assert.match(t.description, /\(build 2c\), or packaging codes \(build 2d\)/);
 });
 
