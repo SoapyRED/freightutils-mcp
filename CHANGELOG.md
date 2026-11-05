@@ -1,5 +1,37 @@
 # Changelog
 
+## 2.29.0 — 2026-11-05
+
+Mirrors the website's new check, POST /api/adr/consignment-check (freightutils.com build 2a), and types two
+calculator fields the API has served since 4 November (T2b-3). Additive: one new tool, nothing removed, no default
+changed — every 2.28.0 argument and answer field still validates. The hosted endpoint gains the tool with the
+website's pin of this release.
+
+Why a minor release: a new tool.
+
+### Added
+
+- **`adr_consignment_check`** — one call on the consignment object (`lines[]`, `journey`, `vehicle`, `options`,
+  with `edition` / `as_of` beside it; `journey.date` is the default `as_of`): the 1.1.3.6 verdict (the
+  `adr_exemption_calculator` answer, whole), the limited / excepted quantity check of each line with
+  `inner_packaging` (the `adr_lq_eq_check` answer), the whole-load tunnel code against `journey.tunnels_on_route`
+  with and without the 1.1.3.6 relief (ADR 8.6.3 / 8.6.4), and the 5.4.1.1.1 transport-document entries. Answers
+  `status` (`pass` | `fail` | `conditional` | `insufficient_data`), `missing_inputs[]` ({ name, check, what })
+  and `checks_performed[]` (verdict, edition, as_of, basis, citations with the ADR section and PDF page). Strict
+  input (an unknown key is a tool error naming it); every answer field typed, loose where the website's shape may grow.
+  A keyed call carries `_meta.check_id`; without a key, `_meta.receipt` (the hash, nothing stored).
+- Scope `dg` (`--scope dg` / `FREIGHTUTILS_SCOPE=dg`) and the default list include it.
+- **`adr_exemption_calculator`** types `strict_adr_2027.entry_deleted` (boolean), `deleted_un_numbers` and `message`,
+  and `items[].edition_basis` (`"2025"` | `"2027"`). An ADR 2027 call for a line whose entry is deleted in ADR 2027
+  (e.g. UN 2941) on a stated `as_of` from 2027-01-01 to 2027-06-30 is answered on ADR 2025 under 1.6.1.1, every line
+  `edition_basis: "2025"`, the strict block's four figures null; outside that window the call is refused as before.
+  The description's ADR 2027 paragraph and Returns line name them. Proved by a recorded production answer (cc-032:
+  UN 2941, 100 L, exempt 300 on 1.6.1.1) parsed through the typed result branch.
+
+### Changed
+
+- Nothing removed, no default changed.
+
 ## 2.28.0 — 2026-11-04
 
 Mirrors the website's 4 Nov calculator changes (freightutils.com #328) and its ADR code registry statuses

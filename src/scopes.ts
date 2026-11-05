@@ -9,7 +9,7 @@ export const SCOPES = ['all', 'dg', 'customs', 'ops'] as const;
 export type Scope = (typeof SCOPES)[number];
 
 export const SCOPE_TOOLS: Record<Exclude<Scope, 'all'>, readonly string[]> = {
-  dg: ['adr_lookup', 'adr_exemption_calculator', 'adr_lq_eq_check', 'validate', 'resolve_reference'],
+  dg: ['adr_lookup', 'adr_exemption_calculator', 'adr_lq_eq_check', 'adr_consignment_check', 'validate', 'resolve_reference'],
   customs: ['hs_code_lookup', 'uk_duty_calculator', 'ics2_check', 'incoterms_lookup', 'validate'],
   ops: [
     'cbm_calculator', 'chargeable_weight_calculator', 'ldm_calculator', 'pallet_fitting_calculator',

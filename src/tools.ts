@@ -386,11 +386,11 @@ Routing: every returned line carries state, in the words the FreightUtils docume
 
 Gross figures: ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging. A gross mass (basis "gross") on an entry counted by mass is read as an upper bound of the net mass: the load is answered exempt on it only when it clears even on the gross figure — then figure_basis is "upper_bound_gross" and the line carries upper_bound_gross true (its true points are lower). Otherwise, and always for an entry counted in litres, the line gets no points (basis_mismatch): send the net quantity.
 
-ADR 2027 basis: an ADR 2027 answer carries basis — what the verdict rests on: "adr_2027", or, on a stated as_of from 1 January 2027, a transitional measure open on that date that clears a load ADR 2027 itself does not: "1.6.1.61" (the ADR 2025 note-a rule, ×20 with a 50 kg maximum, until 31 December 2030) before "1.6.1.1" (the whole of ADR 2025, until 30 June 2027). Such an answer headlines the transitional basis that clears the load, names it, gives basis_until (the last day it may be applied) and puts the strict ADR 2027 figure beside it (strict_adr_2027: basis, total_points, exempt, has_category_zero, has_quantity_exceedance). Without a stated as_of, the strict ADR 2027 reading stays the headline. transitional_1_6_1_61 (a load with one of the nine note-a UN numbers) and transitional_1_6_1_1 (inside the 1.6.1.1 window, where ADR 2027 itself is not exempt) state the load on each basis: measure, basis, points_on_this_basis, exempt_on_this_basis, until, note.
+ADR 2027 basis: an ADR 2027 answer carries basis — what the verdict rests on: "adr_2027", or, on a stated as_of from 1 January 2027, a transitional measure open on that date that clears a load ADR 2027 itself does not: "1.6.1.61" (the ADR 2025 note-a rule, ×20 with a 50 kg maximum, until 31 December 2030) before "1.6.1.1" (the whole of ADR 2025, until 30 June 2027). Such an answer headlines the transitional basis that clears the load, names it, gives basis_until (the last day it may be applied) and puts the strict ADR 2027 figure beside it (strict_adr_2027: basis, total_points, exempt, has_category_zero, has_quantity_exceedance). A line whose entry is deleted in ADR 2027 (e.g. UN 2941) has no ADR 2027 figure at all: on a stated as_of from 2027-01-01 to 2027-06-30 the whole load is answered on ADR 2025 under 1.6.1.1 (basis "1.6.1.1", every line edition_basis "2025") and strict_adr_2027 carries entry_deleted true, deleted_un_numbers and message, its four figures null; outside that window, or without a stated as_of, the call is refused naming the deleted entry. Without a stated as_of, the strict ADR 2027 reading stays the headline. transitional_1_6_1_61 (a load with one of the nine note-a UN numbers) and transitional_1_6_1_1 (inside the 1.6.1.1 window, where ADR 2027 itself is not exempt) state the load on each basis: measure, basis, points_on_this_basis, exempt_on_this_basis, until, note.
 
 Behavior: deterministic points arithmetic over ADR 2025 reference data; a UN that cannot be found returns blocking_errors (NOT_FOUND); exempt is the overall verdict. ${UNKNOWN_FIELDS_REFUSED} ${RATE}
 
-Returns: items[] (each with state, packing_group, variant_index, transport_category, multiplier, points, air_only_id + icao_limited_quantity or entry_required on an ID-prefixed line, nil_quantity on a 0 line, upper_bound_gross on a gross mass counted as an upper bound, quantity_unit/quantity_basis/expected_unit when a unit or basis was declared, scope flags where applicable, withheld + ambiguity_reason on an unpinned multi-variant line, and equivalent_variants + variant_note when a packing group resolved by equivalence), total_points (NULL when no verdict was reached), threshold (1000), exempt (NULL when no verdict was reached — never false as a stand-in), has_category_zero, has_quantity_exceedance, warnings, message, figure_basis, and on ADR 2027 answers basis, basis_until, strict_adr_2027, transitional_1_6_1_61, transitional_1_6_1_1, human_review_required + candidates[] when any line is withheld, and — on scope verdicts — not_subject_to_adr/conditions_ref/conditions[]/carriage_prohibited under result — or, when every line is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
+Returns: items[] (each with state, packing_group, variant_index, transport_category, multiplier, points, air_only_id + icao_limited_quantity or entry_required on an ID-prefixed line, nil_quantity on a 0 line, upper_bound_gross on a gross mass counted as an upper bound, edition_basis on an answer resting on 1.6.1.1 for an entry deleted in ADR 2027, quantity_unit/quantity_basis/expected_unit when a unit or basis was declared, scope flags where applicable, withheld + ambiguity_reason on an unpinned multi-variant line, and equivalent_variants + variant_note when a packing group resolved by equivalence), total_points (NULL when no verdict was reached), threshold (1000), exempt (NULL when no verdict was reached — never false as a stand-in), has_category_zero, has_quantity_exceedance, warnings, message, figure_basis, and on ADR 2027 answers basis, basis_until, strict_adr_2027 (with entry_deleted, deleted_un_numbers and message when an entry is deleted in ADR 2027), transitional_1_6_1_61, transitional_1_6_1_1, human_review_required + candidates[] when any line is withheld, and — on scope verdicts — not_subject_to_adr/conditions_ref/conditions[]/carriage_prohibited under result — or, when every line is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
 
 Editions: ${EDITIONS}
 
@@ -452,6 +452,9 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
       icao_limited_quantity: z.boolean(),
       nil_quantity: z.boolean(),
       upper_bound_gross: z.boolean(),
+      // 2.29.0 (website T2b-3 #332): the edition the line was counted on — "2025" on every line of an
+      // ADR 2027 answer that rests on 1.6.1.1 because an entry is deleted in ADR 2027.
+      edition_basis: z.enum(['2025', '2027']),
     })),
     total_points: z.number(),
     threshold: z.number(),
@@ -476,6 +479,11 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
       exempt: z.boolean(),
       has_category_zero: z.boolean(),
       has_quantity_exceedance: z.boolean(),
+      // 2.29.0 (website T2b-3 #332): the line's ADR 2027 entry is deleted — no ADR 2027 total and no
+      // ADR 2027 verdict (the four figures above are null), the load answered on 1.6.1.1 inside its window.
+      entry_deleted: z.boolean(),
+      deleted_un_numbers: z.array(z.string()),
+      message: z.string(),
     }),
     transitional_1_6_1_61: loose({
       measure: z.literal('1.6.1.61'),
@@ -1362,6 +1370,117 @@ Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exempt
 };
 
 // ─────────────────────────────────────────────────────────────
+//  ADR Consignment Check (2.29.0; freightutils.com build 2a)
+// ─────────────────────────────────────────────────────────────
+
+const CC_PLACE = z.string().regex(/^[A-Za-z]{2}(?:\s?[A-Za-z2-9]{3})?$/, 'a place is a 5-character UN/LOCODE (e.g. "NLRTM") or a 2-letter ISO country code (e.g. "NL") — never an address');
+const CC_MONEY = strictInput({ amount: z.number().nonnegative().max(1e12), currency: z.string().regex(/^[A-Z]{3}$/) }, { acceptedLabel: 'Accepted in an amount' });
+const CC_LINE = strictInput({
+  description: z.string().max(200).optional().describe('What the line is, at most 200 characters.'),
+  un_number: z.string().regex(/^(?:(?:UN\s?)?\d{4}|ID\s?\d{4})$/i, 'un_number must be 4 digits, optionally "UN"-prefixed (e.g. "1203", "UN1203"), or an ID-prefixed air-only number (e.g. "ID 8000")').optional().describe('UN number of a dangerous-goods line ("1203", "UN1203"), or an ID-prefixed air-only number ("ID 8000"). A line without one is listed and not read by the dangerous-goods checks.'),
+  packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group, to pin one ADR Table A row of a multi-row UN.'),
+  variant_index: z.number().int().nonnegative().max(1000).optional().describe('ADR Table A variant index (as adr_lookup returns it), to pin one row.'),
+  quantity: strictInput({
+    value: z.number().nonnegative().max(1_000_000_000).describe('The dangerous-goods quantity for the whole line, all packages together. 0 = not carried (left out of 1.1.3.6, named in a warning).'),
+    unit: z.enum(['L', 'kg']).optional().describe('"L" or "kg" — checked against the dimension ADR 1.1.3.6.3 counts for the row.'),
+    basis: z.enum(['net', 'gross']).optional().describe('"net" or "gross"; a gross mass on a mass-counted row is an upper bound.'),
+  }, { acceptedLabel: 'Accepted in quantity' }).optional().describe('The dangerous-goods quantity (ADR 1.1.3.6.3).'),
+  packages: strictInput({
+    count: z.number().int().positive().max(100_000),
+    type: z.string().max(40).optional(),
+    gross_kg: z.number().positive().max(1_000_000).optional(),
+  }, { acceptedLabel: 'Accepted in packages' }).optional().describe('The pieces. A line in packages is "other carriage" for the ADR 8.6.4 tunnel table; a line without packages whose code treats tank and other carriage differently is asked about.'),
+  hs_code: z.string().regex(/^\d{6,10}$/).optional(),
+  value: CC_MONEY.optional(),
+  dims: strictInput({ l: z.number().positive().max(100_000), w: z.number().positive().max(100_000), h: z.number().positive().max(100_000), unit: z.enum(['mm', 'cm', 'm', 'in']) }, { acceptedLabel: 'Accepted in dims' }).optional(),
+  stackable: z.boolean().optional(),
+  icao_limited_quantity: z.boolean().optional().describe('On an ID-prefixed line only: the packages are limited quantities to the ICAO Technical Instructions (3.4.8 mark / 3.4.10). Without it such a line has no 1.1.3.6 verdict.'),
+  inner_packaging: strictInput({
+    quantity: z.number().positive().max(1_000_000).describe('The quantity in ONE inner packaging.'),
+    unit: z.enum(['ml', 'L', 'g', 'kg']),
+    per_outer: z.number().int().min(1).max(100_000).optional().describe('Inner packagings in one outer packaging (default 1) — the excepted-quantity outer limit.'),
+    regime: z.enum(['lq', 'eq']).optional().describe('The exemption the line is meant to use; omitted, both are checked and the line fails only when it fits neither.'),
+  }, { acceptedLabel: 'Accepted in inner_packaging' }).optional().describe('The inner packaging, for the limited / excepted quantity check (Table A columns (7a) / (7b)).'),
+}, { acceptedLabel: 'Accepted on each line' });
+
+const CC_CITATION = loose({ section: z.string(), volume: z.string(), pdf_page: z.union([z.number(), z.array(z.number())]), document: z.string(), quote: z.string(), table_a_columns: z.string() });
+const CC_VERDICT = z.enum(['pass', 'fail', 'conditional', 'insufficient_data', 'not_applicable', 'not_assessed', 'not_in_this_version']);
+const CC_QTY_LINE = loose({ line_index: z.number(), un_number: z.string(), assessed: z.boolean(), reason: z.string(), answer: z.record(z.string(), z.unknown()), overall_status: z.string() });
+
+const adrConsignmentCheck: ToolDef = {
+  name: 'adr_consignment_check',
+  description: `One call on the consignment object for the ADR picture of a road load: the 1.1.3.6 small-load verdict, the limited / excepted quantity check of each line, the tunnel restriction code of the whole load against the tunnels on the route, and each line's transport-document entry. The rules are page-cited to the free UNECE ADR 2025 publication.
+
+Provide lines[] — each dangerous-goods line with un_number, quantity {value, unit, basis} and, where it applies, packing_group / variant_index, packages {count, type}, inner_packaging {quantity, unit, per_outer?, regime?} and (ID lines only) icao_limited_quantity — and optionally journey {date, tunnels_on_route (A–E), mode}, edition and as_of. journey.date is the default as_of; an as_of that contradicts it is refused.
+
+Behavior: deterministic. The 1.1.3.6 check is the adr_exemption_calculator's answer, whole (basis, basis_until, strict_adr_2027, items[].state incl. EXCLUDED_NIL / BLOCKED / AIR_ONLY_ID). The LQ / EQ checks are the adr_lq_eq_check answer per line with inner_packaging. The tunnel check assigns the whole load the most restrictive code (8.6.3.2, ranked by the categories the 8.6.4 table forbids for the carriage), gives which tunnels on the route the load may use without and with the 1.1.3.6 relief (8.6.3.3: goods carried under 1.1.3 are not subject to tunnel restrictions unless the unit must bear the 3.4.13 mark), and computes the net explosive mass for B1000C / C5000D. The document entries follow 5.4.1.1.1 (a), (b), (c), (d), (k) in that order, from Table A columns (1)–(5) and (15) — e.g. "UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)"; a row whose name joins names by "or" gives one entry per name (3.1.2.2); for a load within 1.1.3.6 the total quantity and calculated value per transport category (NOTE 1 to 5.4.1.1.1 (f)). Where the text does not settle a case (a code that splits tank and other carriage on a line with no packages; a Class 1 line not in net kg) the check asks instead of assuming. ${RATE}
+
+Returns: status (pass | fail | conditional | insufficient_data), missing_inputs[] ({name, check, what}), checks_performed[] ({name, verdict, required, edition, as_of, basis, citations[] — section, volume, PDF page, a short quotation}), edition, as_of, edition_basis, lines[], exemption_1_1_3_6 {verdict, basis, conditions, engine}, limited_quantities and excepted_quantities {verdict, lines[]}, tunnel_restriction {verdict, lines[], whole_load {codes, forbidden_categories, complete}, route {tunnels_on_route, without_1_1_3_6_relief, with_1_1_3_6_relief}, needs_info[]}, transport_document {verdict, lines[] (elements a–k, strings), exemption_1_1_3_6_statement} — all under result — ${ENV} A call made with an API key stores a check receipt (_meta.check_id); without one the answer carries the receipt hash (_meta.receipt) and nothing is stored.
+
+Editions: ${EDITIONS}
+
+Limitations: version 2a does not yet check mixed loading (7.5.2; build 2b), plates and placards (5.3), vehicle equipment (8.1) or driver training (8.2.1) (build 2c), or packaging codes (build 2d) — each is listed in checks_performed as not_in_this_version until its build ships; limited / excepted quantities are not taken out of the tunnel code (the object does not say a line is carried so); not legal advice, verify against the current UNECE ADR text.
+
+Related: adr_exemption_calculator (the 1.1.3.6 check alone), adr_lq_eq_check (LQ / EQ alone), adr_lookup (a row's columns).`,
+
+  strictKeys: true,
+  schema: strictInput({
+    lines: z.array(CC_LINE).min(1).max(50).describe('The lines of the load (1–50). Required.'),
+    journey: strictInput({
+      origin: CC_PLACE.optional(),
+      destination: CC_PLACE.optional(),
+      date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'date must be YYYY-MM-DD').optional().describe('Date of carriage, YYYY-MM-DD — the default as_of.'),
+      tunnels_on_route: z.array(z.enum(['A', 'B', 'C', 'D', 'E'])).max(20).optional().describe('ADR tunnel categories on the route (A–E).'),
+      mode: z.enum(['road', 'air', 'sea', 'multimodal']).optional(),
+    }, { acceptedLabel: 'Accepted in journey' }).optional(),
+    vehicle: strictInput({ type: z.string().max(60).optional(), max_mass_t: z.number().positive().max(100).optional(), axles: z.number().int().min(1).max(12).optional() }, { acceptedLabel: 'Accepted in vehicle' }).optional().describe('Not read in version 2a.'),
+    options: z.record(z.string(), z.unknown()).optional().describe('The consignment object\'s options; not read by this check.'),
+    ...EDITION_SHAPE,
+  }, {
+    hints: { items: 'lines', consignment: 'lines, journey (the consignment object at the top level)', un_number: 'lines[n].un_number', quantity: 'lines[n].quantity', date: 'journey.date', tunnels: 'journey.tunnels_on_route' },
+    acceptedLabel: 'Accepted arguments',
+    note: 'The arguments are the consignment object (https://www.freightutils.com/schema/consignment-object.v1.json) with edition and as_of beside it.',
+  }),
+
+  resultSchema: resultShape({
+    status: z.enum(['pass', 'fail', 'conditional', 'insufficient_data']),
+    missing_inputs: z.array(loose({ name: z.string(), check: z.string(), what: z.string() })),
+    checks_performed: z.array(loose({ name: z.string(), verdict: CC_VERDICT, required: z.boolean(), edition: z.string(), as_of: z.string(), basis: z.string(), citations: z.array(CC_CITATION), run: z.string() })),
+    edition: z.string(),
+    as_of: z.string(),
+    edition_basis: z.string(),
+    lines: z.array(loose({ line_index: z.number(), un_number: z.string(), dangerous_goods: z.boolean(), description: z.string() })),
+    exemption_1_1_3_6: loose({ verdict: CC_VERDICT, basis: z.string(), conditions: z.array(z.string()), notes: z.array(z.string()), engine: z.record(z.string(), z.unknown()) }),
+    limited_quantities: loose({ verdict: CC_VERDICT, lines: z.array(CC_QTY_LINE) }),
+    excepted_quantities: loose({ verdict: CC_VERDICT, lines: z.array(CC_QTY_LINE) }),
+    lq_eq_status_verdict: CC_VERDICT,
+    tunnel_restriction: loose({
+      verdict: CC_VERDICT,
+      lines: z.array(loose({ line_index: z.number(), un_number: z.string(), column_15: z.string(), counted: z.boolean(), reason: z.string(), carriage: z.string(), forbidden: z.array(z.string()) })),
+      whole_load: loose({ codes: z.array(z.string()), forbidden_categories: z.array(z.string()), complete: z.boolean(), ordering: z.string(), net_explosive_mass_kg: z.number() }),
+      route: loose({ tunnels_on_route: z.array(z.string()), without_1_1_3_6_relief: z.record(z.string(), z.unknown()), with_1_1_3_6_relief: z.record(z.string(), z.unknown()) }),
+      conditions: z.array(z.string()),
+      needs_info: z.array(loose({ line_index: z.number(), question: z.string() })),
+      notes: z.array(z.string()),
+    }),
+    transport_document: loose({
+      verdict: CC_VERDICT,
+      lines: z.array(loose({ line_index: z.number(), un_number: z.string(), edition: z.string(), variant_index: z.number(), elements: loose({ a: z.string(), b: z.array(z.string()), c: z.string(), d: z.string(), k: z.string() }), strings: z.array(z.string()), tunnel_code_required: z.boolean(), equivalent_rows: z.number(), notes: z.array(z.string()), reason: z.string(), candidates: z.array(z.record(z.string(), z.unknown())) })),
+      order: z.string(),
+      exemption_1_1_3_6_statement: loose({ applies: z.boolean(), rule: z.string(), per_transport_category: z.array(loose({ transport_category: z.string(), total_quantity: z.array(loose({ value: z.number(), unit: z.string() })), calculated_value: z.number() })), wording: z.string() }),
+      conditions: z.array(z.string()),
+    }),
+    notes: z.array(z.string()),
+    adr_edition: z.record(z.string(), z.unknown()),
+  }),
+
+  annotations: readOnlyAnnotations('ADR Consignment Check'),
+
+  handler: async (args, opts) =>
+    apiPost('adr/consignment-check', { lines: args.lines, journey: args.journey, vehicle: args.vehicle, options: args.options, edition: args.edition, as_of: args.as_of }, opts),
+};
+
+// ─────────────────────────────────────────────────────────────
 //  19. Get Subscribe Link
 // ─────────────────────────────────────────────────────────────
 
@@ -1790,5 +1909,6 @@ export const ALL_TOOLS: ToolDef[] = [
   airportLookup,
   nearestAirport,
   resolveReference,
+  adrConsignmentCheck,
   getSubscribeLink,
 ];
