@@ -1,5 +1,5 @@
 /**
- * 2.30.0 (unreleased): adr_consignment_check's mixed_loading_7_5_2 — answers of the website's
+ * 2.30.0: adr_consignment_check's mixed_loading_7_5_2 — answers of the website's
  * POST /api/adr/consignment-check recorded on its build-2b preview (test-fixtures/recorded-2.30.0.json, keyed,
  * envelope 1.2; check_ids synthetic), driven through the real server and the SDK's validating Client, and parsed
  * through the TYPED branch of the tool's result schema; plus the new optional input vehicle.foodstuffs_carried.

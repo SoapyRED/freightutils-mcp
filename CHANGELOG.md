@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.30.0 — unreleased
+## 2.30.0 — 2026-11-05
 
 Mirrors build 2b of the website's POST /api/adr/consignment-check: `adr_consignment_check` now checks mixed loading.
 Additive: nothing removed, no default changed — every 2.29.0 argument and answer field still validates.
@@ -20,7 +20,9 @@ Why a minor release: a new optional input field and a new typed answer block.
 ### Changed
 
 - The description says mixed loading is checked; its Limitations name what is left (5.3, 8.1, 8.2.1 in build 2c;
-  packaging codes in build 2d) and the foodstuffs input.
+  packaging codes in build 2d) and the foodstuffs input. The `vehicle` argument's description says only
+  `foodstuffs_carried` is read.
+- Nothing removed, no default changed: every 2.29.0 argument and answer field still validates.
 
 ## 2.29.0 — 2026-11-05
 
