@@ -22,6 +22,13 @@ Why a minor release: new optional input fields (and a new optional `crew` object
 - The description: Returns names the three blocks; Behavior describes the requirement-list reading and the 1.1.3.6.2 answers;
   Limitations: packaging codes (build 2d) remain; without the vehicle-side inputs a dangerous-goods load is conditional.
 - `vehicle.max_mass_t` is described as the transport unit's maximum permissible mass (the 8.1.4.1 band, 3.4.13).
+- What `fail` means (website run 2x): a load outside 1.1.3.6 answers `exemption_1_1_3_6: not_applicable` (the full
+  requirements apply), not `fail`, and a line with no stated `inner_packaging.regime` that fits neither LQ nor EQ is
+  `not_applicable` on both quantity checks; `not_applicable` does not change the status. A stated regime that is missed,
+  and a CARRIAGE PROHIBITED entry, still fail. The description's Behavior / Returns lines and the `regime` input say so.
+- Typed: `result.regime` ("1.1.3.6" | "full_adr" | "undetermined"; null without dangerous goods) and the per-line
+  `verdict` of `limited_quantities` / `excepted_quantities` (tolerant, like every result field). The 2.31.0 fixtures
+  that read the old `fail` were re-recorded from the website's run-2x preview.
 
 ## 2.30.0 — 2026-11-05
 

@@ -66,6 +66,10 @@ test('2.31.0: the description names the vehicle side, its inputs and the 2c limi
   assert.match(t.description, /crew \{adr_training_certificate, specialisations\[\]/);
   assert.match(t.description, /Limitations: version 2c does not yet check packaging codes \(build 2d\)/);
   assert.doesNotMatch(t.description, /does not yet check plates and placards/);
+  // website run 2x: what fail, not_applicable and regime mean
+  assert.match(t.description, /regime \("1\.1\.3\.6" \| "full_adr" \| "undetermined"/);
+  assert.match(t.description, /a relief that does not apply is not_applicable, not fail, and does not change the status/);
+  assert.doesNotMatch(t.description, /the line fails only when it fits neither/);
 });
 
 test('2.31.0: the vehicle-side inputs and crew are accepted, sent through, and refused when mistyped', async () => {
@@ -103,6 +107,8 @@ test('recorded: no vehicle-side inputs — the three checks conditional with the
   assert.equal(blk(sc, 'driver_training_8_2').requirements[0].id, 'driver_certificate_8_2_1');
   const missing = (sc.result.missing_inputs as Array<{ name: string; what: string }>).map((m) => m.name);
   for (const n of ['vehicle.orange_plates_displayed', 'vehicle.fire_extinguishers_kg', 'crew.adr_training_certificate']) assert.ok(missing.includes(n), n);
+  assert.equal(sc.result.status, 'conditional');
+  assert.equal(sc.result.regime, 'full_adr');
 });
 
 test('recorded: everything declared on a 7.5 t unit — the three pass; the band is the printed row', async () => {
@@ -110,6 +116,10 @@ test('recorded: everything declared on a 7.5 t unit — the three pass; the band
   const { sc } = await call(rec, bodyOf(rec));
   parsesTyped(sc.result);
   for (const k of ['placards_and_plates_5_3', 'equipment_8_1', 'driver_training_8_2']) assert.equal(blk(sc, k).verdict, 'pass', k);
+  // website run 2x: a fully regulated load with every input met passes — the exemption check is not_applicable
+  assert.equal(sc.result.status, 'pass');
+  assert.equal(sc.result.regime, 'full_adr');
+  assert.equal(blk(sc, 'exemption_1_1_3_6').verdict, 'not_applicable');
   const ext = blk(sc, 'equipment_8_1').fire_extinguishers as { band: { transport_unit_maximum_permissible_mass: string; minimum_total_kg: number; additional_minimum_kg: number }; verdict: string };
   assert.equal(ext.band.transport_unit_maximum_permissible_mass, '> 3.5 tonnes ≤ 7.5 tonnes');
   assert.equal(ext.band.minimum_total_kg, 8);

@@ -1,5 +1,5 @@
 {
- "_recorded": "preview 2026-11-05T07:08Z (freightutils.com build 2c, commit 9c2d7a3), keyed, envelope 1.2; check_id / receipt_url replaced by synthetic ids of the same shape",
+ "_recorded": "preview 2026-11-05T07:08Z (freightutils.com build 2c, commit 9c2d7a3), keyed, envelope 1.2; check_id / receipt_url replaced by synthetic ids of the same shape; re-recorded 2026-11-05T09:23Z on the run-2x preview (commit fe050c9) — vehicle_no_inputs_conditional, vehicle_everything_declared_pass, vehicle_extinguishers_short_fail, vehicle_relief_1_1_3_6, vehicle_class1_specialisation_fail, vehicle_label_6_1_escape_mask",
  "vehicle_no_inputs_conditional": {
   "request": "POST /api/adr/consignment-check?envelope=1.2 {\"lines\":[{\"un_number\":\"1203\",\"quantity\":{\"value\":2000,\"unit\":\"L\",\"basis\":\"net\"},\"packages\":{\"count\":10,\"type\":\"drum\",\"gross_kg\":1800},\"packing_group\":\"II\"}],\"journey\":{\"date\":\"2026-11-20\",\"mode\":\"road\"}}",
   "status": 200,
@@ -15,7 +15,8 @@
    },
    "as_of": "2026-11-20",
    "result": {
-    "status": "fail",
+    "status": "conditional",
+    "regime": "full_adr",
     "missing_inputs": [
      {
       "name": "lines[].inner_packaging",
@@ -66,11 +67,11 @@
     "checks_performed": [
      {
       "name": "exemption_1_1_3_6",
-      "verdict": "fail",
+      "verdict": "not_applicable",
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points — the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load",
       "citations": [
        {
         "section": "1.1.3.6.3, 1.1.3.6.4",
@@ -153,7 +154,7 @@
       "required": false,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3",
+      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3; answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.6.3.1",
@@ -281,7 +282,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "one load in one transport unit with a single assessed line: no pair to check under 7.5.2; foodstuffs by 7.5.4 (CV28 in column (18))",
+      "basis": "one load in one transport unit with a single assessed line: no pair to check under 7.5.2; foodstuffs by 7.5.4 (CV28 in column (18)); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "7.5.2.1",
@@ -429,7 +430,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "orange-coloured plates by 5.3.2.1.1, placards for a vehicle carrying packages by 5.3.1.5, the 5.3.6 mark with placards, and the 3.4.13 LQ mark, read from the pinned rows",
+      "basis": "orange-coloured plates by 5.3.2.1.1, placards for a vehicle carrying packages by 5.3.1.5, the 5.3.6 mark with placards, and the 3.4.13 LQ mark, read from the pinned rows; answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "5.3.2.1.1",
@@ -577,7 +578,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the documents of 8.1.2, the portable fire extinguishers of 8.1.4.1 by the transport unit's maximum permissible mass, and the equipment of 8.1.5 selected by the danger labels of Table A column (5)",
+      "basis": "the documents of 8.1.2, the portable fire extinguishers of 8.1.4.1 by the transport unit's maximum permissible mass, and the equipment of 8.1.5 selected by the danger labels of Table A column (5); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.1.2.1",
@@ -746,7 +747,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the driver certificate of 8.2.1.1 and the specialisations of 8.2.1.4, read from the class and classification code of each pinned row and the S-provisions of column (19)",
+      "basis": "the driver certificate of 8.2.1.1 and the specialisations of 8.2.1.4, read from the class and classification code of each pinned row and the S-provisions of column (19); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.2.1.1",
@@ -875,10 +876,12 @@
      }
     ],
     "exemption_1_1_3_6": {
-     "verdict": "fail",
-     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+     "verdict": "not_applicable",
+     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points — the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load",
      "conditions": [],
-     "notes": [],
+     "notes": [
+      "the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load"
+     ],
      "engine": {
       "items": [
        {
@@ -1750,7 +1753,7 @@
     "checked_at": "2026-11-04"
    },
    "citation": {
-    "text": "ADR consignment check (version 2c) on ADR 2025, as of 2026-11-20: status fail — exemption_1_1_3_6 fail; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass; mixed_loading_7_5_2 pass; placards_and_plates_5_3 conditional; equipment_8_1 conditional; driver_training_8_2 conditional. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1, 7.5.2 / 7.5.4, 5.3 / 3.4.13, 8.1, 8.2 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
+    "text": "ADR consignment check (version 2c) on ADR 2025, as of 2026-11-20: status conditional, regime full_adr — exemption_1_1_3_6 not_applicable; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass; mixed_loading_7_5_2 pass; placards_and_plates_5_3 conditional; equipment_8_1 conditional; driver_training_8_2 conditional. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1, 7.5.2 / 7.5.4, 5.3 / 3.4.13, 8.1, 8.2 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
    },
    "normalized_input": {
     "consignment": {
@@ -1783,7 +1786,8 @@
    },
    "as_of": "2026-11-20",
    "result": {
-    "status": "fail",
+    "status": "pass",
+    "regime": "full_adr",
     "missing_inputs": [
      {
       "name": "lines[].inner_packaging",
@@ -1799,11 +1803,11 @@
     "checks_performed": [
      {
       "name": "exemption_1_1_3_6",
-      "verdict": "fail",
+      "verdict": "not_applicable",
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points — the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load",
       "citations": [
        {
         "section": "1.1.3.6.3, 1.1.3.6.4",
@@ -1886,7 +1890,7 @@
       "required": false,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3",
+      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3; answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.6.3.1",
@@ -2014,7 +2018,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "one load in one transport unit with a single assessed line: no pair to check under 7.5.2; foodstuffs by 7.5.4 (CV28 in column (18))",
+      "basis": "one load in one transport unit with a single assessed line: no pair to check under 7.5.2; foodstuffs by 7.5.4 (CV28 in column (18)); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "7.5.2.1",
@@ -2162,7 +2166,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "orange-coloured plates by 5.3.2.1.1, placards for a vehicle carrying packages by 5.3.1.5, the 5.3.6 mark with placards, and the 3.4.13 LQ mark, read from the pinned rows",
+      "basis": "orange-coloured plates by 5.3.2.1.1, placards for a vehicle carrying packages by 5.3.1.5, the 5.3.6 mark with placards, and the 3.4.13 LQ mark, read from the pinned rows; answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "5.3.2.1.1",
@@ -2310,7 +2314,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the documents of 8.1.2, the portable fire extinguishers of 8.1.4.1 by the transport unit's maximum permissible mass, and the equipment of 8.1.5 selected by the danger labels of Table A column (5)",
+      "basis": "the documents of 8.1.2, the portable fire extinguishers of 8.1.4.1 by the transport unit's maximum permissible mass, and the equipment of 8.1.5 selected by the danger labels of Table A column (5); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.1.2.1",
@@ -2479,7 +2483,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the driver certificate of 8.2.1.1 and the specialisations of 8.2.1.4, read from the class and classification code of each pinned row and the S-provisions of column (19)",
+      "basis": "the driver certificate of 8.2.1.1 and the specialisations of 8.2.1.4, read from the class and classification code of each pinned row and the S-provisions of column (19); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.2.1.1",
@@ -2608,10 +2612,12 @@
      }
     ],
     "exemption_1_1_3_6": {
-     "verdict": "fail",
-     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+     "verdict": "not_applicable",
+     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points — the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load",
      "conditions": [],
-     "notes": [],
+     "notes": [
+      "the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load"
+     ],
      "engine": {
       "items": [
        {
@@ -3471,7 +3477,7 @@
     "checked_at": "2026-11-04"
    },
    "citation": {
-    "text": "ADR consignment check (version 2c) on ADR 2025, as of 2026-11-20: status fail — exemption_1_1_3_6 fail; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass; mixed_loading_7_5_2 pass; placards_and_plates_5_3 pass; equipment_8_1 pass; driver_training_8_2 pass. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1, 7.5.2 / 7.5.4, 5.3 / 3.4.13, 8.1, 8.2 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
+    "text": "ADR consignment check (version 2c) on ADR 2025, as of 2026-11-20: status pass, regime full_adr — exemption_1_1_3_6 not_applicable; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass; mixed_loading_7_5_2 pass; placards_and_plates_5_3 pass; equipment_8_1 pass; driver_training_8_2 pass. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1, 7.5.2 / 7.5.4, 5.3 / 3.4.13, 8.1, 8.2 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
    },
    "normalized_input": {
     "consignment": {
@@ -3505,6 +3511,7 @@
    "as_of": "2026-11-20",
    "result": {
     "status": "fail",
+    "regime": "full_adr",
     "missing_inputs": [
      {
       "name": "lines[].inner_packaging",
@@ -3520,11 +3527,11 @@
     "checks_performed": [
      {
       "name": "exemption_1_1_3_6",
-      "verdict": "fail",
+      "verdict": "not_applicable",
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points — the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load",
       "citations": [
        {
         "section": "1.1.3.6.3, 1.1.3.6.4",
@@ -3607,7 +3614,7 @@
       "required": false,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3",
+      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3; answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.6.3.1",
@@ -3735,7 +3742,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "one load in one transport unit with a single assessed line: no pair to check under 7.5.2; foodstuffs by 7.5.4 (CV28 in column (18))",
+      "basis": "one load in one transport unit with a single assessed line: no pair to check under 7.5.2; foodstuffs by 7.5.4 (CV28 in column (18)); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "7.5.2.1",
@@ -3883,7 +3890,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "orange-coloured plates by 5.3.2.1.1, placards for a vehicle carrying packages by 5.3.1.5, the 5.3.6 mark with placards, and the 3.4.13 LQ mark, read from the pinned rows",
+      "basis": "orange-coloured plates by 5.3.2.1.1, placards for a vehicle carrying packages by 5.3.1.5, the 5.3.6 mark with placards, and the 3.4.13 LQ mark, read from the pinned rows; answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "5.3.2.1.1",
@@ -4031,7 +4038,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the documents of 8.1.2, the portable fire extinguishers of 8.1.4.1 by the transport unit's maximum permissible mass, and the equipment of 8.1.5 selected by the danger labels of Table A column (5)",
+      "basis": "the documents of 8.1.2, the portable fire extinguishers of 8.1.4.1 by the transport unit's maximum permissible mass, and the equipment of 8.1.5 selected by the danger labels of Table A column (5); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.1.2.1",
@@ -4200,7 +4207,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the driver certificate of 8.2.1.1 and the specialisations of 8.2.1.4, read from the class and classification code of each pinned row and the S-provisions of column (19)",
+      "basis": "the driver certificate of 8.2.1.1 and the specialisations of 8.2.1.4, read from the class and classification code of each pinned row and the S-provisions of column (19); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.2.1.1",
@@ -4329,10 +4336,12 @@
      }
     ],
     "exemption_1_1_3_6": {
-     "verdict": "fail",
-     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+     "verdict": "not_applicable",
+     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points — the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load",
      "conditions": [],
-     "notes": [],
+     "notes": [
+      "the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load"
+     ],
      "engine": {
       "items": [
        {
@@ -5192,7 +5201,7 @@
     "checked_at": "2026-11-04"
    },
    "citation": {
-    "text": "ADR consignment check (version 2c) on ADR 2025, as of 2026-11-20: status fail — exemption_1_1_3_6 fail; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass; mixed_loading_7_5_2 pass; placards_and_plates_5_3 pass; equipment_8_1 fail; driver_training_8_2 pass. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1, 7.5.2 / 7.5.4, 5.3 / 3.4.13, 8.1, 8.2 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
+    "text": "ADR consignment check (version 2c) on ADR 2025, as of 2026-11-20: status fail, regime full_adr — exemption_1_1_3_6 not_applicable; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass; mixed_loading_7_5_2 pass; placards_and_plates_5_3 pass; equipment_8_1 fail; driver_training_8_2 pass. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1, 7.5.2 / 7.5.4, 5.3 / 3.4.13, 8.1, 8.2 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
    },
    "normalized_input": {
     "consignment": {
@@ -5226,6 +5235,7 @@
    "as_of": "2026-11-20",
    "result": {
     "status": "conditional",
+    "regime": "1.1.3.6",
     "missing_inputs": [
      {
       "name": "lines[].inner_packaging",
@@ -5338,7 +5348,7 @@
       "required": false,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3",
+      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3; answered under 1.1.3.6 (regime \"1.1.3.6\": the 1.1.3.6.2 relief applied)",
       "citations": [
        {
         "section": "8.6.3.1",
@@ -5480,7 +5490,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "one load in one transport unit with a single assessed line: no pair to check under 7.5.2; foodstuffs by 7.5.4 (CV28 in column (18))",
+      "basis": "one load in one transport unit with a single assessed line: no pair to check under 7.5.2; foodstuffs by 7.5.4 (CV28 in column (18)); answered under 1.1.3.6 (regime \"1.1.3.6\": the 1.1.3.6.2 relief applied)",
       "citations": [
        {
         "section": "7.5.2.1",
@@ -5628,7 +5638,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the load is carried under 1.1.3.6: 1.1.3.6.2 does not apply Chapter 5.3",
+      "basis": "the load is carried under 1.1.3.6: 1.1.3.6.2 does not apply Chapter 5.3; answered under 1.1.3.6 (regime \"1.1.3.6\": the 1.1.3.6.2 relief applied)",
       "citations": [
        {
         "section": "5.3.2.1.1",
@@ -5776,7 +5786,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the load is carried under 1.1.3.6: of Chapter 8.1, 1.1.3.6.2 keeps the transport document (8.1.2.1 (a)) and the one 2 kg extinguisher of 8.1.4.2 (8.1.4.2 to 8.1.4.5)",
+      "basis": "the load is carried under 1.1.3.6: of Chapter 8.1, 1.1.3.6.2 keeps the transport document (8.1.2.1 (a)) and the one 2 kg extinguisher of 8.1.4.2 (8.1.4.2 to 8.1.4.5); answered under 1.1.3.6 (regime \"1.1.3.6\": the 1.1.3.6.2 relief applied)",
       "citations": [
        {
         "section": "8.1.2.1",
@@ -5945,7 +5955,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the load is carried under 1.1.3.6: 8.2.1 is not applied; 8.2.3 (training according to Chapter 1.3) is kept, and reaches a driver without the 8.2.1 certificate",
+      "basis": "the load is carried under 1.1.3.6: 8.2.1 is not applied; 8.2.3 (training according to Chapter 1.3) is kept, and reaches a driver without the 8.2.1 certificate; answered under 1.1.3.6 (regime \"1.1.3.6\": the 1.1.3.6.2 relief applied)",
       "citations": [
        {
         "section": "8.2.1.1",
@@ -6755,7 +6765,7 @@
     "checked_at": "2026-11-04"
    },
    "citation": {
-    "text": "ADR consignment check (version 2c) on ADR 2025, as of 2026-11-20: status conditional — exemption_1_1_3_6 pass; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass; mixed_loading_7_5_2 pass; placards_and_plates_5_3 pass; equipment_8_1 conditional; driver_training_8_2 conditional. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1, 7.5.2 / 7.5.4, 5.3 / 3.4.13, 8.1, 8.2 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
+    "text": "ADR consignment check (version 2c) on ADR 2025, as of 2026-11-20: status conditional, regime 1.1.3.6 — exemption_1_1_3_6 pass; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass; mixed_loading_7_5_2 pass; placards_and_plates_5_3 pass; equipment_8_1 conditional; driver_training_8_2 conditional. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1, 7.5.2 / 7.5.4, 5.3 / 3.4.13, 8.1, 8.2 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
    },
    "normalized_input": {
     "consignment": {
@@ -6789,6 +6799,7 @@
    "as_of": "2026-11-20",
    "result": {
     "status": "fail",
+    "regime": "full_adr",
     "missing_inputs": [
      {
       "name": "lines[].inner_packaging",
@@ -6834,11 +6845,11 @@
     "checks_performed": [
      {
       "name": "exemption_1_1_3_6",
-      "verdict": "fail",
+      "verdict": "not_applicable",
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points — the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load",
       "citations": [
        {
         "section": "1.1.3.6.3, 1.1.3.6.4",
@@ -6921,7 +6932,7 @@
       "required": false,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3",
+      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3; answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.6.3.1",
@@ -7049,7 +7060,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "one load in one transport unit with a single assessed line: no pair to check under 7.5.2; foodstuffs by 7.5.4 (CV28 in column (18))",
+      "basis": "one load in one transport unit with a single assessed line: no pair to check under 7.5.2; foodstuffs by 7.5.4 (CV28 in column (18)); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "7.5.2.1",
@@ -7197,7 +7208,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "orange-coloured plates by 5.3.2.1.1, placards for a vehicle carrying packages by 5.3.1.5, the 5.3.6 mark with placards, and the 3.4.13 LQ mark, read from the pinned rows",
+      "basis": "orange-coloured plates by 5.3.2.1.1, placards for a vehicle carrying packages by 5.3.1.5, the 5.3.6 mark with placards, and the 3.4.13 LQ mark, read from the pinned rows; answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "5.3.2.1.1",
@@ -7345,7 +7356,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the documents of 8.1.2, the portable fire extinguishers of 8.1.4.1 by the transport unit's maximum permissible mass, and the equipment of 8.1.5 selected by the danger labels of Table A column (5)",
+      "basis": "the documents of 8.1.2, the portable fire extinguishers of 8.1.4.1 by the transport unit's maximum permissible mass, and the equipment of 8.1.5 selected by the danger labels of Table A column (5); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.1.2.1",
@@ -7514,7 +7525,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the driver certificate of 8.2.1.1 and the specialisations of 8.2.1.4, read from the class and classification code of each pinned row and the S-provisions of column (19)",
+      "basis": "the driver certificate of 8.2.1.1 and the specialisations of 8.2.1.4, read from the class and classification code of each pinned row and the S-provisions of column (19); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.2.1.1",
@@ -7643,10 +7654,12 @@
      }
     ],
     "exemption_1_1_3_6": {
-     "verdict": "fail",
-     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+     "verdict": "not_applicable",
+     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points — the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load",
      "conditions": [],
-     "notes": [],
+     "notes": [
+      "the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load"
+     ],
      "engine": {
       "items": [
        {
@@ -8459,7 +8472,7 @@
     "checked_at": "2026-11-04"
    },
    "citation": {
-    "text": "ADR consignment check (version 2c) on ADR 2025, as of 2026-11-20: status fail — exemption_1_1_3_6 fail; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass; mixed_loading_7_5_2 pass; placards_and_plates_5_3 conditional; equipment_8_1 conditional; driver_training_8_2 fail. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1, 7.5.2 / 7.5.4, 5.3 / 3.4.13, 8.1, 8.2 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
+    "text": "ADR consignment check (version 2c) on ADR 2025, as of 2026-11-20: status fail, regime full_adr — exemption_1_1_3_6 not_applicable; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass; mixed_loading_7_5_2 pass; placards_and_plates_5_3 conditional; equipment_8_1 conditional; driver_training_8_2 fail. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1, 7.5.2 / 7.5.4, 5.3 / 3.4.13, 8.1, 8.2 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
    },
    "normalized_input": {
     "consignment": {
@@ -8492,7 +8505,8 @@
    },
    "as_of": "2026-11-20",
    "result": {
-    "status": "fail",
+    "status": "conditional",
+    "regime": "full_adr",
     "missing_inputs": [
      {
       "name": "lines[].inner_packaging",
@@ -8548,11 +8562,11 @@
     "checks_performed": [
      {
       "name": "exemption_1_1_3_6",
-      "verdict": "fail",
+      "verdict": "not_applicable",
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+      "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points — the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load",
       "citations": [
        {
         "section": "1.1.3.6.3, 1.1.3.6.4",
@@ -8635,7 +8649,7 @@
       "required": false,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3",
+      "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3; answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.6.3.1",
@@ -8763,7 +8777,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "one load in one transport unit with a single assessed line: no pair to check under 7.5.2; foodstuffs by 7.5.4 (CV28 in column (18))",
+      "basis": "one load in one transport unit with a single assessed line: no pair to check under 7.5.2; foodstuffs by 7.5.4 (CV28 in column (18)); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "7.5.2.1",
@@ -8911,7 +8925,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "orange-coloured plates by 5.3.2.1.1, placards for a vehicle carrying packages by 5.3.1.5, the 5.3.6 mark with placards, and the 3.4.13 LQ mark, read from the pinned rows",
+      "basis": "orange-coloured plates by 5.3.2.1.1, placards for a vehicle carrying packages by 5.3.1.5, the 5.3.6 mark with placards, and the 3.4.13 LQ mark, read from the pinned rows; answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "5.3.2.1.1",
@@ -9059,7 +9073,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the documents of 8.1.2, the portable fire extinguishers of 8.1.4.1 by the transport unit's maximum permissible mass, and the equipment of 8.1.5 selected by the danger labels of Table A column (5)",
+      "basis": "the documents of 8.1.2, the portable fire extinguishers of 8.1.4.1 by the transport unit's maximum permissible mass, and the equipment of 8.1.5 selected by the danger labels of Table A column (5); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.1.2.1",
@@ -9228,7 +9242,7 @@
       "required": true,
       "edition": "ADR 2025",
       "as_of": "2026-11-20",
-      "basis": "the driver certificate of 8.2.1.1 and the specialisations of 8.2.1.4, read from the class and classification code of each pinned row and the S-provisions of column (19)",
+      "basis": "the driver certificate of 8.2.1.1 and the specialisations of 8.2.1.4, read from the class and classification code of each pinned row and the S-provisions of column (19); answered for a fully regulated load (regime \"full_adr\": the load is not within 1.1.3.6)",
       "citations": [
        {
         "section": "8.2.1.1",
@@ -9357,10 +9371,12 @@
      }
     ],
     "exemption_1_1_3_6": {
-     "verdict": "fail",
-     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+     "verdict": "not_applicable",
+     "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points — the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load",
      "conditions": [],
-     "notes": [],
+     "notes": [
+      "the load is not within 1.1.3.6 (1.1.3.6.1, read with the 1.1.3.6.3 table and the 1.1.3.6.4 points): the full requirements of ADR apply, and the other checks answer for a fully regulated load"
+     ],
      "engine": {
       "items": [
        {
@@ -10203,7 +10219,7 @@
     "checked_at": "2026-11-04"
    },
    "citation": {
-    "text": "ADR consignment check (version 2c) on ADR 2025, as of 2026-11-20: status fail — exemption_1_1_3_6 fail; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass; mixed_loading_7_5_2 conditional; placards_and_plates_5_3 conditional; equipment_8_1 conditional; driver_training_8_2 conditional. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1, 7.5.2 / 7.5.4, 5.3 / 3.4.13, 8.1, 8.2 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
+    "text": "ADR consignment check (version 2c) on ADR 2025, as of 2026-11-20: status conditional, regime full_adr — exemption_1_1_3_6 not_applicable; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass; mixed_loading_7_5_2 conditional; placards_and_plates_5_3 conditional; equipment_8_1 conditional; driver_training_8_2 conditional. Rules: ADR 1.1.3.6 (the exemption calculator), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1, 7.5.2 / 7.5.4, 5.3 / 3.4.13, 8.1, 8.2 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
    },
    "normalized_input": {
     "consignment": {
