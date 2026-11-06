@@ -40,6 +40,9 @@ export function envelopeShape(result: z.ZodTypeAny): z.ZodRawShape {
       check_id: z.string().optional(),
       receipt_url: z.string().optional(),
       edition_basis: z.string().optional(),
+      // ids (2.33.0; freightutils.com run 0.1b): present on an answer whose records carry fu_id — the identifier
+      // scheme (1) and its pattern, "fu:<namespace>:<segment>[:<segment>…][@<edition>]".
+      ids: z.object({ scheme: z.number().int(), pattern: z.string() }).passthrough().optional(),
       receipt: z.object({
         stored: z.literal(false),
         // 2.28.0 (website 0C): "quota" — the key's daily stored-receipt allowance for the day is used up;
@@ -113,6 +116,16 @@ export function resultShape(fields: z.ZodRawShape): z.ZodTypeAny {
   // package) can never fail output-schema validation and break the tool.
   return z.object(tolerant).passthrough().or(z.record(z.string(), z.unknown()));
 }
+
+/**
+ * The stable identifiers on every record (2.33.0; freightutils.com run 0.1b). Optional, like every declared
+ * field (loose / resultShape make them nullish): a record of a deploy before the identifiers, or of a family
+ * the API keys no record of, still validates. fu_version_id only where the dataset has editions.
+ */
+export const FU_ID_FIELDS = {
+  fu_id: z.string().describe('Stable FreightUtils identifier of this record, fu:<namespace>:<key> — the same across editions; resolve_reference resolves it to exactly this record.'),
+  fu_version_id: z.string().describe('This record in one dataset edition, fu_id@<edition>. Present only where the dataset has editions (absent on airlines, ULDs, containers, vehicles).'),
+} satisfies z.ZodRawShape;
 
 /** Same tolerance rule for nested record objects (array items, sub-objects). */
 export function loose(fields: z.ZodRawShape): z.ZodTypeAny {

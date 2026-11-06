@@ -1,0 +1,3835 @@
+{
+  "_recorded": {
+    "at": "2026-11-06T02:21:46.485Z",
+    "target": "https://www.freightutils.com",
+    "via": "freightutils-mcp server (dist) + real fetch, keyed; no headers stored",
+    "note": "check ids synthetic (chk_SYNTHETIC01c…); every other byte as production answered on 2026-11-06."
+  },
+  "adr_un_1203": {
+    "tool": "adr_lookup",
+    "args": {
+      "un_number": "1203",
+      "include_codes": "compact"
+    },
+    "request": "GET /api/adr?un=1203&include_codes=compact&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2025",
+        "applies_from": "2025-01-01",
+        "may_apply_until": "2027-06-30"
+      },
+      "as_of": "2026-10-28",
+      "result": {
+        "count": 1,
+        "results": [
+          {
+            "verified": false,
+            "verification": {
+              "status": "unverified",
+              "basis": "dataset",
+              "reason": "No row-level audit. Transcribed from the UNECE ADR 2025 Table A and held by the dataset-level checks only (56 anchor rows carry a row-level audit)."
+            },
+            "un_number": "1203",
+            "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+            "class": "3",
+            "classification_code": "F1",
+            "packing_group": "II",
+            "labels": "3",
+            "special_provisions": "243 534 664",
+            "limited_quantity": "1 L",
+            "excepted_quantity": "E2",
+            "packing_instructions": "P001 IBC02 R001",
+            "special_packing_provisions": "BB2",
+            "mixed_packing_provisions": "MP19",
+            "portable_tank_instructions": "T4",
+            "portable_tank_special_provisions": "TP1",
+            "tank_code": "LGBF",
+            "tank_special_provisions": "TU9",
+            "vehicle_for_tank_carriage": "FL",
+            "carriage_packages": null,
+            "carriage_bulk": null,
+            "carriage_loading_unloading_handling": null,
+            "carriage_operation": "S2 S20",
+            "transport_category": "2",
+            "tunnel_restriction_code": "(D/E)",
+            "hazard_identification_number": "33",
+            "variant_index": 0,
+            "variant_count": 1,
+            "fu_id": "fu:adr:un:1203:II:F1",
+            "fu_version_id": "fu:adr:un:1203:II:F1@2025"
+          }
+        ],
+        "resolved_codes": [
+          {
+            "code": "3",
+            "family": "label",
+            "columns": [
+              "5"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Label model 3 (flammable liquids): flame, black or white.",
+            "section": "5.2.2.2.2, label model No. 3",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:label:3",
+            "fu_version_id": "fu:adr-code:label:3@2025"
+          },
+          {
+            "code": "243",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Gasoline, motor spirit and petrol for spark-ignition engines go under this entry whatever their volatility.",
+            "section": "3.3.1, special provision 243",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:sp:243",
+            "fu_version_id": "fu:adr-code:sp:243@2025"
+          },
+          {
+            "code": "534",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Petrol with a 50 °C vapour pressure up to 150 kPa (1.50 bar) in some climates is still treated as not exceeding 110 kPa (1.10 bar).",
+            "section": "3.3.1, special provision 534",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:sp:534",
+            "fu_version_id": "fu:adr-code:sp:534@2025"
+          },
+          {
+            "code": "664",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Tank-vehicles and demountable tanks for this substance may carry additive devices under set construction, approval, use, test and document rules.",
+            "section": "3.3.1, special provision 664",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:sp:664",
+            "fu_version_id": "fu:adr-code:sp:664@2025"
+          },
+          {
+            "code": "P001",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "General packing instruction for liquids: combination, single, composite packagings and pressure receptacles, with capacity/mass limits by packing group.",
+            "section": "4.1.4.1, P001",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:pi:P001",
+            "fu_version_id": "fu:adr-code:pi:P001@2025"
+          },
+          {
+            "code": "IBC02",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Liquids under IBC02 may use metal (31A/31B/31N), rigid plastics (31H1/31H2) or composite 31HZ1 IBCs, with B and BB limits per UN number.",
+            "section": "4.1.4.2, IBC02",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:pi:IBC02",
+            "fu_version_id": "fu:adr-code:pi:IBC02@2025"
+          },
+          {
+            "code": "R001",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "R001 permits light gauge metal packagings 0A1 and 0A2 up to 40 l / 50 kg for packing groups II and III; packing group I is not allowed.",
+            "section": "4.1.4.1, R001",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:pi:R001",
+            "fu_version_id": "fu:adr-code:pi:R001@2025"
+          },
+          {
+            "code": "BB2",
+            "family": "spp",
+            "columns": [
+              "9a"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "RID/ADR only: UN 1203 may use IBCs only if its actual vapour pressure stays within 110 kPa (50 °C) or 130 kPa (55 °C).",
+            "section": "4.1.4.2, IBC02, BB2",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:spp:BB2",
+            "fu_version_id": "fu:adr-code:spp:BB2@2025"
+          },
+          {
+            "code": "MP19",
+            "family": "mp",
+            "columns": [
+              "9b"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Up to 5 litres per inner packaging may be mixed with goods of other codes or classes that permit it, or with non-ADR goods.",
+            "section": "4.1.10.4, MP19",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:mp:MP19",
+            "fu_version_id": "fu:adr-code:mp:MP19@2025"
+          },
+          {
+            "code": "T4",
+            "family": "t",
+            "columns": [
+              "10"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Portable tank, Class 1 and 3–9: test 2.65 bar; shell See 6.7.2.4.2; relief Normal; bottom openings See 6.7.2.6.3.",
+            "section": "4.2.5.2.6, portable tank instruction T4",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:t:T4",
+            "fu_version_id": "fu:adr-code:t:T4@2025"
+          },
+          {
+            "code": "TP1",
+            "family": "tp",
+            "columns": [
+              "11"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Portable tank must not be filled beyond the degree of filling set by 4.2.1.9.2 (the 97-based formula).",
+            "section": "4.2.5.3, TP1",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:tp:TP1",
+            "fu_version_id": "fu:adr-code:tp:TP1@2025"
+          },
+          {
+            "code": "LGBF",
+            "family": "tank_code",
+            "columns": [
+              "12"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "ADR tank code for Classes 1 and 3–9: liquid tank, G (general minimum), openings B, valves/devices F.",
+            "section": "4.3.4.1.1, tank code LGBF",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:tank_code:LGBF",
+            "fu_version_id": "fu:adr-code:tank_code:LGBF@2025"
+          },
+          {
+            "code": "TU9",
+            "family": "tsp",
+            "columns": [
+              "13"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "UN 1203 petrol with vapour pressure at 50 °C above 110 kPa and up to 150 kPa may also use tanks designed to 6.8.2.1.14 (a) with 6.8.2.2.6 equipment.",
+            "section": "4.3.5, TU9",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:tsp:TU9",
+            "fu_version_id": "fu:adr-code:tsp:TU9@2025"
+          },
+          {
+            "code": "FL",
+            "family": "vehicle",
+            "columns": [
+              "14"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Vehicle for flammable liquids (flash point ≤ 60 °C), flammable gases or UN 2015 > 60 % in tanks above set sizes.",
+            "section": "9.1.1.2, FL vehicle",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:vehicle:FL",
+            "fu_version_id": "fu:adr-code:vehicle:FL@2025"
+          },
+          {
+            "code": "2",
+            "family": "transport_category",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Transport category 2: at most 333 per transport unit under 1.1.3.6 on its own; counts ×3 toward the 1,000-point limit.",
+            "section": "1.1.3.6.3",
+            "verification_status": "verified"
+          },
+          {
+            "code": "(D/E)",
+            "family": "tunnel_code",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Tanks: Prohibited in D, E (bulk or tanks). Other carriage: Prohibited in E.",
+            "section": "8.6.4",
+            "verification_status": "verified"
+          },
+          {
+            "code": "S2",
+            "family": "s",
+            "columns": [
+              "19"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Flammable liquids/gases: no ordinary portable lights in closed load compartments; FL heaters off during loading; earth FL vehicles before filling.",
+            "section": "8.5, S2",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:s:S2",
+            "fu_version_id": "fu:adr-code:s:S2@2025"
+          },
+          {
+            "code": "S20",
+            "family": "s",
+            "columns": [
+              "19"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Chapter 8.4 supervision applies above 10 000 kg in packages, or above 3 000 litres in tanks.",
+            "section": "8.5, S20",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:s:S20",
+            "fu_version_id": "fu:adr-code:s:S20@2025"
+          },
+          {
+            "code": "33",
+            "family": "hin",
+            "columns": [
+              "20"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Hazard identification number 33 on the orange plate: highly flammable liquid (flash-point below 23 °C).",
+            "section": "5.3.2.3.2, 33",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:hin:33",
+            "fu_version_id": "fu:adr-code:hin:33@2025"
+          }
+        ],
+        "meta": {
+          "source": "ADR 2025 (UNECE, ECE/TRANS/352, applicable 1 Jan 2025); given legal effect by EU Directive 2008/68/EC (consolidated). Factual compilation, best-effort — not legal advice, not a regulatory authority.",
+          "edition": "ADR 2025",
+          "entries": 2939
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "UNECE ADR 2025 (ECE/TRANS/352)",
+        "checked": "2026-10-28",
+        "provenance_status": "verified",
+        "source_url": "https://unece.org/adr-2025-files",
+        "dataset_edition": "ADR 2025",
+        "authority_current_edition": "ADR 2025",
+        "checked_at": "2026-11-05"
+      },
+      "citation": {
+        "text": "UN 1203 MOTOR SPIRIT or GASOLINE or PETROL — Class 3 PG II, UNECE ADR 2025.",
+        "qualifier": "Factual compilation, not legal advice — verify against the current UNECE ADR text."
+      },
+      "legacy_source": {
+        "type": "reference",
+        "authority": "UNECE",
+        "dataset": "ADR 2025",
+        "source_url": "https://unece.org/adr-2025-files",
+        "data_vintage": "ADR 2025",
+        "licence": "factual compilation, no named open licence",
+        "retrieved_via": "freightutils.com",
+        "dataset_edition": "ADR 2025",
+        "authority_current_edition": "ADR 2025",
+        "checked_at": "2026-11-05"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        }
+      }
+    }
+  },
+  "adr_lq_1203": {
+    "tool": "adr_lq_eq_check",
+    "args": {
+      "mode": "lq",
+      "items": [
+        {
+          "un_number": "1203",
+          "quantity": 500,
+          "unit": "ml",
+          "inner_packaging_qty": 4
+        }
+      ]
+    },
+    "request": "POST /api/adr/lq-check?envelope=1.2&legacy_source=1 {\"mode\":\"lq\",\"items\":[{\"un_number\":\"1203\",\"quantity\":500,\"unit\":\"ml\",\"inner_packaging_qty\":4}]}",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2025",
+        "applies_from": "2025-01-01",
+        "may_apply_until": "2027-06-30"
+      },
+      "as_of": "2026-11-06",
+      "result": {
+        "mode": "lq",
+        "overall_status": "qualifies",
+        "items": [
+          {
+            "un_number": "1203",
+            "variant_index": 0,
+            "substance": "MOTOR SPIRIT or GASOLINE or PETROL",
+            "class": "3",
+            "packing_group": "II",
+            "lq_limit": "1 L",
+            "lq_limit_value": 1,
+            "lq_limit_unit": "L",
+            "eq_code": "E2",
+            "quantity_entered": 500,
+            "unit_entered": "ml",
+            "status": "within_limit",
+            "reason": "500 ml is within the LQ limit of 1 L per inner packaging",
+            "fu_id": "fu:adr:un:1203:II:F1",
+            "fu_version_id": "fu:adr:un:1203:II:F1@2025"
+          }
+        ],
+        "summary": {
+          "total_items": 1,
+          "qualifying": 1,
+          "exceeding": 0,
+          "not_permitted": 0
+        },
+        "references": {
+          "adr_chapter": "3.4",
+          "table": "3.2 Column 7a"
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "UNECE (ADR 2025)",
+        "checked": "2026-10-28",
+        "provenance_status": "verified",
+        "source_url": "https://unece.org/adr-2025-files",
+        "dataset_edition": "ADR 2025",
+        "authority_current_edition": "ADR 2025",
+        "checked_at": "2026-11-05"
+      },
+      "citation": {
+        "text": "LQ check: qualifies (1/1 qualifying, 0 exceeding, 0 not permitted) — against UNECE ADR 2025 Table A limits.",
+        "qualifier": "Deterministic threshold check, best-effort — not legal advice; verify against the current UNECE ADR text."
+      },
+      "normalized_input": {
+        "mode": "lq",
+        "items": [
+          {
+            "un_number": "1203",
+            "quantity": 500,
+            "unit": "ml"
+          }
+        ],
+        "defaults_applied": []
+      },
+      "legacy_source": {
+        "type": "reference",
+        "authority": "UNECE",
+        "dataset": "ADR 2025",
+        "source_url": "https://unece.org/adr-2025-files",
+        "data_vintage": "ADR 2025",
+        "licence": "factual compilation, no named open licence",
+        "retrieved_via": "freightutils.com",
+        "dataset_edition": "ADR 2025",
+        "authority_current_edition": "ADR 2025",
+        "checked_at": "2026-11-05"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        },
+        "check_id": "chk_SYNTHETIC01cxxxxxxxx01",
+        "receipt_url": "https://www.freightutils.com/api/receipts/chk_SYNTHETIC01cxxxxxxxx01"
+      }
+    }
+  },
+  "consignment_1203": {
+    "tool": "adr_consignment_check",
+    "args": {
+      "lines": [
+        {
+          "un_number": "1203",
+          "packing_group": "II",
+          "quantity": {
+            "value": 200,
+            "unit": "L",
+            "basis": "net"
+          },
+          "packages": {
+            "count": 1,
+            "type": "drum",
+            "gross_kg": 180
+          }
+        }
+      ],
+      "journey": {
+        "date": "2026-11-20",
+        "mode": "road"
+      }
+    },
+    "request": "POST /api/adr/consignment-check?envelope=1.2&legacy_source=1 {\"lines\":[{\"un_number\":\"1203\",\"packing_group\":\"II\",\"quantity\":{\"value\":200,\"unit\":\"L\",\"basis\":\"net\"},\"packages\":{\"count\":1,\"type\":\"drum\",\"gross_kg\":180}}],\"journey\":{\"date\":\"2026-11-20\",\"mode\":\"road\"}}",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2025",
+        "applies_from": "2025-01-01",
+        "may_apply_until": "2027-06-30"
+      },
+      "as_of": "2026-11-20",
+      "result": {
+        "status": "conditional",
+        "regime": "1.1.3.6",
+        "missing_inputs": [
+          {
+            "name": "lines[].inner_packaging",
+            "check": "limited_quantities, excepted_quantities",
+            "what": "optional: the inner packaging { quantity, unit } of a line, to check it against Table A column (7a) / (7b)"
+          },
+          {
+            "name": "journey.tunnels_on_route",
+            "check": "tunnel_restriction",
+            "what": "optional: the tunnel categories (A–E) on the route, to check them against the whole-load code"
+          },
+          {
+            "name": "vehicle.fire_extinguishers_kg",
+            "check": "equipment_8_1",
+            "what": "optional: the capacities in kg (dry powder or equivalent) of the portable fire extinguishers on board, to check them against 8.1.4.1 (or 8.1.4.2 under 1.1.3.6)"
+          },
+          {
+            "name": "crew.awareness_training_1_3",
+            "check": "driver_training_8_2",
+            "what": "optional: whether the driver has received training according to Chapter 1.3 (8.2.3 — the training a 1.1.3.6 load keeps for a driver without the 8.2.1 certificate); a certificate holder needs none"
+          },
+          {
+            "name": "lines[0].packages.un_mark",
+            "check": "packaging_code_validity",
+            "what": "optional: the UN packaging mark the line's packagings bear, as printed (6.1.3.1), to read it and hold its packing-group letter against the line's packing group"
+          }
+        ],
+        "checks_performed": [
+          {
+            "name": "exemption_1_1_3_6",
+            "verdict": "pass",
+            "required": true,
+            "edition": "ADR 2025",
+            "as_of": "2026-11-20",
+            "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+            "citations": [
+              {
+                "section": "1.1.3.6.3, 1.1.3.6.4",
+                "volume": "I",
+                "pdf_page": [
+                  30,
+                  31
+                ],
+                "document": "ECE/TRANS/352 (ADR 2025)"
+              },
+              {
+                "section": "Table A (3.2.1)",
+                "table_a_columns": "(15) transport category",
+                "document": "ECE/TRANS/352 (ADR 2025)"
+              },
+              {
+                "section": "1.1.3.6.2",
+                "volume": "I",
+                "pdf_page": 29,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "may be carried in packages in one transport unit without application of the following provisions"
+              }
+            ]
+          },
+          {
+            "name": "limited_quantities",
+            "verdict": "not_assessed",
+            "required": false,
+            "edition": "ADR 2025",
+            "as_of": "2026-11-20",
+            "basis": "the LQ/EQ engine (adr_lq_eq_check, mode lq) on each line's inner_packaging",
+            "citations": [
+              {
+                "section": "3.4.1",
+                "document": "ECE/TRANS/352 (ADR 2025)"
+              },
+              {
+                "section": "Table A (3.2.1)",
+                "table_a_columns": "(7a) limited quantity",
+                "document": "ECE/TRANS/352 (ADR 2025)"
+              },
+              {
+                "section": "1.1.3.4.2",
+                "volume": "I",
+                "pdf_page": 28,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+              }
+            ]
+          },
+          {
+            "name": "excepted_quantities",
+            "verdict": "not_assessed",
+            "required": false,
+            "edition": "ADR 2025",
+            "as_of": "2026-11-20",
+            "basis": "the LQ/EQ engine (adr_lq_eq_check, mode eq) on each line's inner_packaging",
+            "citations": [
+              {
+                "section": "3.5.1.2, Table 3.5.1.2",
+                "document": "ECE/TRANS/352 (ADR 2025)"
+              },
+              {
+                "section": "Table A (3.2.1)",
+                "table_a_columns": "(7b) excepted quantity code",
+                "document": "ECE/TRANS/352 (ADR 2025)"
+              },
+              {
+                "section": "1.1.3.4.2",
+                "volume": "I",
+                "pdf_page": 28,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Certain dangerous goods may be subject to exemptions provided that the conditions of Chapter 3.4 are met."
+              }
+            ]
+          },
+          {
+            "name": "tunnel_restriction",
+            "verdict": "not_assessed",
+            "required": false,
+            "edition": "ADR 2025",
+            "as_of": "2026-11-20",
+            "basis": "the whole-load code by 8.6.3.2 against journey.tunnels_on_route by the 8.6.4 table; 1.1.3 loads by 8.6.3.3; answered under 1.1.3.6 (regime \"1.1.3.6\": the 1.1.3.6.2 relief applied)",
+            "citations": [
+              {
+                "section": "8.6.3.1",
+                "volume": "II",
+                "pdf_page": 637,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "based on the tunnel restriction code of these goods, indicated in Column (15) of Table A of Chapter 3.2"
+              },
+              {
+                "section": "8.6.3.2",
+                "volume": "II",
+                "pdf_page": 637,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "the most restrictive of these tunnel restriction codes shall be assigned to the whole load."
+              },
+              {
+                "section": "8.6.3.3",
+                "volume": "II",
+                "pdf_page": 637,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Dangerous goods carried in accordance with 1.1.3 are not subject to the tunnel restrictions"
+              },
+              {
+                "section": "8.6.3.3",
+                "volume": "II",
+                "pdf_page": 637,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "except if the transport unit is required to be marked in accordance with 3.4.13 subject to 3.4.14."
+              },
+              {
+                "section": "8.6.4",
+                "volume": "II",
+                "pdf_page": 637,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "to transport units for which an orange-coloured plate marking is required according to 5.3.2"
+              },
+              {
+                "section": "8.6.4",
+                "volume": "II",
+                "pdf_page": 638,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Passage allowed through all tunnels (For UN Nos. 2919 and 3331, see also 8.6.3.1)."
+              },
+              {
+                "section": "Table A (3.2.1)",
+                "table_a_columns": "(15) tunnel restriction code",
+                "document": "ECE/TRANS/352 (ADR 2025)"
+              }
+            ]
+          },
+          {
+            "name": "transport_document",
+            "verdict": "pass",
+            "required": true,
+            "edition": "ADR 2025",
+            "as_of": "2026-11-20",
+            "basis": "the 5.4.1.1.1 particulars (a)–(d), (k) built from Table A columns (1)–(5) and (15) of the pinned row",
+            "citations": [
+              {
+                "section": "5.4.1.1.1 (a)",
+                "volume": "II",
+                "pdf_page": 271,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The UN number preceded by the letters \"UN\""
+              },
+              {
+                "section": "5.4.1.1.1 (b)",
+                "volume": "II",
+                "pdf_page": 271,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The proper shipping name supplemented, when applicable (see 3.1.2.8.1) with the technical name in brackets"
+              },
+              {
+                "section": "5.4.1.1.1 (c)",
+                "volume": "II",
+                "pdf_page": 271,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "When more than one label model numbers are given, the numbers following the first one shall be given in brackets."
+              },
+              {
+                "section": "5.4.1.1.1 (d)",
+                "volume": "II",
+                "pdf_page": 271,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Where assigned, the packing group for the substance which may be preceded by the letters \"PG\""
+              },
+              {
+                "section": "5.4.1.1.1 (k)",
+                "volume": "II",
+                "pdf_page": 272,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "For carriage that includes passage through tunnels with restrictions for carriage of dangerous goods, the tunnel restriction code"
+              },
+              {
+                "section": "5.4.1.1.1",
+                "volume": "II",
+                "pdf_page": 272,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "(a), (b), (c), (d) and (k) shall be shown in the order listed above"
+              },
+              {
+                "section": "5.4.1.1.1",
+                "volume": "II",
+                "pdf_page": 272,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "\"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\""
+              },
+              {
+                "section": "3.1.2.2",
+                "volume": "I",
+                "pdf_page": 289,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "only the most appropriate shall be shown in the transport document and package marks"
+              },
+              {
+                "section": "3.1.2.8.1",
+                "volume": "I",
+                "pdf_page": 290,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Generic and \"not otherwise specified\" proper shipping names that are assigned to special provision 274 or 318"
+              },
+              {
+                "section": "3.1.2.8.1",
+                "volume": "I",
+                "pdf_page": 290,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Technical names shall be entered in brackets immediately following the proper shipping name."
+              },
+              {
+                "section": "3.3.1 SP 274",
+                "volume": "I",
+                "pdf_page": 618,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The provisions of 3.1.2.8 apply."
+              },
+              {
+                "section": "5.4.1.1.1 (f) NOTE 1",
+                "volume": "II",
+                "pdf_page": 272,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "the total quantity and the calculated value of dangerous goods for each transport category shall be indicated"
+              },
+              {
+                "section": "5.4.1.1.10",
+                "volume": "II",
+                "pdf_page": 275,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "5.4.1.1.10 (Deleted)"
+              },
+              {
+                "section": "Table A (3.2.1)",
+                "table_a_columns": "(1)–(5), (15)",
+                "document": "ECE/TRANS/352 (ADR 2025)"
+              }
+            ]
+          },
+          {
+            "name": "mixed_loading_7_5_2",
+            "verdict": "pass",
+            "required": true,
+            "edition": "ADR 2025",
+            "as_of": "2026-11-20",
+            "basis": "one load in one transport unit with a single assessed line: no pair to check under 7.5.2; foodstuffs by 7.5.4 (CV28 in column (18)); answered under 1.1.3.6 (regime \"1.1.3.6\": the 1.1.3.6.2 relief applied)",
+            "citations": [
+              {
+                "section": "7.5.2.1",
+                "volume": "II",
+                "pdf_page": 602,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Packages bearing different danger labels shall not be loaded together in the same vehicle or container"
+              },
+              {
+                "section": "7.5.2.1",
+                "volume": "II",
+                "pdf_page": 602,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "unless mixed loading is permitted according to the following Table based on the danger labels they bear."
+              },
+              {
+                "section": "7.5.2.1 table",
+                "volume": "II",
+                "pdf_page": 602,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "X Mixed loading permitted."
+              },
+              {
+                "section": "7.5.2.1 NOTE 2",
+                "volume": "II",
+                "pdf_page": 602,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "irrespective of any other danger labels required for these packages, mixed loading shall be permitted in accordance with 7.5.2.2."
+              },
+              {
+                "section": "7.5.2.1 NOTE 2",
+                "volume": "II",
+                "pdf_page": 602,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "shall only apply when such packages are loaded together with packages containing substances or articles of other classes."
+              },
+              {
+                "section": "7.5.2.2",
+                "volume": "II",
+                "pdf_page": 603,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "which are assigned to different compatibility groups shall not be loaded together in the same vehicle or container"
+              },
+              {
+                "section": "7.5.2.2",
+                "volume": "II",
+                "pdf_page": 603,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "unless mixed loading is permitted in accordance with the following Table for the corresponding compatibility groups."
+              },
+              {
+                "section": "3.2.1 column (5)",
+                "volume": "I",
+                "pdf_page": 294,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Contains the model number of the labels/placards (see 5.2.2.2 and 5.3.1.7) that have to be affixed to packages"
+              },
+              {
+                "section": "3.2.1 column (5)",
+                "volume": "I",
+                "pdf_page": 294,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "7X means label model No.7A, 7B or 7C as appropriate according to the category"
+              },
+              {
+                "section": "7.5.2.3",
+                "volume": "II",
+                "pdf_page": 603,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "shall also apply between dangerous goods contained in a container and the other dangerous goods loaded on the same vehicle"
+              },
+              {
+                "section": "7.5.2.4",
+                "volume": "II",
+                "pdf_page": 604,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "explosive substances and articles, except those of Division 1.4 and UN Nos. 0161 and 0499, is prohibited."
+              },
+              {
+                "section": "3.4.1 (g)",
+                "volume": "I",
+                "pdf_page": 663,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "(g) Part 7, Chapter 7.1 and 7.2.1, 7.2.2, 7.5.1 (except 7.5.1.4), 7.5.2.4, 7.5.7, 7.5.8 and 7.5.9;"
+              },
+              {
+                "section": "3.5.1.1",
+                "volume": "I",
+                "pdf_page": 667,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "this Chapter are not subject to any other provisions of ADR except for:"
+              },
+              {
+                "section": "1.1.3.6.2",
+                "volume": "I",
+                "pdf_page": 29,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "CV1 of 7.5.11;"
+              },
+              {
+                "section": "7.5.4",
+                "volume": "II",
+                "pdf_page": 604,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "If special provision CV28 is indicated for a substance or article in Column (18) of Table A"
+              },
+              {
+                "section": "7.5.4",
+                "volume": "II",
+                "pdf_page": 604,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "shall not be stacked on or loaded in immediate proximity to packages known to contain foodstuffs"
+              },
+              {
+                "section": "7.5.11 CV28",
+                "volume": "II",
+                "pdf_page": 608,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "CV28 See 7.5.4."
+              },
+              {
+                "section": "7.5.4",
+                "volume": "II",
+                "pdf_page": 604,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "bearing labels conforming to models Nos. 6.1 or 6.2"
+              },
+              {
+                "section": "7.5.4",
+                "volume": "II",
+                "pdf_page": 604,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "those bearing labels conforming to model No. 9 containing goods of UN Nos. 2212, 2315, 2590, 3151, 3152 or 3245"
+              },
+              {
+                "section": "Table A (3.2.1)",
+                "table_a_columns": "(3b) classification code, (5) labels, (18) CV28",
+                "document": "ECE/TRANS/352 (ADR 2025)"
+              }
+            ]
+          },
+          {
+            "name": "placards_and_plates_5_3",
+            "verdict": "pass",
+            "required": true,
+            "edition": "ADR 2025",
+            "as_of": "2026-11-20",
+            "basis": "the load is carried under 1.1.3.6: 1.1.3.6.2 does not apply Chapter 5.3; answered under 1.1.3.6 (regime \"1.1.3.6\": the 1.1.3.6.2 relief applied)",
+            "citations": [
+              {
+                "section": "5.3.2.1.1",
+                "volume": "II",
+                "pdf_page": 264,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Transport units carrying dangerous goods shall display two rectangular orange-coloured plates"
+              },
+              {
+                "section": "5.3.2.1.1",
+                "volume": "II",
+                "pdf_page": 264,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "They shall be affixed one at the front and the other at the rear of the transport unit,"
+              },
+              {
+                "section": "5.3.2.1.2",
+                "volume": "II",
+                "pdf_page": 264,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "These orange-coloured plates shall bear the hazard identification number and the UN number prescribed respectively in Columns (20) and (1)"
+              },
+              {
+                "section": "5.3.1.1.1",
+                "volume": "II",
+                "pdf_page": 261,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "placards shall be affixed to the exterior surface of containers, bulk containers, MEGCs, MEMUs, tank-containers, portable tanks and vehicles."
+              },
+              {
+                "section": "5.3.1.1.1",
+                "volume": "II",
+                "pdf_page": 261,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Placards shall correspond to the labels required in Column (5) and, where appropriate, Column (6) of Table A"
+              },
+              {
+                "section": "5.3.1.5",
+                "volume": "II",
+                "pdf_page": 262,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Placarding of vehicles carrying packages only"
+              },
+              {
+                "section": "5.3.1.5.1",
+                "volume": "II",
+                "pdf_page": 262,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "For vehicles carrying packages containing substances or articles of Class 1 (other than of Division 1.4,"
+              },
+              {
+                "section": "5.3.1.5.2",
+                "volume": "II",
+                "pdf_page": 262,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "For vehicles carrying radioactive material of Class 7 in packagings or IBCs (other than excepted packages), placards shall be affixed"
+              },
+              {
+                "section": "5.3.1.5.1",
+                "volume": "II",
+                "pdf_page": 262,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "placards shall be affixed to both sides and at the rear of the vehicle."
+              },
+              {
+                "section": "5.3.1.1.2",
+                "volume": "II",
+                "pdf_page": 261,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "shall bear only placards conforming to the model of the most dangerous division in the order:"
+              },
+              {
+                "section": "5.3.1.1.2",
+                "volume": "II",
+                "pdf_page": 261,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Placards are not required for the carriage of explosives of Division 1.4, compatibility group S."
+              },
+              {
+                "section": "5.3.1.1.3",
+                "volume": "II",
+                "pdf_page": 261,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "For Class 7, the primary hazard placard shall conform to model No. 7D as specified in 5.3.1.7.2."
+              },
+              {
+                "section": "5.3.6.1",
+                "volume": "II",
+                "pdf_page": 270,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "When a placard is required to be displayed in accordance with the provisions of section 5.3.1,"
+              },
+              {
+                "section": "3.4.13 (a)",
+                "volume": "I",
+                "pdf_page": 665,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Transport units with a maximum mass exceeding 12 tonnes carrying dangerous goods packed in limited quantities shall be marked"
+              },
+              {
+                "section": "3.4.13 (a)",
+                "volume": "I",
+                "pdf_page": 665,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "except when the transport unit contains other dangerous goods for which orange-coloured plate marking in accordance with 5.3.2 is required."
+              },
+              {
+                "section": "3.4.14",
+                "volume": "I",
+                "pdf_page": 665,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The marks specified in 3.4.13 may be dispensed with, if the total gross mass of the packages"
+              },
+              {
+                "section": "1.1.3.6.2",
+                "volume": "I",
+                "pdf_page": 29,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "- Chapter 5.3; - Section 5.4.3;"
+              },
+              {
+                "section": "3.4.1 (e)",
+                "volume": "I",
+                "pdf_page": 663,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "(e) Part 5, 5.1.2.1(a) (i) and (b), 5.1.2.2, 5.1.2.3, 5.2.1.10, 5.4.2;"
+              },
+              {
+                "section": "8.1.3",
+                "volume": "II",
+                "pdf_page": 619,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Transport units carrying dangerous goods shall be placarded and marked in conformity with Chapter 5.3."
+              },
+              {
+                "section": "Table A (3.2.1)",
+                "table_a_columns": "(1) UN number, (3b) classification code, (5) labels, (7a) limited quantity, (20) hazard identification number",
+                "document": "ECE/TRANS/352 (ADR 2025)"
+              }
+            ]
+          },
+          {
+            "name": "equipment_8_1",
+            "verdict": "conditional",
+            "required": true,
+            "edition": "ADR 2025",
+            "as_of": "2026-11-20",
+            "basis": "the load is carried under 1.1.3.6: of Chapter 8.1, 1.1.3.6.2 keeps the transport document (8.1.2.1 (a)) and the one 2 kg extinguisher of 8.1.4.2 (8.1.4.2 to 8.1.4.5); answered under 1.1.3.6 (regime \"1.1.3.6\": the 1.1.3.6.2 relief applied)",
+            "citations": [
+              {
+                "section": "8.1.2.1",
+                "volume": "II",
+                "pdf_page": 619,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "the following documents shall be carried on the driver's cab of the transport unit:"
+              },
+              {
+                "section": "8.1.2.1 (a)",
+                "volume": "II",
+                "pdf_page": 619,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "(a) The transport documents prescribed in 5.4.1, covering all the dangerous goods carried;"
+              },
+              {
+                "section": "8.1.2.1 (b)",
+                "volume": "II",
+                "pdf_page": 619,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "(b) The instructions in writing prescribed in 5.4.3;"
+              },
+              {
+                "section": "8.1.2.1 (d)",
+                "volume": "II",
+                "pdf_page": 619,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "(d) Means of identification, which include a photograph, for each member of the vehicle crew, in accordance with 1.10.1.4."
+              },
+              {
+                "section": "8.1.2.2",
+                "volume": "II",
+                "pdf_page": 619,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Where the provisions of ADR require the following documents to be drawn up, they shall likewise be carried"
+              },
+              {
+                "section": "8.1.2.2 (b)",
+                "volume": "II",
+                "pdf_page": 619,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "(b) The driver's training certificate prescribed in 8.2.1;"
+              },
+              {
+                "section": "8.1.4.1",
+                "volume": "II",
+                "pdf_page": 620,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The following table shows the minimum provisions for portable fire extinguishers for the inflammability"
+              },
+              {
+                "section": "8.1.4.2",
+                "volume": "II",
+                "pdf_page": 620,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Transport units carrying dangerous goods in accordance with 1.1.3.6 shall be equipped with one portable"
+              },
+              {
+                "section": "8.1.4.2",
+                "volume": "II",
+                "pdf_page": 620,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "with a minimum capacity of 2 kg dry powder (or an equivalent capacity for any other suitable extinguishing agent)."
+              },
+              {
+                "section": "8.1.4.1",
+                "volume": "II",
+                "pdf_page": 620,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The capacities are for dry powder devices (or an equivalent capacity for any other suitable extinguishing agent)."
+              },
+              {
+                "section": "8.5 S3",
+                "volume": "II",
+                "pdf_page": 634,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The requirements of the table columns (2), (3) and (5) in 8.1.4.1 and the requirements in 8.3.4"
+              },
+              {
+                "section": "8.1.5.1",
+                "volume": "II",
+                "pdf_page": 620,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Each transport unit carrying dangerous goods shall be provided with items of equipment for general and"
+              },
+              {
+                "section": "8.1.5.1",
+                "volume": "II",
+                "pdf_page": 620,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The items of equipment shall be selected in accordance with the danger label number of the goods loaded."
+              },
+              {
+                "section": "8.1.5.2",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The following equipment shall be carried on board the transport unit:"
+              },
+              {
+                "section": "8.1.5.2",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "for each member of the vehicle crew"
+              },
+              {
+                "section": "8.1.5.3",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Additional equipment required for certain classes:"
+              },
+              {
+                "section": "8.1.5.3",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "transport unit for danger label numbers 2.3 or 6.1;"
+              },
+              {
+                "section": "8.1.5.2 footnote 2",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Not required for danger label numbers 1, 1.4, 1.5, 1.6, 2.1, 2.2 and 2.3."
+              },
+              {
+                "section": "8.1.5.3 footnote 4",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Only required for solids and liquids with danger label numbers 3, 4.1, 4.3, 8 or 9."
+              },
+              {
+                "section": "1.1.3.6.2",
+                "volume": "I",
+                "pdf_page": 29,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,"
+              },
+              {
+                "section": "3.4.1 (h)",
+                "volume": "I",
+                "pdf_page": 663,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "(h) Part 8, 8.2.3, 8.6.3.3 and 8.6.4."
+              },
+              {
+                "section": "8.5 S5",
+                "volume": "II",
+                "pdf_page": 634,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The requirements of the instructions in writing of 8.1.2.1 (b) and of 8.2.1, 8.3.1 and 8.3.4 shall not apply."
+              },
+              {
+                "section": "Table A (3.2.1)",
+                "table_a_columns": "(5) labels, (19) S-provisions",
+                "document": "ECE/TRANS/352 (ADR 2025)"
+              }
+            ]
+          },
+          {
+            "name": "driver_training_8_2",
+            "verdict": "conditional",
+            "required": true,
+            "edition": "ADR 2025",
+            "as_of": "2026-11-20",
+            "basis": "the load is carried under 1.1.3.6: 8.2.1 is not applied; 8.2.3 (training according to Chapter 1.3) is kept, and reaches a driver without the 8.2.1 certificate; answered under 1.1.3.6 (regime \"1.1.3.6\": the 1.1.3.6.2 relief applied)",
+            "citations": [
+              {
+                "section": "8.2.1.1",
+                "volume": "II",
+                "pdf_page": 623,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Drivers of vehicles carrying dangerous goods shall hold a certificate issued by the competent authority"
+              },
+              {
+                "section": "8.2.1.2",
+                "volume": "II",
+                "pdf_page": 623,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Drivers of vehicles carrying dangerous goods shall attend a basic training course."
+              },
+              {
+                "section": "8.2.1.4",
+                "volume": "II",
+                "pdf_page": 623,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Drivers of vehicles carrying dangerous goods of Class 1, other than substances and articles of Division"
+              },
+              {
+                "section": "8.2.1.4",
+                "volume": "II",
+                "pdf_page": 623,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "1.4, compatibility group S, or Class 7 shall attend specialization training courses"
+              },
+              {
+                "section": "8.2.3",
+                "volume": "II",
+                "pdf_page": 628,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Persons whose duties concern the carriage of dangerous goods by road shall have received training in"
+              },
+              {
+                "section": "8.2.3",
+                "volume": "II",
+                "pdf_page": 628,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "appropriate to their responsibilities and duties according to Chapter 1.3."
+              },
+              {
+                "section": "8.2.3",
+                "volume": "II",
+                "pdf_page": 628,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "drivers of vehicles other than drivers holding a certificate in accordance with 8.2.1,"
+              },
+              {
+                "section": "1.3.1",
+                "volume": "I",
+                "pdf_page": 57,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "shall be trained in the requirements governing the carriage of such goods appropriate to their responsibilities and duties."
+              },
+              {
+                "section": "1.3.1 NOTE 2",
+                "volume": "I",
+                "pdf_page": 57,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "NOTE 2: With regard to the training of the vehicle crew, see Chapter 8.2 instead of this section."
+              },
+              {
+                "section": "1.1.3.6.2",
+                "volume": "I",
+                "pdf_page": 29,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,"
+              },
+              {
+                "section": "3.4.1 (h)",
+                "volume": "I",
+                "pdf_page": 663,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "(h) Part 8, 8.2.3, 8.6.3.3 and 8.6.4."
+              },
+              {
+                "section": "3.5.1.1 (a)",
+                "volume": "I",
+                "pdf_page": 667,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "(a) The training requirements in Chapter 1.3;"
+              },
+              {
+                "section": "8.5 S5",
+                "volume": "II",
+                "pdf_page": 634,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The requirements of the instructions in writing of 8.1.2.1 (b) and of 8.2.1, 8.3.1 and 8.3.4 shall not apply."
+              },
+              {
+                "section": "8.5 S12",
+                "volume": "II",
+                "pdf_page": 635,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "the requirements in 8.2.1 concerning the training of drivers need not be applied."
+              },
+              {
+                "section": "Table A (3.2.1)",
+                "table_a_columns": "(1) UN number, (3b) classification code, (19) S-provisions",
+                "document": "ECE/TRANS/352 (ADR 2025)"
+              }
+            ]
+          },
+          {
+            "name": "packaging_code_validity",
+            "verdict": "conditional",
+            "required": false,
+            "edition": "ADR 2025",
+            "as_of": "2026-11-20",
+            "basis": "each line's packages.un_mark read by the grammar of 6.1.3.1 ((a) symbol, (b) the 6.1.2 code, (c) the packing-group letter and the density or mass, (d) S or the test pressure, (e) year, (f) State, (g) manufacturer; 6.1.3.7 the sequence) and the letter held against the line's packing group",
+            "citations": [
+              {
+                "section": "6.1.3.1",
+                "volume": "II",
+                "pdf_page": 303,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Each packaging intended for use according to the ADR shall bear marks on a non-removable component"
+              },
+              {
+                "section": "6.1.3.1 (a) (i)",
+                "volume": "II",
+                "pdf_page": 303,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The United Nations packaging symbol"
+              },
+              {
+                "section": "6.1.3.1 (b)",
+                "volume": "II",
+                "pdf_page": 303,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The code designating the type of packaging according to 6.1.2;"
+              },
+              {
+                "section": "6.1.2.7",
+                "volume": "II",
+                "pdf_page": 300,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The following table indicates the codes to be used for designating types of packagings"
+              },
+              {
+                "section": "6.1.2.4",
+                "volume": "II",
+                "pdf_page": 300,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The letters \"T\", \"V\" or \"W\" may follow the packaging code."
+              },
+              {
+                "section": "6.1.3.1 (c) (i)",
+                "volume": "II",
+                "pdf_page": 303,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "A letter designating the packing group(s) for which the design type has been successfully tested:"
+              },
+              {
+                "section": "6.1.3.1 (c) (i)",
+                "volume": "II",
+                "pdf_page": 303,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "X for packing groups I, II and III;"
+              },
+              {
+                "section": "6.1.3.1 (c) (i)",
+                "volume": "II",
+                "pdf_page": 303,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Y for packing groups II and III;"
+              },
+              {
+                "section": "6.1.3.1 (c) (i)",
+                "volume": "II",
+                "pdf_page": 303,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Z for packing group III only;"
+              },
+              {
+                "section": "6.1.3.1 (c) (ii)",
+                "volume": "II",
+                "pdf_page": 303,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The relative density, rounded off to the first decimal, for which the design type has been tested"
+              },
+              {
+                "section": "6.1.3.1 (c) (ii)",
+                "volume": "II",
+                "pdf_page": 303,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "For packagings intended to contain solids or inner packagings, the maximum gross mass in kilograms."
+              },
+              {
+                "section": "6.1.3.1 (d)",
+                "volume": "II",
+                "pdf_page": 303,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Either the letter \"S\" denoting that the packaging is intended for the carriage of solids or inner"
+              },
+              {
+                "section": "6.1.3.1 (d)",
+                "volume": "II",
+                "pdf_page": 303,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "the hydraulic test pressure which the packaging was shown to withstand in kPa rounded down to the nearest 10 kPa"
+              },
+              {
+                "section": "6.1.3.1 (e)",
+                "volume": "II",
+                "pdf_page": 304,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The last two digits of the year during which the packaging was manufactured."
+              },
+              {
+                "section": "6.1.3.1 (f)",
+                "volume": "II",
+                "pdf_page": 304,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The State authorizing the allocation of the mark, indicated by the distinguishing sign used on vehicles in international road traffic"
+              },
+              {
+                "section": "6.1.3.1 (g)",
+                "volume": "II",
+                "pdf_page": 304,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The name of the manufacturer or other identification of the packaging specified by the competent authority."
+              },
+              {
+                "section": "6.1.3.7",
+                "volume": "II",
+                "pdf_page": 305,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Marks shall be applied in the sequence of the sub-paragraphs in 6.1.3.1;"
+              },
+              {
+                "section": "6.1.3.7",
+                "volume": "II",
+                "pdf_page": 305,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "shall be clearly separated, e.g. by a slash or space, so as to be easily identifiable."
+              },
+              {
+                "section": "6.1.3 NOTE 1",
+                "volume": "II",
+                "pdf_page": 302,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "In itself, therefore, the mark does not necessarily confirm that the packaging may be used for any substance:"
+              },
+              {
+                "section": "Table A (3.2.1)",
+                "table_a_columns": "(4) packing group, (8) packing instructions (not checked)",
+                "document": "ECE/TRANS/352 (ADR 2025)"
+              }
+            ]
+          }
+        ],
+        "edition": "ADR 2025",
+        "as_of": "2026-11-20",
+        "edition_basis": "adr_2025",
+        "lines": [
+          {
+            "line_index": 0,
+            "un_number": "1203",
+            "dangerous_goods": true
+          }
+        ],
+        "exemption_1_1_3_6": {
+          "verdict": "pass",
+          "basis": "the ADR 2025 1.1.3.6.3 table and 1.1.3.6.4 points",
+          "conditions": [],
+          "notes": [
+            "1.1.3.6.2: the load may be carried in packages without the provisions it lists (among them Chapter 5.3 and Part 8 except those named); the transport document (5.4.1) is still required."
+          ],
+          "engine": {
+            "items": [
+              {
+                "un_number": "1203",
+                "state": "COUNTED",
+                "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+                "class": "3",
+                "packing_group": "II",
+                "variant_index": 0,
+                "transport_category": "2",
+                "quantity": 200,
+                "multiplier": 3,
+                "points": 600,
+                "quantity_unit": "L",
+                "quantity_basis": "net",
+                "expected_unit": "L",
+                "fu_id": "fu:adr:un:1203:II:F1",
+                "fu_version_id": "fu:adr:un:1203:II:F1@2025"
+              }
+            ],
+            "total_points": 600,
+            "threshold": 1000,
+            "exempt": true,
+            "has_category_zero": false,
+            "has_quantity_exceedance": false,
+            "warnings": [],
+            "message": "1.1.3.6 exemption applies",
+            "resolved_subtotal_points": 600,
+            "threshold_exceeded_by_resolved_items": false,
+            "verdict_basis": "all_items",
+            "unresolved_item_indexes": []
+          }
+        },
+        "limited_quantities": {
+          "verdict": "not_assessed",
+          "lines": [
+            {
+              "line_index": 0,
+              "un_number": "1203",
+              "assessed": false,
+              "reason": "no inner_packaging on the line"
+            }
+          ]
+        },
+        "excepted_quantities": {
+          "verdict": "not_assessed",
+          "lines": [
+            {
+              "line_index": 0,
+              "un_number": "1203",
+              "assessed": false,
+              "reason": "no inner_packaging on the line"
+            }
+          ]
+        },
+        "lq_eq_status_verdict": "not_assessed",
+        "tunnel_restriction": {
+          "verdict": "not_assessed",
+          "lines": [
+            {
+              "line_index": 0,
+              "un_number": "1203",
+              "column_15": "(D/E)",
+              "counted": true,
+              "carriage": "packages",
+              "forbidden": [
+                "E"
+              ]
+            }
+          ],
+          "whole_load": {
+            "codes": [
+              "(D/E)"
+            ],
+            "forbidden_categories": [
+              "E"
+            ],
+            "complete": true,
+            "ordering": "ADR 8.6.3.2 assigns the most restrictive code to the whole load and names no ranking; this check ranks codes by the categories the 8.6.4 table forbids for the carriage (each a run of categories ending at E), so a code that forbids more categories is the more restrictive."
+          },
+          "route": null,
+          "conditions": [],
+          "needs_info": [],
+          "notes": [
+            "8.6.4: the restrictions apply to transport units for which orange-coloured plate marking is required (5.3.2), by the whole-load code, and to units marked under 3.4.13 (subject to 3.4.14) through tunnels of category E; limited and excepted quantities (1.1.3.4) are not taken into account here — a line is counted unless the 1.1.3.6 check left it out."
+          ]
+        },
+        "transport_document": {
+          "verdict": "pass",
+          "lines": [
+            {
+              "line_index": 0,
+              "un_number": "1203",
+              "edition": "ADR 2025",
+              "variant_index": 0,
+              "elements": {
+                "a": "UN 1203",
+                "b": [
+                  "MOTOR SPIRIT",
+                  "GASOLINE",
+                  "PETROL"
+                ],
+                "c": "3",
+                "d": "II",
+                "k": "(D/E)"
+              },
+              "strings": [
+                "UN 1203 MOTOR SPIRIT, 3, II, (D/E)",
+                "UN 1203 GASOLINE, 3, II, (D/E)",
+                "UN 1203 PETROL, 3, II, (D/E)"
+              ],
+              "tunnel_code_required": null,
+              "notes": [
+                "3.1.2.2: the row offers several names joined by \"or\"; only the most appropriate is shown — one string per name",
+                "5.4.1.1.1 (c): the labels are column (5)'s; a special provision of column (6) (243 534 664) may change them — not assessed here"
+              ]
+            }
+          ],
+          "order": "5.4.1.1.1: (a) UN number, (b) proper shipping name, (c) labels / class, (d) packing group, (k) tunnel restriction code — in that order, nothing interspersed; the example form \"UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)\"",
+          "exemption_1_1_3_6_statement": {
+            "applies": true,
+            "rule": "5.4.1.1.1 (f) NOTE 1: in the case of intended application of 1.1.3.6, the total quantity and the calculated value for each transport category are indicated in the transport document (1.1.3.6.3, 1.1.3.6.4). 5.4.1.1.10, which the plan named, is \"(Deleted)\" in ADR 2025.",
+            "per_transport_category": [
+              {
+                "transport_category": "2",
+                "total_quantity": [
+                  {
+                    "value": 200,
+                    "unit": "L"
+                  }
+                ],
+                "calculated_value": 600
+              }
+            ],
+            "wording": "the full wording is the carrier's to copy from the regulation"
+          },
+          "conditions": []
+        },
+        "mixed_loading_7_5_2": {
+          "verdict": "pass",
+          "basis": "one load in one transport unit with a single assessed line: no pair to check under 7.5.2",
+          "lines": [
+            {
+              "line_index": 0,
+              "un_number": "1203",
+              "labels": [
+                "3"
+              ],
+              "classification_code": null,
+              "compatibility_group": null,
+              "assessed": true,
+              "headings": [
+                "3"
+              ]
+            }
+          ],
+          "pairs": [],
+          "class_1": {
+            "assessed": false,
+            "pairs": []
+          },
+          "foodstuffs": {
+            "engaged": false,
+            "lines": [],
+            "input": null,
+            "verdict": "not_applicable",
+            "edition_text": "ADR 2025: 7.5.4 (Vol. II p. 604)"
+          },
+          "conditions": [],
+          "needs_info": [],
+          "notes": [
+            "Basis: the lines of one consignment object are one load in one transport unit, so every pair of lines is read as packages loaded together in the same vehicle or container (7.5.2.1).",
+            "Every label of Table A column (5) counts, subsidiary labels included (7.5.2.1: the table is read \"based on the danger labels they bear\"); a line bearing 4.1 and 1 (or 5.2 and 1) is read under the combined heading the table prints for it. Column (6) special provisions may change the labels (3.2.1 column (5) NOTE) — not applied.",
+            "1.1.3.6.2: the provisions a 1.1.3.6 load is carried without name, in Chapter 7.5, only CV1 of 7.5.11 — 7.5.2 and 7.5.4 still apply, so this verdict stands under the relief."
+          ]
+        },
+        "placards_and_plates_5_3": {
+          "verdict": "pass",
+          "basis": "the load is carried under 1.1.3.6: 1.1.3.6.2 does not apply Chapter 5.3",
+          "requirements": [
+            {
+              "id": "orange_plates_5_3_2_1_1",
+              "applies": false,
+              "basis": "1.1.3.6.2: 5.3.2 orange-coloured plate marking — not applied under the relief (\"- Chapter 5.3; - Section 5.4.3;\" (1.1.3.6.2, Vol. I p. 29))",
+              "lines": [
+                0
+              ],
+              "source_ref": {
+                "section": "5.3.2.1.1",
+                "volume": "II",
+                "pdf_page": 264,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Transport units carrying dangerous goods shall display two rectangular orange-coloured plates"
+              }
+            },
+            {
+              "id": "placards_5_3_1_5",
+              "applies": false,
+              "basis": "1.1.3.6.2: 5.3.1 placarding — not applied under the relief (\"- Chapter 5.3; - Section 5.4.3;\" (1.1.3.6.2, Vol. I p. 29))",
+              "lines": [],
+              "source_ref": {
+                "section": "5.3.1.5.1",
+                "volume": "II",
+                "pdf_page": 262,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "For vehicles carrying packages containing substances or articles of Class 1 (other than of Division 1.4,"
+              }
+            },
+            {
+              "id": "lq_mark_3_4_13",
+              "applies": false,
+              "basis": "the lines that may be LQ total 180 kg gross: \"The marks specified in 3.4.13 may be dispensed with, if the total gross mass of the packages\" (3.4.14, Vol. I p. 665) \"limited quantities carried does not exceed 8 tonnes per transport unit.\" (3.4.14, Vol. I p. 665) (Chapter 3.4 — not among the provisions 1.1.3.6.2 lists)",
+              "lines": [
+                0
+              ],
+              "source_ref": {
+                "section": "3.4.13 (a)",
+                "volume": "I",
+                "pdf_page": 665,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Transport units with a maximum mass exceeding 12 tonnes carrying dangerous goods packed in limited quantities shall be marked"
+              }
+            }
+          ],
+          "orange_plates": {
+            "required": false,
+            "numbered": false,
+            "basis": "1.1.3.6.2: 5.3.2 orange-coloured plate marking — not applied under the relief (\"- Chapter 5.3; - Section 5.4.3;\" (1.1.3.6.2, Vol. I p. 29))",
+            "hazard_identification_numbers": [
+              {
+                "line_index": 0,
+                "un_number": "1203",
+                "column_20": "33"
+              }
+            ]
+          },
+          "placards": {
+            "required": false,
+            "lines": [],
+            "basis": "1.1.3.6.2: 5.3.1 placarding — not applied under the relief (\"- Chapter 5.3; - Section 5.4.3;\" (1.1.3.6.2, Vol. I p. 29))",
+            "notes": []
+          },
+          "marks": [],
+          "lq_mark": {
+            "applies": false,
+            "condition": null,
+            "basis": "the lines that may be LQ total 180 kg gross: \"The marks specified in 3.4.13 may be dispensed with, if the total gross mass of the packages\" (3.4.14, Vol. I p. 665) \"limited quantities carried does not exceed 8 tonnes per transport unit.\" (3.4.14, Vol. I p. 665)"
+          },
+          "inputs": {
+            "orange_plates_displayed": null,
+            "placards_displayed": null,
+            "max_mass_t": null
+          },
+          "outcomes": {
+            "orange_plates": "not_required",
+            "placards": "not_required"
+          },
+          "conditions": [],
+          "needs_info": [],
+          "notes": [
+            "5.3.3: the elevated temperature mark is for \"Tank-vehicles, tank-containers, portable tanks, special vehicles or containers or specially equipped vehicles or containers containing a substance\" (5.3.3, Vol. II p. 270) carried at or above 100 °C (liquid) / 240 °C (solid) — the object cannot say the temperature; not assessed.",
+            "1.1.3.6.2: 5.3.1 placarding — not applied under the relief (\"- Chapter 5.3; - Section 5.4.3;\" (1.1.3.6.2, Vol. I p. 29)): no placard, plate or mark of Chapter 5.3 is required for this load."
+          ]
+        },
+        "equipment_8_1": {
+          "verdict": "conditional",
+          "basis": "the load is carried under 1.1.3.6: of Chapter 8.1, 1.1.3.6.2 keeps the transport document (8.1.2.1 (a)) and the one 2 kg extinguisher of 8.1.4.2 (8.1.4.2 to 8.1.4.5)",
+          "requirements": [
+            {
+              "id": "fire_extinguisher_8_1_4_2",
+              "applies": true,
+              "basis": "\"Transport units carrying dangerous goods in accordance with 1.1.3.6 shall be equipped with one portable\" (8.1.4.2, Vol. II p. 620) \"with a minimum capacity of 2 kg dry powder (or an equivalent capacity for any other suitable extinguishing agent).\" (8.1.4.2, Vol. II p. 620)",
+              "quantity": "one, of at least 2 kg dry powder (or equivalent)",
+              "source_ref": {
+                "section": "8.1.4.2",
+                "volume": "II",
+                "pdf_page": 620,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Transport units carrying dangerous goods in accordance with 1.1.3.6 shall be equipped with one portable"
+              }
+            },
+            {
+              "id": "fire_extinguishers_8_1_4_1",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.4.1 the extinguisher table by mass — replaced under the relief by 8.1.4.2 (one portable extinguisher of at least 2 kg) (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "source_ref": {
+                "section": "8.1.4.1",
+                "volume": "II",
+                "pdf_page": 620,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "The following table shows the minimum provisions for portable fire extinguishers for the inflammability"
+              }
+            }
+          ],
+          "fire_extinguishers": {
+            "band": null,
+            "small_load_rule": {
+              "applies": true,
+              "minimum_number": 1,
+              "minimum_capacity_kg": 2,
+              "basis": "\"Transport units carrying dangerous goods in accordance with 1.1.3.6 shall be equipped with one portable\" (8.1.4.2, Vol. II p. 620) \"with a minimum capacity of 2 kg dry powder (or an equivalent capacity for any other suitable extinguishing agent).\" (8.1.4.2, Vol. II p. 620)"
+            },
+            "minimum_total_kg": 2,
+            "minimum_largest_kg": 2,
+            "on_board": null,
+            "verdict": "conditional"
+          },
+          "general_equipment": [
+            {
+              "item": "wheel_chock",
+              "printed": "For each vehicle, a wheel chock of a size suited to the maximum mass of the vehicle and to the diameter of the wheel;",
+              "per": "vehicle",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.5 miscellaneous equipment and equipment for personal protection — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "lines": [],
+              "on_board": null,
+              "outcome": "not_required",
+              "source_ref": {
+                "section": "8.1.5.2",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "wheel chock of a size suited to the maximum mass of the vehicle and to the diameter of the wheel;"
+              }
+            },
+            {
+              "item": "warning_signs",
+              "printed": "Two self-standing warning signs;",
+              "per": "transport_unit",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.5 miscellaneous equipment and equipment for personal protection — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "lines": [],
+              "on_board": null,
+              "outcome": "not_required",
+              "source_ref": {
+                "section": "8.1.5.2",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Two self-standing warning signs;"
+              }
+            },
+            {
+              "item": "eye_rinsing_liquid",
+              "printed": "Eye rinsing liquid2; and",
+              "per": "transport_unit",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.5 miscellaneous equipment and equipment for personal protection — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "lines": [],
+              "on_board": null,
+              "outcome": "not_required",
+              "source_ref": {
+                "section": "8.1.5.2",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Eye rinsing liquid2; and"
+              }
+            },
+            {
+              "item": "warning_vest",
+              "printed": "A warning vest (e.g. as described in the EN ISO 20471 standard);",
+              "per": "crew_member",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.5 miscellaneous equipment and equipment for personal protection — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "lines": [],
+              "on_board": null,
+              "outcome": "not_required",
+              "source_ref": {
+                "section": "8.1.5.2",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "A warning vest (e.g. as described in the EN ISO 20471 standard);"
+              }
+            },
+            {
+              "item": "portable_lighting",
+              "printed": "Portable lighting apparatus conforming to the provisions of 8.3.4;",
+              "per": "crew_member",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.5 miscellaneous equipment and equipment for personal protection — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "lines": [],
+              "on_board": null,
+              "outcome": "not_required",
+              "source_ref": {
+                "section": "8.1.5.2",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Portable lighting apparatus conforming to the provisions of 8.3.4;"
+              }
+            },
+            {
+              "item": "protective_gloves",
+              "printed": "A pair of protective gloves; and",
+              "per": "crew_member",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.5 miscellaneous equipment and equipment for personal protection — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "lines": [],
+              "on_board": null,
+              "outcome": "not_required",
+              "source_ref": {
+                "section": "8.1.5.2",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "A pair of protective gloves; and"
+              }
+            },
+            {
+              "item": "eye_protection",
+              "printed": "Eye protection (e.g. protective goggles).",
+              "per": "crew_member",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.5 miscellaneous equipment and equipment for personal protection — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "lines": [],
+              "on_board": null,
+              "outcome": "not_required",
+              "source_ref": {
+                "section": "8.1.5.2",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Eye protection (e.g. protective goggles)."
+              }
+            }
+          ],
+          "label_specific_equipment": [
+            {
+              "item": "emergency_escape_mask",
+              "printed": "An emergency escape mask3 for each member of the vehicle crew shall be carried on board the transport unit for danger label numbers 2.3 or 6.1;",
+              "per": "crew_member",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.5 miscellaneous equipment and equipment for personal protection — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "for_labels": [
+                "2.3",
+                "6.1"
+              ],
+              "lines": [],
+              "on_board": null,
+              "outcome": "not_required",
+              "source_ref": {
+                "section": "8.1.5.3",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "transport unit for danger label numbers 2.3 or 6.1;"
+              }
+            },
+            {
+              "item": "shovel",
+              "printed": "A shovel4;",
+              "per": "transport_unit",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.5 miscellaneous equipment and equipment for personal protection — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "for_labels": [
+                "3",
+                "4.1",
+                "4.3",
+                "8",
+                "9"
+              ],
+              "lines": [],
+              "on_board": null,
+              "outcome": "not_required",
+              "source_ref": {
+                "section": "8.1.5.3",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "A shovel4;"
+              }
+            },
+            {
+              "item": "drain_seal",
+              "printed": "A drain seal4;",
+              "per": "transport_unit",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.5 miscellaneous equipment and equipment for personal protection — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "for_labels": [
+                "3",
+                "4.1",
+                "4.3",
+                "8",
+                "9"
+              ],
+              "lines": [],
+              "on_board": null,
+              "outcome": "not_required",
+              "source_ref": {
+                "section": "8.1.5.3",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "A drain seal4;"
+              }
+            },
+            {
+              "item": "collecting_container",
+              "printed": "A collecting container4.",
+              "per": "transport_unit",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.5 miscellaneous equipment and equipment for personal protection — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "for_labels": [
+                "3",
+                "4.1",
+                "4.3",
+                "8",
+                "9"
+              ],
+              "lines": [],
+              "on_board": null,
+              "outcome": "not_required",
+              "source_ref": {
+                "section": "8.1.5.3",
+                "volume": "II",
+                "pdf_page": 621,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "A collecting container4."
+              }
+            }
+          ],
+          "documents": [
+            {
+              "document": "transport_documents_8_1_2_1_a",
+              "applies": true,
+              "basis": "\"(a) The transport documents prescribed in 5.4.1, covering all the dangerous goods carried;\" (8.1.2.1 (a), Vol. II p. 619) — 1.1.3.6.2: 8.1.2.1 (a) transport documents — kept under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "answered_by": "transport_document",
+              "verdict": "pass",
+              "source_ref": {
+                "section": "8.1.2.1 (a)",
+                "volume": "II",
+                "pdf_page": 619,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "(a) The transport documents prescribed in 5.4.1, covering all the dangerous goods carried;"
+              }
+            },
+            {
+              "document": "instructions_in_writing_8_1_2_1_b",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.2.1 (b) instructions in writing — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29)) (and Section 5.4.3 is not applied)",
+              "input": null,
+              "outcome": "not_required",
+              "source_ref": {
+                "section": "8.1.2.1 (b)",
+                "volume": "II",
+                "pdf_page": 619,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "(b) The instructions in writing prescribed in 5.4.3;"
+              }
+            },
+            {
+              "document": "photo_identification_8_1_2_1_d",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.2.1 (d) means of identification with a photograph — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "input": null,
+              "outcome": "not_required",
+              "source_ref": {
+                "section": "8.1.2.1 (d)",
+                "volume": "II",
+                "pdf_page": 619,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "(d) Means of identification, which include a photograph, for each member of the vehicle crew, in accordance with 1.10.1.4."
+              }
+            },
+            {
+              "document": "driver_training_certificate_8_1_2_2_b",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.1.2.2 documents drawn up where ADR requires them — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "answered_by": "driver_training_8_2",
+              "source_ref": {
+                "section": "8.1.2.2 (b)",
+                "volume": "II",
+                "pdf_page": 619,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "(b) The driver's training certificate prescribed in 8.2.1;"
+              }
+            }
+          ],
+          "inputs": {
+            "max_mass_t": null,
+            "fire_extinguishers_kg": null,
+            "equipment_8_1_5": null,
+            "instructions_in_writing": null,
+            "photo_identification": null
+          },
+          "conditions": [],
+          "needs_info": [],
+          "notes": [
+            "8.1.4.3–8.1.4.5 (kept under 1.1.3.6 too): \"The portable fire extinguishers shall be suitable for use on a vehicle and shall comply with the relevant\" (8.1.4.3, Vol. II p. 620) …; \"shall be fitted with a seal which allows verifying that they have not been used.\" (8.1.4.4, Vol. II p. 620); \"The fire extinguishers shall be installed on the transport units in a way that they are easily accessible\" (8.1.4.5, Vol. II p. 620) — not checked. \"The capacities are for dry powder devices (or an equivalent capacity for any other suitable extinguishing agent).\" (8.1.4.1, Vol. II p. 620)",
+            "1.1.3.6.2: 8.1.5 miscellaneous equipment and equipment for personal protection — not applied under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+            "1.1.3.6.2 keeps of Chapter 8.1 only 8.1.2.1 (a) (the transport document) and 8.1.4.2 to 8.1.4.5 (one extinguisher of 2 kg): \"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29)"
+          ]
+        },
+        "driver_training_8_2": {
+          "verdict": "conditional",
+          "basis": "the load is carried under 1.1.3.6: 8.2.1 is not applied; 8.2.3 (training according to Chapter 1.3) is kept, and reaches a driver without the 8.2.1 certificate",
+          "requirements": [
+            {
+              "id": "driver_certificate_8_2_1",
+              "applies": false,
+              "basis": "1.1.3.6.2: 8.2.1 the driver training certificate and its specialisations — replaced under the relief by 8.2.3 (training according to Chapter 1.3, for drivers other than drivers holding a certificate in accordance with 8.2.1) (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29))",
+              "lines": [
+                0
+              ],
+              "source_ref": {
+                "section": "8.2.1.1",
+                "volume": "II",
+                "pdf_page": 623,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Drivers of vehicles carrying dangerous goods shall hold a certificate issued by the competent authority"
+              }
+            },
+            {
+              "id": "driver_training_8_2_3",
+              "applies": true,
+              "basis": "1.1.3.6.2: 8.2.3 training of persons other than certificated drivers (Chapter 1.3) — kept under the relief (\"- Part 8 except for 8.1.2.1 (a), 8.1.4.2 to 8.1.4.5, 8.2.3, 8.3.3, 8.3.4, 8.3.5, Chapter 8.4,\" (1.1.3.6.2, Vol. I p. 29)): \"Persons whose duties concern the carriage of dangerous goods by road shall have received training in\" (8.2.3, Vol. II p. 628) … \"appropriate to their responsibilities and duties according to Chapter 1.3.\" (8.2.3, Vol. II p. 628) — it names \"drivers of vehicles other than drivers holding a certificate in accordance with 8.2.1,\" (8.2.3, Vol. II p. 628)",
+              "source_ref": {
+                "section": "8.2.3",
+                "volume": "II",
+                "pdf_page": 628,
+                "document": "ECE/TRANS/352 (ADR 2025)",
+                "quote": "Persons whose duties concern the carriage of dangerous goods by road shall have received training in"
+              }
+            }
+          ],
+          "certificate": {
+            "required": false,
+            "under_relief": true,
+            "specialisations": [],
+            "held": null,
+            "outcome": "not_required"
+          },
+          "awareness_training_1_3": {
+            "applies": true,
+            "for_driver": true,
+            "basis": "8.2.3: the driver of a 1.1.3.6 load without the 8.2.1 certificate is trained according to Chapter 1.3",
+            "held": null,
+            "outcome": "unanswered"
+          },
+          "inputs": {
+            "adr_training_certificate": null,
+            "specialisations": null,
+            "awareness_training_1_3": null
+          },
+          "conditions": [],
+          "needs_info": [],
+          "notes": [
+            "8.2.1.3: \"shall attend a specialization training course for carriage in tanks covering at least the subjects defined in 8.2.2.3.3.\" (8.2.1.3, Vol. II p. 623) — for tanks, not packages; not assessed.",
+            "8.2.3 (kept under 1.1.3.6, and by 3.4.1 (h) for limited quantities): \"Persons whose duties concern the carriage of dangerous goods by road shall have received training in\" (8.2.3, Vol. II p. 628) … \"appropriate to their responsibilities and duties according to Chapter 1.3.\" (8.2.3, Vol. II p. 628) 1.3.1: \"shall be trained in the requirements governing the carriage of such goods appropriate to their responsibilities and duties.\" (1.3.1, Vol. I p. 57) \"NOTE 2: With regard to the training of the vehicle crew, see Chapter 8.2 instead of this section.\" (1.3.1 NOTE 2, Vol. I p. 57)"
+          ]
+        },
+        "packaging_code_validity": {
+          "verdict": "conditional",
+          "basis": "each line's packages.un_mark read by the grammar of 6.1.3.1 ((a) symbol, (b) the 6.1.2 code, (c) the packing-group letter and the density or mass, (d) S or the test pressure, (e) year, (f) State, (g) manufacturer; 6.1.3.7 the sequence) and the letter held against the line's packing group",
+          "lines": [
+            {
+              "line_index": 0,
+              "un_number": "1203",
+              "verdict": "conditional",
+              "mark": null,
+              "reason": "no mark sent: \"Each packaging intended for use according to the ADR shall bear marks on a non-removable component\" (6.1.3.1, Vol. II p. 303) — send packages.un_mark to have it read"
+            }
+          ],
+          "notes": [
+            "Not checked: whether the packaging kind is one the line's packing instruction (Table A column (8), Chapter 4.1) allows — \"In itself, therefore, the mark does not necessarily confirm that the packaging may be used for any substance:\" (6.1.3 NOTE 1, Vol. II p. 302) (the packing-instruction tables are a later build).",
+            "The UN packaging symbol is a graphic: a mark sent without \"UN\" is read from its code on, and the symbol is not checked."
+          ]
+        },
+        "notes": [],
+        "adr_edition": {
+          "edition": "2025",
+          "name": "ADR 2025",
+          "as_of": "2026-11-20",
+          "selected_by": "as_of",
+          "applies_from": "2025-01-01",
+          "may_apply_until": "2027-06-30"
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "UNECE ADR 2025 (ECE/TRANS/352)",
+        "checked": "2026-10-28",
+        "provenance_status": "verified",
+        "source_url": "https://unece.org/adr-2025-files",
+        "dataset_edition": "ADR 2025",
+        "authority_current_edition": "ADR 2025",
+        "checked_at": "2026-11-05"
+      },
+      "citation": {
+        "text": "ADR consignment check (version 2d) on ADR 2025, as of 2026-11-20: status conditional, regime 1.1.3.6 — exemption_1_1_3_6 pass; limited_quantities not_assessed; excepted_quantities not_assessed; tunnel_restriction not_assessed; transport_document pass; mixed_loading_7_5_2 pass; placards_and_plates_5_3 pass; equipment_8_1 conditional; driver_training_8_2 conditional; packaging_code_validity conditional. Rules: ADR 1.1.3.6 (the exemption calculator; 1.1.3.6.5), 3.4 / 3.5 (the LQ/EQ check), 8.6.3 / 8.6.4, 5.4.1.1.1, 7.5.2 / 7.5.4, 5.3 / 3.4.13, 8.1, 8.2, 6.1.2 / 6.1.3 (UNECE ECE/TRANS/352, page-cited in checks_performed)."
+      },
+      "normalized_input": {
+        "consignment": {
+          "schema": "consignment-object.v1",
+          "lines_read": [
+            0
+          ],
+          "not_read": []
+        },
+        "as_of_from": "journey.date"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        },
+        "check_id": "chk_SYNTHETIC01cxxxxxxxx02",
+        "receipt_url": "https://www.freightutils.com/api/receipts/chk_SYNTHETIC01cxxxxxxxx02"
+      }
+    }
+  },
+  "hs_010121": {
+    "tool": "hs_code_lookup",
+    "args": {
+      "code": "010121"
+    },
+    "request": "GET /api/hs?code=010121&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "HS 2022",
+        "applies_from": "2022-01-01",
+        "may_apply_until": null
+      },
+      "as_of": "2026-07-24",
+      "result": {
+        "hscode": "010121",
+        "description": "Horses; live, pure-bred breeding animals",
+        "level": 6,
+        "parent": "0101",
+        "section": "I",
+        "ancestors": [
+          {
+            "hscode": "01",
+            "description": "Animals; live",
+            "level": 2,
+            "parent": "TOTAL",
+            "section": "I",
+            "fu_id": "fu:hs:01",
+            "fu_version_id": "fu:hs:01@2022"
+          },
+          {
+            "hscode": "0101",
+            "description": "Horses, asses, mules and hinnies; live",
+            "level": 4,
+            "parent": "01",
+            "section": "I",
+            "fu_id": "fu:hs:0101",
+            "fu_version_id": "fu:hs:0101@2022"
+          }
+        ],
+        "children": [],
+        "sectionName": "Live animals; animal products",
+        "fu_id": "fu:hs:010121",
+        "fu_version_id": "fu:hs:010121@2022",
+        "meta": {
+          "source": "HS 2022 descriptions from UN Comtrade's H6 classification (UN Statistics Division); full 6-digit nomenclature diff-verified 2026-07-24 against US HTS, UK Trade Tariff and World Bank WITS",
+          "edition": "HS 2022",
+          "codes": 6937
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "World Customs Organization (HS 2022)",
+        "checked": "2026-07-24",
+        "provenance_status": "verified",
+        "dataset_edition": "HS 2022",
+        "authority_current_edition": "HS 2022",
+        "checked_at": "2026-11-05"
+      },
+      "citation": {
+        "text": "010121 — Horses; live, pure-bred breeding animals (WCO HS 2022).",
+        "qualifier": "WCO HS 2022 (6-digit international level) — national tariff lines (8–10 digit) and duty rates are set per-country; verify with the destination customs tariff."
+      },
+      "legacy_source": {
+        "type": "reference",
+        "authority": "World Customs Organization",
+        "dataset": "HS 2022",
+        "data_vintage": "HS 2022",
+        "licence": "WCO nomenclature as published by the UN Statistics Division (UN Comtrade H6); no named open licence",
+        "retrieved_via": "freightutils.com",
+        "dataset_edition": "HS 2022",
+        "authority_current_edition": "HS 2022",
+        "checked_at": "2026-11-05"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        }
+      }
+    }
+  },
+  "locode_gblhr": {
+    "tool": "unlocode_lookup",
+    "args": {
+      "code": "GBLHR"
+    },
+    "request": "GET /api/unlocode?code=GBLHR&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "UN/LOCODE 2025-1",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-10-29",
+      "result": {
+        "code": "GBLHR",
+        "country": "GB",
+        "location_code": "LHR",
+        "name": "Heathrow Apt/London",
+        "name_ascii": "Heathrow Apt/London",
+        "subdivision": "HIL",
+        "functions": [
+          "airport"
+        ],
+        "status": "AF",
+        "coordinates": {
+          "lat": 51.47,
+          "lon": -0.45
+        },
+        "iata_code": "LHR",
+        "iata_code_basis": "location-code-confirmed-by-ourairports",
+        "change_indicator": null,
+        "entry_status": "active",
+        "sources": [
+          {
+            "url": "https://service.unece.org/trade/locode/gb.htm",
+            "accessed_at": null
+          },
+          {
+            "url": "https://en.wikipedia.org/wiki/UN/LOCODE",
+            "accessed_at": null
+          },
+          {
+            "url": "https://www.iata.org/en/publications/directories/code-search/?airport.search=LHR",
+            "accessed_at": null
+          }
+        ],
+        "audited_at": "2026-05-15",
+        "verified": false,
+        "decision_rationale": "Anchor record for the LHR-weighted UN/LOCODE air-freight set. Major UK air-cargo hub; no sea/road port. Subdivision HIL = Hillingdon. Existing fields (name, country, subdivision, functions, status, coordinates, IATA) preserved unchanged — sandbox HTTPS allowlist did not include UNECE / Wikipedia / IATA on this audit pass, so live re-fetch against canonical sources was deferred. Provenance metadata only. See docs/audit/containers-unlocode-verification-2026-05-15.md.",
+        "fu_id": "fu:locode:GBLHR",
+        "fu_version_id": "fu:locode:GBLHR@2025-1"
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "UNECE (UN/LOCODE 2025-1)",
+        "checked": "2026-10-29",
+        "provenance_status": "pending-verification",
+        "dataset_edition": "UN/LOCODE 2025-1",
+        "authority_current_edition": "UN/LOCODE 2025-1",
+        "checked_at": "2026-11-05"
+      },
+      "citation": {
+        "text": "GBLHR — Heathrow Apt/London, HIL (UN/LOCODE 2025-1).",
+        "qualifier": "UN/LOCODE 2025-1 — administrative code list; confirm operational status/coordinates with the port/authority. UN/LOCODE © UNECE, CC BY 4.0 (as UNECE states for UN/CEFACT standards); parsed by FreightUtils, which withholds coordinates the published strings put out of range. Licence: https://creativecommons.org/licenses/by/4.0/"
+      },
+      "warnings": [
+        {
+          "code": "PROVENANCE_PENDING",
+          "message": "unlocode provenance is pending independent verification."
+        }
+      ],
+      "legacy_source": {
+        "type": "reference",
+        "authority": "UNECE",
+        "provenance_status": "pending-verification",
+        "dataset_edition": "UN/LOCODE 2025-1",
+        "authority_current_edition": "UN/LOCODE 2025-1",
+        "checked_at": "2026-11-05"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        }
+      }
+    }
+  },
+  "airport_lhr": {
+    "tool": "airport_lookup",
+    "args": {
+      "iata": "LHR"
+    },
+    "request": "GET /api/airports?iata=LHR&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "OurAirports (public domain)",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-10-30",
+      "result": {
+        "count": 1,
+        "results": [
+          {
+            "ident": "EGLL",
+            "icao_code": "EGLL",
+            "iata_code": "LHR",
+            "name": "London Heathrow Airport",
+            "type": "large_airport",
+            "municipality": "London",
+            "region": "England",
+            "country": "GB",
+            "country_name": "United Kingdom",
+            "latitude": 51.470748,
+            "longitude": -0.459909,
+            "elevation_ft": 83,
+            "scheduled_service": true,
+            "iso_region": "GB-ENG",
+            "gps_code": null,
+            "keywords": "LON, Londres",
+            "fu_id": "fu:airport:EGLL",
+            "fu_version_id": "fu:airport:EGLL@2026-10-30"
+          }
+        ],
+        "disclaimer": "Airport reference data from OurAirports (public domain), cross-checked against OpenFlights and Wikidata. Reference-only, best-effort — coordinates are the airport reference point (not runway thresholds) and are intended for search and nearest-airport ranking, NOT navigation or regulatory filing. Verify current IATA / ICAO codes with the airport authority. Small, closed, heliport and seaplane entries are less authoritative; a few very new airports carry a provisional ident.",
+        "meta": {
+          "source": "Airport reference data from OurAirports (ourairports.com/data), dedicated to the public domain. All large airports cross-checked against OpenFlights + an independent Wikidata sample (codes + coordinates). Reference-only, best-effort — not authoritative for navigation or regulatory filing; verify current codes with IATA / ICAO.",
+          "airports": 86248,
+          "last_verified": "June 2026"
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "OurAirports (public domain)",
+        "checked": "2026-10-30",
+        "provenance_status": "verified",
+        "source_url": "https://ourairports.com/data/"
+      },
+      "citation": {
+        "text": "London Heathrow Airport (LHR) — OurAirports.",
+        "qualifier": "Reference-only, best-effort — not authoritative for navigation or regulatory filing; verify current codes with IATA / ICAO."
+      },
+      "legacy_source": {
+        "type": "reference",
+        "authority": "OurAirports (community-maintained open data)",
+        "dataset": "OurAirports 2026-10-30",
+        "source_url": "https://ourairports.com/data/",
+        "data_vintage": "OurAirports 2026-10-30",
+        "licence": "Public Domain (OurAirports — dedicated to the public domain)",
+        "retrieved_via": "freightutils.com"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        }
+      }
+    }
+  },
+  "nearest_lhr": {
+    "tool": "nearest_airport",
+    "args": {
+      "latitude": 51.47,
+      "longitude": -0.4543,
+      "max_results": 2
+    },
+    "request": "GET /api/nearest-airport?lat=51.47&lon=-0.4543&max_results=2&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "OurAirports (community-maintained open data) (OurAirports 2026-10-30)",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-10-30",
+      "result": {
+        "count": 2,
+        "results": [
+          {
+            "ident": "EGLL",
+            "icao_code": "EGLL",
+            "iata_code": "LHR",
+            "name": "London Heathrow Airport",
+            "type": "large_airport",
+            "municipality": "London",
+            "region": "England",
+            "country": "GB",
+            "country_name": "United Kingdom",
+            "latitude": 51.470748,
+            "longitude": -0.459909,
+            "elevation_ft": 83,
+            "scheduled_service": true,
+            "iso_region": "GB-ENG",
+            "gps_code": null,
+            "keywords": "LON, Londres",
+            "distance_km": 0.4,
+            "fu_id": "fu:airport:EGLL",
+            "fu_version_id": "fu:airport:EGLL@2026-10-30"
+          },
+          {
+            "ident": "EGLC",
+            "icao_code": "EGLC",
+            "iata_code": "LCY",
+            "name": "London City Airport",
+            "type": "medium_airport",
+            "municipality": "London",
+            "region": "England",
+            "country": "GB",
+            "country_name": "United Kingdom",
+            "latitude": 51.505299,
+            "longitude": 0.055278,
+            "elevation_ft": 19,
+            "scheduled_service": true,
+            "iso_region": "GB-ENG",
+            "gps_code": null,
+            "keywords": "LON",
+            "distance_km": 35.5,
+            "fu_id": "fu:airport:EGLC",
+            "fu_version_id": "fu:airport:EGLC@2026-10-30"
+          }
+        ],
+        "distance_basis": "great_circle",
+        "filter": "scheduled_iata",
+        "filter_description": "airports with scheduled airline service and an IATA code; heliports and closed fields excluded — include_all lists every type",
+        "disclaimer": "Airport reference data from OurAirports (public domain), cross-checked against OpenFlights and Wikidata. Reference-only, best-effort — coordinates are the airport reference point (not runway thresholds) and are intended for search and nearest-airport ranking, NOT navigation or regulatory filing. Verify current IATA / ICAO codes with the airport authority. Small, closed, heliport and seaplane entries are less authoritative; a few very new airports carry a provisional ident.",
+        "meta": {
+          "query": {
+            "latitude": 51.47,
+            "longitude": -0.4543,
+            "radius_km": null,
+            "max_results": 2,
+            "type": null,
+            "include_all": false
+          },
+          "source": "Airport reference data from OurAirports (ourairports.com/data), dedicated to the public domain. All large airports cross-checked against OpenFlights + an independent Wikidata sample (codes + coordinates). Reference-only, best-effort — not authoritative for navigation or regulatory filing; verify current codes with IATA / ICAO.",
+          "airports": 86248
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "match_quality",
+        "score": 0.93
+      },
+      "_source": {
+        "name": "OurAirports (community-maintained open data) (OurAirports 2026-10-30)",
+        "checked": "2026-10-30",
+        "provenance_status": "verified",
+        "source_url": "https://ourairports.com/data/"
+      },
+      "citation": {
+        "text": "London Heathrow Airport (LHR) — 0.4 km, OurAirports.",
+        "qualifier": "Best-effort nearest airport by great-circle distance from OurAirports data — reference only, not authoritative for navigation or filing; verify codes with IATA/ICAO."
+      },
+      "normalized_input": {
+        "latitude": 51.47,
+        "longitude": -0.4543,
+        "radius_km": null,
+        "max_results": 2,
+        "type": null,
+        "include_all": false,
+        "defaults_applied": [
+          "radius_km=unbounded",
+          "closed airfields excluded (type=closed lists them)",
+          "scheduled airports with an IATA code only (include_all=true lists every type)"
+        ]
+      },
+      "warnings": [
+        {
+          "code": "FUZZY_BEST_MATCH",
+          "message": "Nearest of 2 airport(s) — \"London Heathrow Airport\" (large_airport) at 0.4 km.",
+          "details": {
+            "candidates": 2,
+            "distance_km": 0.4,
+            "type": "large_airport"
+          }
+        }
+      ],
+      "legacy_source": {
+        "type": "reference",
+        "authority": "OurAirports (community-maintained open data)",
+        "dataset": "OurAirports 2026-10-30",
+        "source_url": "https://ourairports.com/data/",
+        "data_vintage": "OurAirports 2026-10-30",
+        "licence": "Public Domain (OurAirports — dedicated to the public domain)",
+        "retrieved_via": "freightutils.com"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        }
+      }
+    }
+  },
+  "airline_ek": {
+    "tool": "airline_lookup",
+    "args": {
+      "iata": "EK"
+    },
+    "request": "GET /api/airlines?iata=EK&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "FreightUtils airline code compilation (public sources)",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-05-13",
+      "result": {
+        "count": 1,
+        "results": [
+          {
+            "slug": "emirates",
+            "airline_name": "Emirates",
+            "iata_code": "EK",
+            "icao_code": "UAE",
+            "awb_prefix": [
+              "176"
+            ],
+            "prefix_shared": false,
+            "prefix_holders": [
+              "emirates"
+            ],
+            "callsign": "EMIRATES",
+            "country": "United Arab Emirates",
+            "has_cargo": true,
+            "aliases": [
+              "Emirates SkyCargo"
+            ],
+            "verified": false,
+            "sources": [
+              {
+                "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                "accessed_at": "2026-08-11"
+              },
+              {
+                "url": "https://www.iata.org/en/publications/directories/code-search/?airline.search=EK",
+                "accessed_at": "2026-08-11"
+              },
+              {
+                "url": "https://www.skycargo.com/",
+                "accessed_at": "2026-08-11"
+              }
+            ],
+            "audited_at": "2026-05-13",
+            "status": "unverified",
+            "status_checked_at": "2026-08-11",
+            "field_provenance": {
+              "icao_code": [
+                {
+                  "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                  "publisher": "FAA Order JO 7340.2P Chg 3 (eff 2026-07-09), Chapter 3",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "callsign": [
+                {
+                  "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                  "publisher": "FAA Order JO 7340.2P Chg 3 (eff 2026-07-09), Chapter 3",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "iata_code": [
+                {
+                  "url": "https://www.iata.org/en/publications/directories/code-search/?airline.search=EK",
+                  "publisher": "IATA (free code search, tie-break spot check)",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "operating_status": [
+                {
+                  "url": "https://www.skycargo.com/",
+                  "publisher": "Emirates SkyCargo",
+                  "accessed_at": "2026-08-11"
+                }
+              ],
+              "operational_status": [
+                {
+                  "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_2.html",
+                  "publisher": "FAA Order JO 7340.2P Change 3 (eff 2026-07-09), Chapter 3",
+                  "accessed_at": "2026-10-30",
+                  "sha256": "8b6182b4318bac5f3e295797bb6a174da500275c13f97bd3d3ff17e6bd769970",
+                  "note": "ICAO UAE listed for EMIRATES in the current edition"
+                }
+              ],
+              "cargo_website": [
+                {
+                  "url": "https://skycargo.com/",
+                  "publisher": "Emirates (carrier-published; HTTP 200 at ingest)",
+                  "accessed_at": "2026-10-30",
+                  "sha256": "7e3a3599995e4a473c2d340e9fa68bbfb0cfa7c616929a4ad7e4b93ae4cd58fa"
+                }
+              ]
+            },
+            "data_note": "Audited in the 2026-05-13 anchor pass, but awb_prefix carries no per-field carrier-published citation and the anchor sources include aggregators (which score zero). Held at unverified until a later wave re-sources it.",
+            "operational_status": "active",
+            "operational_status_basis": "faa_designator_current",
+            "cargo_website": "https://skycargo.com/",
+            "chargeable_weight_ref": "emirates-skycargo",
+            "fu_id": "fu:airline:emirates"
+          }
+        ],
+        "meta": {
+          "source": "Compiled by FreightUtils from public sources. Verified records cite carrier-published pages and FAA Order JO 7340.2 field by field (field_provenance), with IATA's public code search as a tie-break only; the rest are pending verification. IATA and ICAO assign these codes, but this dataset is not published or endorsed by IATA or ICAO.",
+          "airlines": 6356,
+          "last_verified": "2026-05-13"
+        }
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "FreightUtils airline code compilation (public sources)",
+        "checked": "2026-05-13",
+        "provenance_status": "pending-verification"
+      },
+      "citation": {
+        "text": "Emirates — IATA EK.",
+        "qualifier": "Airline name/code/AWB-prefix reference — provenance pending verification; confirm against IATA/ICAO or the carrier."
+      },
+      "warnings": [
+        {
+          "code": "PROVENANCE_PENDING",
+          "message": "airline provenance is pending independent verification."
+        }
+      ],
+      "legacy_source": {
+        "type": "reference",
+        "authority": "FreightUtils airline code compilation (public sources)",
+        "provenance_status": "pending-verification"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        }
+      }
+    }
+  },
+  "uld_ake": {
+    "tool": "uld_lookup",
+    "args": {
+      "type": "AKE"
+    },
+    "request": "GET /api/uld?type=AKE&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "IATA ULD Technical Manual + carrier-published specifications",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-05-13",
+      "result": {
+        "result": {
+          "code": "AKE",
+          "name": "LD3",
+          "slug": "ake-ld3",
+          "category": "container",
+          "deck_position": "lower",
+          "external_dimensions": {
+            "length": 156,
+            "width": 153,
+            "height": 163
+          },
+          "internal_dimensions": {
+            "length": 150,
+            "width": 147,
+            "height": 155
+          },
+          "internal_dimensions_basis": "unverified",
+          "door_dimensions": {
+            "width": 147,
+            "height": 152
+          },
+          "max_gross_weight": 1588,
+          "max_gross_weight_basis": "structural-mgw-manufacturer",
+          "max_gross_weight_basis_qualifier": "Jettainer (pool operator) publishes 'Max. gross weight 1.588 kg | 3,500 lbs' with no aircraft or deck qualifier; AirBridgeCargo prints 1,588 kg. ANA Cargo's 1,587 sits under the column 'Weight Lim Inc ULD Tare Wt' scoped to B747/B777/B767 and is therefore the operational figure, not the structural rating.",
+          "deck_limits": [],
+          "tare_weight": 82,
+          "tare_weight_basis": "unverified",
+          "tare_basis_qualifier": "Served 82 kg is matched only by AirBridgeCargo, whose AKE prose and 'AS1825 volume' label appear to be the same boilerplate that aclairshop.com (a reseller already cited on this record) publishes — so it is not treated as independent. ANA Cargo publishes 90-100 kg for the standard AKE and 71 kg for the LIGHT WEIGHT TYPE; IAG Cargo publishes 74 kg. Observed band across carriers 71-100 kg, spanning documented build variants.",
+          "usable_volume": 4.3,
+          "capacity_basis": "carrier-published",
+          "max_build_up_height_cm": null,
+          "max_build_up_height_deck": null,
+          "compatible_aircraft": [
+            "B777",
+            "A330",
+            "B747",
+            "A380",
+            "B787"
+          ],
+          "notes": "Most common lower-deck container worldwide. Contoured to fit narrow-body and wide-body lower holds. Rectangular base 156×153 cm; contour broadens at top to ~200 cm (ACL Airshop reports the contour-top width, hence its '200.7 cm' figure for the same container). MGW 1588 kg (Unilode, ACL, AviusULD, DSV 1587 within tolerance).",
+          "provenance": {
+            "status": "pending",
+            "sources": [
+              {
+                "url": "https://www.unilode.com/uld-specification/",
+                "accessed_at": "2026-08-03T09:08:13.920Z",
+                "source_class": "primary-fetchable",
+                "verdict": "CONFIRMED",
+                "verdict_at": "2026-08-03T09:08:13.920Z",
+                "fields_confirmed": [
+                  "externalDimensions",
+                  "usableVolume",
+                  "maxGrossWeight"
+                ],
+                "fields_not_on_page": [
+                  "tareWeight"
+                ]
+              },
+              {
+                "url": "https://www.cargolux.com/fleet-equipment/ulds/",
+                "accessed_at": "2026-08-03T09:30:53.855Z",
+                "source_class": "primary-fetchable",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-03T09:30:53.855Z",
+                "fields_confirmed": [
+                  "externalDimensions",
+                  "usableVolume"
+                ],
+                "mismatch_detail": "internal: 150x147x155cm vs \"1460x1432x1524\" mm; tare: 82 vs \"100\"; MGW: 1588 vs \"1587 M/D\""
+              },
+              {
+                "url": "https://www.aclairshop.com/container_specs.php",
+                "accessed_at": "2026-08-03T09:31:41.835Z",
+                "source_class": "tertiary",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-03T09:31:41.835Z",
+                "fields_confirmed": [
+                  "maxGrossWeight",
+                  "usableVolume"
+                ],
+                "mismatch_detail": "ext: L156/W153/H163 vs \"1,534 (60.4) x 2,007 (79) x 1,626 (64)\" mm (contour-top axis)"
+              },
+              {
+                "url": "https://www.dsv.com/en/our-solutions/modes-of-transport/air-freight/unit-load-devices/ld3-ake-ave-container",
+                "accessed_at": "2026-08-03T09:13:02.903Z",
+                "source_class": "secondary-fetchable",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-03T09:13:02.903Z",
+                "fields_confirmed": [
+                  "externalDimensions",
+                  "tareWeight"
+                ],
+                "mismatch_detail": "MGW: 1588 vs \"1,587 kg\""
+              },
+              {
+                "url": "https://www.aviusuld.com/products/ake/",
+                "accessed_at": "2026-08-03T09:14:13.924Z",
+                "source_class": "tertiary",
+                "verdict": "CONFIRMED",
+                "verdict_at": "2026-08-03T09:14:13.924Z",
+                "fields_confirmed": [
+                  "externalDimensions",
+                  "maxGrossWeight",
+                  "usableVolume"
+                ],
+                "fields_not_on_page": [
+                  "tareWeight",
+                  "internalDimensions"
+                ]
+              },
+              {
+                "url": "https://en.wikipedia.org/wiki/Unit_load_device",
+                "accessed_at": "2026-08-03T09:19:03.806Z",
+                "source_class": "tertiary",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-03T09:19:03.806Z",
+                "fields_confirmed": [
+                  "identity"
+                ],
+                "mismatch_detail": "vol: 4.3 vs \"4.5 (159)\" (LD3 row)"
+              },
+              {
+                "url": "https://www.anacargo.jp/en/int/specification/pdf/container.pdf",
+                "accessed_at": "2026-08-04T04:36:04.978Z",
+                "source_class": "secondary-fetchable",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-04T04:36:04.978Z",
+                "fields_confirmed": [
+                  "externalDimensions"
+                ],
+                "mismatch_detail": "maxGrossWeight: served 1588 vs page '1,587kg'; usableVolume: served 4.3 vs page '4.4'/'4.0' (variant-dependent)"
+              },
+              {
+                "url": "https://www.anacargo.jp/en/int/specification/cm_container.html",
+                "accessed_at": "2026-08-04T04:33:18.576Z",
+                "source_class": "secondary-fetchable",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-04T04:33:18.576Z",
+                "fields_confirmed": [
+                  "externalDimensions"
+                ],
+                "fields_not_on_page": [
+                  "internalDimensions"
+                ],
+                "mismatch_detail": "maxGrossWeight: served 1588 vs page '1,587'; usableVolume: served 4.3 vs page '4.4'"
+              },
+              {
+                "url": "https://www.airbridgecargo.com/en/page/70/loading-devices",
+                "accessed_at": "2026-08-04T04:33:43.517Z",
+                "source_class": "secondary-fetchable",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-04T04:33:43.517Z",
+                "fields_confirmed": [
+                  "maxGrossWeight",
+                  "tareWeight"
+                ],
+                "fields_not_on_page": [
+                  "externalDimensions",
+                  "internalDimensions"
+                ],
+                "mismatch_detail": "usableVolume: served 4.3 vs page 'AS1825 volume: 4.5 m3'"
+              },
+              {
+                "url": "https://www.jettainer.com/fileadmin/user_upload/Misc/Show_flyer_Final_englisch_01.pdf",
+                "accessed_at": "2026-08-04T04:36:29.488Z",
+                "source_class": "secondary-fetchable",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-04T04:36:29.488Z",
+                "fields_confirmed": [
+                  "maxGrossWeight"
+                ],
+                "fields_not_on_page": [
+                  "internalDimensions",
+                  "tareWeight",
+                  "usableVolume"
+                ],
+                "mismatch_detail": "externalDimensions: served 156x153x163 cm vs page '200x153x162cm' — probable source-data error, resembles RKN's footprint"
+              },
+              {
+                "url": "https://www.iagcargo.com/en/fleet/ulds/",
+                "accessed_at": "2026-08-04T04:33:57.566Z",
+                "source_class": "secondary-fetchable",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-04T04:33:57.566Z",
+                "fields_confirmed": [
+                  "tareWeight"
+                ],
+                "fields_not_on_page": [
+                  "externalDimensions",
+                  "internalDimensions",
+                  "maxGrossWeight"
+                ],
+                "mismatch_detail": "usableVolume: served 4.3 vs page '4.2 cubic m'"
+              }
+            ],
+            "audited_at": "2026-05-12",
+            "chrome_verified_at": "2026-08-03",
+            "soap_signoff_at": null,
+            "field_confirmations": {
+              "external_dimensions": [
+                "unilode.com",
+                "aviusuld.com"
+              ],
+              "internal_dimensions": [],
+              "max_gross_weight": [
+                "unilode.com",
+                "aviusuld.com"
+              ],
+              "tare_weight": [],
+              "usable_volume": [
+                "unilode.com",
+                "aviusuld.com"
+              ]
+            },
+            "tier_bar_outcome": "PENDING — field bar unmet on 5 field(s) — externalDimensions: one credited source, need an independent corroborator | internalDimensions: no source carries read-evidence (CONFIRMED + stamped accessed_at + basis matched) | maxGrossWeight: one credited source, need an independent corroborator | tareWeight: no source carries read-evidence (CONFIRMED + stamped accessed_at + basis matched) | usableVolume: one credited source, need an independent corroborator",
+            "notes": "6 authoritative sources hit. Base dims 156×153 cm and height 163 cm agree across Unilode/Cargolux/DSV/AviusULD/Wikipedia within ±2 cm. MGW 1588 kg (Unilode/AviusULD) and 1587 kg (Cargolux/DSV) agree within ±100 kg. Tare 82 kg (DSV) within published range 82–100 kg (Cargolux 100, AviusULD not listed). Volume 4.3 m³ (Unilode, AviusULD, Cargolux, DSV all agree).",
+            "decision_rationale": "Rule 1 (rounding noise). 6 of 6 authoritative sources concur within tolerance on dims, MGW, tare, and volume. Most-published values taken as headline. No genuine contradictions to resolve. [2026-07-26 ULD lane] provenance.status \"verified\" -> \"pending\". The dataset claimed verified on all 16 records while chromeVerifiedAt and soapSignoffAt were null on all 16 — the second agent in the documented two-agent model had never run — and the sources array was bare strings with NO SLOT for accessed_at, so the dataset was structurally incapable of recording the timestamp its own \"verified\" bar requires. sources is now [{url, accessed_at}]. Every one of this record's 6 cited URLs was HEAD-checked on 2026-07-26 and ALL RESOLVED (dataset-wide: 29/29 distinct URLs, 100%), so this is NOT link rot — the citations are live. What is still missing is a content read: accessed_at stays null because a liveness probe proves a URL answers, not that the page still says what was transcribed from it. Per the project's own rule (multi-source-complete requires accessed_at populated on all records), the honest status is pending, not verified. [2026-08-03 Chrome layer-2 ingest] The second agent ran for the first time; 6 cited source(s) were read and each carries a verdict. 2 CONFIRMED (1 non-tertiary), 4 MISMATCH. Tier bar: bar NOT met — only 1 non-tertiary confirmation(s), need 2. NO non-tertiary source confirms: internalDimensions, tareWeight. Those values remain as transcribed and are NOT evidenced by this run. Disagreements recorded verbatim on each source as mismatchDetail. NO SERVED VALUE WAS CHANGED in this pass: every disagreement is either (a) rounding within the documented tolerance, (b) an axis/row-convention difference already explained in this record's notes, or (c) a genuine contradiction whose resolution needs a source this run could not settle. Changing a figure on a single contested read is the \"plausible reconstruction\" this dataset already refused once on UN/LOCODE, and the record stays pending so nothing is over-claimed. [2026-08-03 lane 4 — basis layer] maxGrossWeight and tareWeight now state WHAT KIND of quantity they are, because the numbers were mislabelled before they were wrong. maxGrossWeightBasis = structural-mgw-manufacturer. Jettainer (pool operator) publishes 'Max. gross weight 1.588 kg | 3,500 lbs' with no aircraft or deck qualifier; AirBridgeCargo prints 1,588 kg. ANA Cargo's 1,587 sits under the column 'Weight Lim Inc ULD Tare Wt' scoped to B747/B777/B767 and is therefore the operational figure, not the structural rating. tareWeightBasis = unverified. Served 82 kg is matched only by AirBridgeCargo, whose AKE prose and 'AS1825 volume' label appear to be the same boilerplate that aclairshop.com (a reseller already cited on this record) publishes — so it is not treated as independent. ANA Cargo publishes 90-100 kg for the standard AKE and 71 kg for the LIGHT WEIGHT TYPE; IAG Cargo publishes 74 kg. Observed band across carriers 71-100 kg, spanning documented build variants. deckLimits is empty: no fetched source published a deck-split table for this record. Back-filling it by inference is the failure this lane exists to prevent. NO SERVED VALUE CHANGED on this record. Variant-record split for deck limits was considered and REJECTED: REJECTED for deck limits. Splitting PAG into PAG-main / PAG-lower would fabricate IATA codes that appear on no air waybill and in no source, and would break lookup by code. The deck/aircraft dependency is expressed as a BASIS plus a sparse deckLimits array, not as new records. (Skill rule 2 governs documented industry variants such as PMC vs PMC-Q7, which DO have distinct published identities; a deck is not such a variant.) [2026-08-04 lane 4C — Chrome delta] The second agent read 5 of this record's delta citation(s). 0 CONFIRMED, 5 MISMATCH, 0 BASIS-MISMATCH, 0 NOT-ON-PAGE. MISMATCH anacargo.jp: maxGrossWeight: served 1588 vs page '1,587kg'; usableVolume: served 4.3 vs page '4.4'/'4.0' (variant-dependent). MISMATCH anacargo.jp: maxGrossWeight: served 1588 vs page '1,587'; usableVolume: served 4.3 vs page '4.4'. MISMATCH airbridgecargo.com: usableVolume: served 4.3 vs page 'AS1825 volume: 4.5 m3'. MISMATCH jettainer.com: externalDimensions: served 156x153x163 cm vs page '200x153x162cm' — probable source-data error, resembles RKN's footprint. MISMATCH iagcargo.com: usableVolume: served 4.3 vs page '4.2 cubic m'. NO SERVED VALUE CHANGED on this record in this pass. [carried-forward disagreements] Recorded by earlier passes and named here because W1b requires every non-CONFIRMED verdict to appear in prose: MISMATCH cargolux.com — internal: 150x147x155cm vs \"1460x1432x1524\" mm; tare: 82 vs \"100\"; MGW: 1588 vs \"1587 M/D\"; MISMATCH dsv.com — MGW: 1588 vs \"1,587 kg\"; MISMATCH en.wikipedia.org — vol: 4.3 vs \"4.5 (159)\" (LD3 row)."
+          },
+          "fu_id": "fu:uld:ake-ld3"
+        },
+        "meta": {
+          "source": "IATA ULD Technical Manual + carrier-published specifications (per-entry provenance; ≥4 cited sources per record; second-agent coverage COMPLETE — every one of the 122 cited pairings has been opened and verdicted, and 145 of 148 citations carry a timestamped read while 3 were never opened; corroboration is counted by publisher rather than by URL, so those 148 citations resolve to 125 distinct sources. Coverage is not agreement: all 16 records remain pending).",
+          "total": 16,
+          "last_audited": "2026-05-12"
+        }
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "IATA ULD Technical Manual + carrier-published specifications",
+        "checked": "2026-05-13",
+        "provenance_status": "pending-verification"
+      },
+      "citation": {
+        "text": "AKE — LD3 (container, lower deck).",
+        "qualifier": "ULD dimensions vary by manufacturer/series and airline variant — confirm operationally critical dimensions against the operator/IATA ULD Technical Manual."
+      },
+      "warnings": [
+        {
+          "code": "PROVENANCE_PENDING",
+          "message": "ULD-spec provenance is pending independent verification."
+        }
+      ],
+      "legacy_source": {
+        "type": "reference",
+        "authority": "IATA ULD Technical Manual + carrier-published specifications",
+        "provenance_status": "pending-verification"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        }
+      }
+    }
+  },
+  "container_20": {
+    "tool": "container_lookup",
+    "args": {
+      "type": "20ft-standard"
+    },
+    "request": "GET /api/containers?type=20ft-standard&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ISO 668 / ISO 1496",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-05-15",
+      "result": {
+        "slug": "20ft-standard",
+        "name": "20ft Standard",
+        "iso_code": "22G1",
+        "internal_length_cm": 589,
+        "internal_width_cm": 234,
+        "internal_height_cm": 238,
+        "capacity_cbm": 33.2,
+        "deck_area_sqm": null,
+        "external_length_cm": 610,
+        "external_width_cm": 244,
+        "external_height_cm": 259,
+        "door_width_cm": 234,
+        "door_height_cm": 228,
+        "tare_weight_kg": 2300,
+        "max_gross_kg": 30480,
+        "max_payload_kg": 28180,
+        "euro_pallets": "11",
+        "gma_pallets": "10",
+        "euro_pallets_min": 11,
+        "euro_pallets_max": null,
+        "gma_pallets_min": 10,
+        "gma_pallets_max": null,
+        "pallet_capacity_basis": "industry-convention",
+        "height_basis": "unverified",
+        "open_top": false,
+        "capacity_basis": "unverified",
+        "max_gross_basis": "iso-668-series-1",
+        "description": "The workhorse of global container shipping. Ideal for dense cargo — machinery, raw materials, and consumer goods.",
+        "notes": "Most common FCL unit. Also known as a TEU (Twenty-foot Equivalent Unit).",
+        "sources": [
+          {
+            "url": "https://www.iso.org/standard/76912.html",
+            "accessed_at": null,
+            "standard_ref": "ISO 668:2020 cl. 5.2.1, Table 2",
+            "supports": "External dimensions and permissible tolerances for series-1 freight containers. Cited by clause: iso.org is paywalled by design, so no liveness claim is made."
+          },
+          {
+            "url": "https://www.iso.org/standard/76912.html",
+            "accessed_at": null,
+            "standard_ref": "ISO 668:2020/Amd 1:2022 cl. 5.2.2, Table 2",
+            "supports": "Ratings (maximum gross mass) AS CURRENTLY IN FORCE — the 2022 amendment raises the 1AA/1CC/1AAA rating to 36 000 kg. The stored maxGrossKg of 30 480 kg is the UNAMENDED 2020 figure; see maxGrossBasis."
+          },
+          {
+            "url": "https://www.one-line.com/en/dry-containers",
+            "accessed_at": "2026-08-03T00:00:00.000Z",
+            "supports": "Ocean Network Express published dry-container specifications — internal dimensions, tare, max gross and capacity."
+          },
+          {
+            "url": "https://www.evergreen-line.com/container/jsp/CNTR_ContainerInformation.jsp",
+            "accessed_at": "2026-08-03T00:00:00.000Z",
+            "supports": "Evergreen Line carrier specification table covering 9 of the 10 slugs in this dataset."
+          },
+          {
+            "url": "https://www.seacoglobal.com/equipment/",
+            "accessed_at": "2026-08-03T00:00:00.000Z",
+            "supports": "Seaco Global (lessor) per-type equipment pages publishing internal dimensions, tare, max gross and capacity."
+          },
+          {
+            "url": "https://www.hapag-lloyd.com/en/services-information/cargo-fleet/container.html",
+            "accessed_at": null,
+            "supports": "PRIMARY-RESTRICTED: 403s to every probe from this environment. Retained as an authoritative carrier reference with no liveness claim; not counted as a fetched corroborator."
+          },
+          {
+            "url": "https://en.wikipedia.org/wiki/Intermodal_container",
+            "accessed_at": null,
+            "supports": "CONTEXT ONLY — tertiary, counts zero toward any verification bar."
+          }
+        ],
+        "audited_at": "2026-05-15",
+        "verified": false,
+        "decision_rationale": "ISO 6346 size code 22G1: first character '2' = 20ft, second '2' = 8'6\" (2591 mm) external height — consistent with the stored externalHeightCm 259. capacityBasis \"unverified\": stored 33.2 CBM sits +0.40 above L×W×H (589×234×238 = 32.80), so it is a published headline rather than a box multiplication, but no source was fetched for it. maxGrossBasis \"iso-668-series-1\": 30480 kg is the ISO 668 series-1 ceiling, NOT an operational carrier limit — see the dataset caveat and the 2026-07-25 sweep; maxPayloadKg is derived as MGW − tare. palletCapacityBasis \"industry-convention\": the stored 11 Euro exceeds the naive aligned-row tiling of this 589×234 cm floor (8), because published container counts assume a pinwheel / mixed-orientation load rather than aligned rows. Not floor-positions, and not payload-capped. Hapag-Lloyd publishes no dedicated 20ft-standard page, so no per-type figure was fetched for this record.",
+        "fu_id": "fu:container:20ft-standard"
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "ISO 668 / ISO 1496",
+        "checked": "2026-05-15",
+        "provenance_status": "pending-verification"
+      },
+      "citation": {
+        "text": "20ft Standard (ISO 22G1) — 33.2 CBM, 28180 kg payload.",
+        "qualifier": "Container specifications vary by manufacturer/series — provenance pending verification; confirm exact dimensions with the operator/CSC plate."
+      },
+      "warnings": [
+        {
+          "code": "PROVENANCE_PENDING",
+          "message": "Container-spec provenance is pending independent verification."
+        }
+      ],
+      "legacy_source": {
+        "type": "reference",
+        "authority": "ISO 668 / ISO 1496",
+        "provenance_status": "pending-verification"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        }
+      }
+    }
+  },
+  "vehicle_list": {
+    "tool": "vehicle_lookup",
+    "args": {
+      "limit": 2
+    },
+    "request": "GET /api/vehicles?view=summary&limit=2&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "EU Directive 96/53/EC, UK DVSA, 49 CFR (regulatory limits)",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-05-16",
+      "result": {
+        "meta": {
+          "source": "Industry standard specifications",
+          "total": 17
+        },
+        "count": 2,
+        "total": 17,
+        "truncated": true,
+        "offset": 0,
+        "limit": 2,
+        "next_offset": 2,
+        "results": [
+          {
+            "slug": "standard-curtainsider",
+            "name": "Standard Curtainsider 13.6m",
+            "category": "articulated",
+            "region": "EU",
+            "internal_dimensions": {
+              "length": 13600,
+              "width": 2480,
+              "height": 2700
+            },
+            "door_dimensions": {
+              "width": 2480,
+              "height": 2700
+            },
+            "max_payload": 24000,
+            "gross_vehicle_weight": 44000,
+            "euro_pallets": 33,
+            "uk_pallets": 26,
+            "us_pallets": null,
+            "pallet_capacity_basis": "floor-positions",
+            "axle_config": "3+3",
+            "open_top": false,
+            "fu_id": "fu:vehicle:standard-curtainsider"
+          },
+          {
+            "slug": "mega-jumbo-trailer",
+            "name": "Mega/Jumbo Trailer 13.6m",
+            "category": "articulated",
+            "region": "EU",
+            "internal_dimensions": {
+              "length": 13600,
+              "width": 2480,
+              "height": 3000
+            },
+            "door_dimensions": {
+              "width": 2480,
+              "height": 3000
+            },
+            "max_payload": 24000,
+            "gross_vehicle_weight": 44000,
+            "euro_pallets": 33,
+            "uk_pallets": 26,
+            "us_pallets": null,
+            "pallet_capacity_basis": "floor-positions",
+            "axle_config": "3+3",
+            "open_top": false,
+            "fu_id": "fu:vehicle:mega-jumbo-trailer"
+          }
+        ],
+        "view": "summary",
+        "detail_hint": "Summary rows. Call vehicle_lookup with slug for one full record (provenance, sources, rationale), or full: true for full rows."
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "EU Directive 96/53/EC, UK DVSA, 49 CFR (regulatory limits)",
+        "checked": "2026-05-16",
+        "provenance_status": "pending-verification"
+      },
+      "citation": {
+        "text": "All 17 reference vehicle specifications.",
+        "qualifier": "Vehicle specifications are industry-standard reference values that vary by make/body-builder — provenance pending verification; confirm against the operator/manufacturer plate."
+      },
+      "warnings": [
+        {
+          "code": "PROVENANCE_PENDING",
+          "message": "Vehicle-spec provenance is pending independent verification."
+        }
+      ],
+      "legacy_source": {
+        "type": "reference",
+        "authority": "EU Directive 96/53/EC, UK DVSA, 49 CFR (regulatory limits)",
+        "provenance_status": "pending-verification"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        }
+      }
+    }
+  },
+  "incoterm_fob": {
+    "tool": "incoterms_lookup",
+    "args": {
+      "code": "FOB"
+    },
+    "request": "GET /api/incoterms?code=FOB&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "Incoterms 2020",
+        "applies_from": "2020-01-01",
+        "may_apply_until": null
+      },
+      "as_of": "2026-07-23",
+      "result": {
+        "code": "FOB",
+        "name": "Free on Board",
+        "slug": "fob-free-on-board",
+        "category": "sea_only",
+        "summary": "Seller delivers goods on board the vessel at port of shipment. One of the most commonly used terms.",
+        "seller_responsibility": "Deliver goods on board the vessel at named port. Export clearance. Loading costs.",
+        "buyer_responsibility": "Main sea freight, insurance, import clearance, duties.",
+        "risk_transfer": "When goods are on board the vessel at port of shipment.",
+        "cost_transfer": "At port of shipment, once loaded on board.",
+        "insurance": "No obligation on either party.",
+        "export_clearance": "Seller.",
+        "import_clearance": "Buyer.",
+        "best_for": "Sea freight where buyer wants to arrange their own shipping and insurance. Very commonly used in international trade.",
+        "watch_out": "Sea and inland waterway ONLY. Despite being widely used, FOB is technically incorrect for containerised cargo — risk should transfer at the container terminal, not on board the vessel. ICC recommends FCA for containers.",
+        "fu_id": "fu:incoterm:FOB",
+        "fu_version_id": "fu:incoterm:FOB@2020"
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "International Chamber of Commerce (Incoterms 2020)",
+        "checked": "2026-07-23",
+        "provenance_status": "verified",
+        "dataset_edition": "Incoterms 2020",
+        "authority_current_edition": "Incoterms 2020",
+        "checked_at": "2026-11-05"
+      },
+      "citation": {
+        "text": "FOB — Free on Board (Incoterms® 2020).",
+        "qualifier": "Incoterms® 2020 codes and mode categories verified against the ICC-published rule list; the rule summaries are FreightUtils wording, not ICC verbatim text — consult the ICC Incoterms® 2020 publication for the authoritative rules."
+      },
+      "legacy_source": {
+        "type": "reference",
+        "authority": "International Chamber of Commerce",
+        "dataset": "Incoterms 2020",
+        "data_vintage": "Incoterms 2020",
+        "retrieved_via": "freightutils.com",
+        "dataset_edition": "Incoterms 2020",
+        "authority_current_edition": "Incoterms 2020",
+        "checked_at": "2026-11-05"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        }
+      }
+    }
+  },
+  "resolve_fu_airline": {
+    "tool": "resolve_reference",
+    "args": {
+      "q": "fu:airline:emirates"
+    },
+    "request": "GET /api/resolve?q=fu%3Aairline%3Aemirates&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": null,
+      "as_of": "2026-11-06",
+      "result": {
+        "query": "fu:airline:emirates",
+        "normalized": "fu:airline:emirates",
+        "candidates": [
+          {
+            "entity_type": "airline",
+            "identifier_type": "airline_iata",
+            "value_normalized": "EK",
+            "summary": "IATA EK — Emirates — United Arab Emirates · cargo carrier",
+            "record": {
+              "slug": "emirates",
+              "airline_name": "Emirates",
+              "iata_code": "EK",
+              "icao_code": "UAE",
+              "awb_prefix": [
+                "176"
+              ],
+              "callsign": "EMIRATES",
+              "country": "United Arab Emirates",
+              "has_cargo": true,
+              "status": "unverified",
+              "status_checked_at": "2026-08-11",
+              "prefix_shared": false,
+              "operational_status": "active",
+              "operational_status_basis": "faa_designator_current",
+              "fu_id": "fu:airline:emirates"
+            },
+            "verification_status": "unverified",
+            "verification_basis": "record",
+            "rank_basis": "exact fu identifier · dataset record hit · verification unverified (record-level) · static prior airlines #1 of 11 · tiebreak airline_iata/EK",
+            "canonical_url": "/airlines/iata/EK",
+            "api_url": "/api/airlines?iata=EK",
+            "citation": {
+              "text": "Emirates — IATA EK.",
+              "qualifier": "Airline name/code/AWB-prefix reference — provenance pending verification; confirm against IATA/ICAO or the carrier."
+            }
+          }
+        ],
+        "count": 1
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "\"fu:airline:emirates\" resolved to 1 candidate — top: airline_iata EK, IATA EK — Emirates — United Arab Emirates · cargo carrier.",
+        "qualifier": "Deterministic grammar match over FreightUtils reference datasets — each candidate carries its own dataset citation; not legal advice."
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        }
+      }
+    }
+  },
+  "resolve_un1203": {
+    "tool": "resolve_reference",
+    "args": {
+      "q": "UN1203"
+    },
+    "request": "GET /api/resolve?q=UN1203&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": null,
+      "as_of": "2026-11-06",
+      "result": {
+        "query": "UN1203",
+        "normalized": "1203",
+        "candidates": [
+          {
+            "entity_type": "dangerous_good",
+            "identifier_type": "un_number",
+            "value_normalized": "1203",
+            "summary": "UN 1203 MOTOR SPIRIT or GASOLINE or PETROL — Class 3",
+            "record": {
+              "un_number": "1203",
+              "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+              "class": "3",
+              "packing_group": "II",
+              "transport_category": "2",
+              "tunnel_restriction_code": "(D/E)",
+              "limited_quantity": "1 L",
+              "excepted_quantity": "E2",
+              "variant_count": 1,
+              "fu_id": "fu:adr:un:1203:II:F1",
+              "fu_version_id": "fu:adr:un:1203:II:F1@2025"
+            },
+            "verification_status": "unverified",
+            "verification_basis": "record",
+            "rank_basis": "dataset record hit · verification unverified (record-level) · static prior adr #2 of 11 · tiebreak un_number/1203",
+            "canonical_url": "/adr/un/1203",
+            "api_url": "/api/adr?un=1203",
+            "citation": {
+              "text": "UN 1203 MOTOR SPIRIT or GASOLINE or PETROL — Class 3 PG II, UNECE ADR 2025.",
+              "qualifier": "Factual compilation, not legal advice — verify against the current UNECE ADR text."
+            }
+          }
+        ],
+        "count": 1
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "\"UN1203\" resolved to 1 candidate — top: un_number 1203, UN 1203 MOTOR SPIRIT or GASOLINE or PETROL — Class 3.",
+        "qualifier": "Deterministic grammar match over FreightUtils reference datasets — each candidate carries its own dataset citation; not legal advice."
+      },
+      "normalized_input": {
+        "q_input": "UN1203",
+        "normalized": "1203"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        }
+      }
+    }
+  },
+  "resolve_nlrtm": {
+    "tool": "resolve_reference",
+    "args": {
+      "q": "NLRTM"
+    },
+    "request": "GET /api/resolve?q=NLRTM&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": null,
+      "as_of": "2026-11-06",
+      "result": {
+        "query": "NLRTM",
+        "normalized": "NLRTM",
+        "candidates": [
+          {
+            "entity_type": "location",
+            "identifier_type": "unlocode",
+            "value_normalized": "NLRTM",
+            "summary": "Rotterdam, ZH, NL — UN/LOCODE NLRTM",
+            "record": {
+              "code": "NLRTM",
+              "name": "Rotterdam",
+              "country": "NL",
+              "subdivision": "ZH",
+              "functions": [
+                "port",
+                "rail",
+                "road",
+                "airport",
+                "postal"
+              ],
+              "status": "AF",
+              "coordinates": {
+                "lat": 51.92,
+                "lon": 4.5
+              },
+              "iata_code": "RTM",
+              "fu_id": "fu:locode:NLRTM",
+              "fu_version_id": "fu:locode:NLRTM@2025-1"
+            },
+            "verification_status": "pending_verification",
+            "verification_basis": "dataset",
+            "rank_basis": "dataset record hit · verification pending_verification (dataset-level) · static prior unlocode #3 of 11 · tiebreak unlocode/NLRTM",
+            "canonical_url": "/unlocode",
+            "api_url": "/api/unlocode?code=NLRTM",
+            "citation": {
+              "text": "NLRTM — Rotterdam, ZH (UN/LOCODE 2025-1).",
+              "qualifier": "UN/LOCODE 2025-1 — administrative code list; confirm operational status/coordinates with the port/authority. UN/LOCODE © UNECE, CC BY 4.0 (as UNECE states for UN/CEFACT standards); parsed by FreightUtils, which withholds coordinates the published strings put out of range. Licence: https://creativecommons.org/licenses/by/4.0/"
+            }
+          }
+        ],
+        "count": 1
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "FreightUtils published methodology",
+        "checked": "request-time",
+        "provenance_status": "computed",
+        "source_url": "https://www.freightutils.com/methodology"
+      },
+      "citation": {
+        "text": "\"NLRTM\" resolved to 1 candidate — top: unlocode NLRTM, Rotterdam, ZH, NL — UN/LOCODE NLRTM.",
+        "qualifier": "Deterministic grammar match over FreightUtils reference datasets — each candidate carries its own dataset citation; not legal advice."
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        }
+      }
+    }
+  },
+  "ics2_parts": {
+    "tool": "ics2_check",
+    "args": {
+      "description": "Parts"
+    },
+    "request": "GET /api/ics2-check?description=Parts&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ICS2 Common Repository stop-words, EU CIRCABC current-in-force version 3 August 2026 (initial list Spring 2025 + 01.08.2025, 02.02.2026, 04.05.2026 and 03.08.2026 waves)",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-11-06",
+      "result": {
+        "description": "Parts",
+        "flagged": [
+          {
+            "term": "Parts",
+            "note": "Used as the entire goods description — a listed stop-word on its own is an automatic ENS rejection. Replace it with a specific product description (what the goods actually are, e.g. \"Men's cotton T-shirts\").",
+            "fu_id": "fu:ics2-stop-word:Parts",
+            "fu_version_id": "fu:ics2-stop-word:Parts@2026-08-03"
+          }
+        ],
+        "clean": false,
+        "caveat": "The EU ICS2 stop-words list is non-exhaustive and updated periodically. A \"clean\" result means no listed stop-word was found — it does NOT mean the entry summary declaration will be accepted; your goods description must still be specific enough for customs to identify the product.",
+        "disclaimer": "Reference check only. This flags terms from the official EU ICS2 stop-words list, which is non-exhaustive and updated periodically. A flagged term will likely cause an ENS rejection; a clean result does NOT guarantee acceptance — your goods description must still be specific enough to identify the product. This is not an ENS filing, not a customs-compliance determination, and not legal advice. Verify against the current official ICS2 requirements; for filing, use your customs broker or filer."
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "European Commission DG TAXUD — EU ICS2 Common Repository stop-words list (ref TAXUD.A.3.003/TA) (ICS2 Common Repository stop-words, EU CIRCABC current-in-force version 3 August 2026 (initial list Spring 2025 + 01.08.2025, 02.02.2026, 04.05.2026 and 03.08.2026 waves))",
+        "checked": "2026-08-03",
+        "provenance_status": "verified",
+        "source_url": "https://taxation-customs.ec.europa.eu/customs/customs-security/import-control-system-2_en",
+        "dataset_edition": "ICS2 Common Repository stop-words, EU CIRCABC current-in-force version 3 August 2026 (initial list Spring 2025 + 01.08.2025, 02.02.2026, 04.05.2026 and 03.08.2026 waves)",
+        "authority_current_edition": "ICS2 Common Repository stop-words, EU CIRCABC current-in-force version 3 August 2026 (initial list Spring 2025 + 01.08.2025, 02.02.2026, 04.05.2026 and 03.08.2026 waves)",
+        "checked_at": "2026-11-04"
+      },
+      "citation": {
+        "text": "1 EU ICS2 stop-word(s) flagged: Parts.",
+        "qualifier": "EU ICS2 stop-words list is non-exhaustive and updated periodically — a clean result does NOT guarantee ENS acceptance; this is not a customs filing or legal advice."
+      },
+      "validity": {
+        "effective_from": "2026-08-03",
+        "effective_to": null,
+        "as_of": "2026-08-03"
+      },
+      "legacy_source": {
+        "type": "reference",
+        "authority": "European Commission DG TAXUD — EU ICS2 Common Repository stop-words list (ref TAXUD.A.3.003/TA)",
+        "dataset": "EU ICS2 unacceptable goods-description terms (stop-words)",
+        "legal_basis": "Commission Delegated Regulation (EU) 2015/2446, Annex B, data element 18 05 000 000 (Description of goods)",
+        "list_in_force": "2026-08-03",
+        "source_url": "https://taxation-customs.ec.europa.eu/customs/customs-security/import-control-system-2_en",
+        "licence": "Factual term list published by the European Commission; legal basis Commission Delegated Regulation (EU) 2015/2446 (DE 18 05 000 000). EU Commission documents are reusable under Decision 2011/833/EU; the legal text itself is not reproduced.",
+        "retrieved": "2026-08-03",
+        "non_exhaustive": true,
+        "retrieved_via": "freightutils.com"
+      },
+      "legacy_source_pos": 4,
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        },
+        "check_id": "chk_SYNTHETIC01cxxxxxxxx03",
+        "receipt_url": "https://www.freightutils.com/api/receipts/chk_SYNTHETIC01cxxxxxxxx03"
+      }
+    }
+  },
+  "emissions_road": {
+    "tool": "emissions_calculator",
+    "args": {
+      "mass": 1000,
+      "distance_km": 100,
+      "mode": "road",
+      "region": "uk"
+    },
+    "request": "GET /api/emissions?mass=1000&distance_km=100&mode=road&region=uk&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "v1 (DEFRA 2026 + EPA 2025 + ADEME Base Carbone v23.11)",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-08-11",
+      "result": {
+        "available": true,
+        "inputs": {
+          "mass": 1000,
+          "mass_unit": "kg",
+          "mass_tonnes": 1,
+          "distance_km": 100,
+          "mode": "road",
+          "sub_mode": "HGV (all types, average laden)",
+          "region": "uk",
+          "basis": "wtw"
+        },
+        "tonne_km": 100,
+        "factor": {
+          "id": "defra_hgv_avg",
+          "mode": "road",
+          "sub_mode": "HGV (all types, average laden)",
+          "authority": "UK DEFRA / DESNZ — Greenhouse gas reporting: conversion factors",
+          "edition": "2026",
+          "region": "uk",
+          "unit": "kgCO2e/tonne-km",
+          "wtw": 0.12715,
+          "ttw": 0.10356,
+          "fu_id": "fu:emission-factor:defra_hgv_avg",
+          "fu_version_id": "fu:emission-factor:defra_hgv_avg@v1"
+        },
+        "emissions": {
+          "wtw_kgco2e": 12.715,
+          "ttw_kgco2e": 10.356,
+          "primary_kgco2e": 12.715,
+          "basis_used": "wtw"
+        },
+        "basis_requested": "wtw",
+        "mass_basis": "actual_gross_mass",
+        "empty_running": "sector_average_included",
+        "representativeness": "medium",
+        "confidence": "medium — fleet-average factor representative for the mode",
+        "summary": "12.715 kgCO2e WTW for 1 t × 100 km by road (UK DEFRA / DESNZ — Greenhouse gas reporting: conversion factors 2026 fleet-average factor). Uses ACTUAL GROSS MASS, not chargeable/volumetric weight. Fleet-average empty running is already included — do not add a separate empty-return leg.",
+        "methodology": "ISO 14083:2023 / GLEC Framework v3.2",
+        "disclaimer": "Best-effort estimate computed using the ISO 14083 / GLEC distance-based method with published emission factors (DEFRA, EPA, ADEME). Reference + computation only — NOT a verified or audited carbon report, not legal advice, and not a regulatory determination. Factors are fleet/sector averages and load assumptions vary; use actual gross mass (not chargeable/volumetric weight) and verify against the current source before reporting.",
+        "_source": {
+          "type": "methodology",
+          "standard": "ISO 14083:2023 / GLEC Framework v3.2",
+          "reference": "ISO 14083 / GLEC v3.2 — DEFRA 2026 + EPA 2025 + ADEME Base Carbone v23.11 (published factors)",
+          "source_url": "https://www.freightutils.com/methodology",
+          "computed_by": "freightutils.com",
+          "factor": {
+            "authority": "UK DEFRA / DESNZ — Greenhouse gas reporting: conversion factors",
+            "edition": "2026",
+            "value": 0.12715,
+            "unit": "kgCO2e/tonne-km",
+            "basis": "wtw",
+            "last_verified": "2026-08-10",
+            "source_url": "https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2026",
+            "licence": "Open Government Licence v3.0"
+          }
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "ISO 14083:2023 / GLEC Framework v3.2 methodology; factors from UK DEFRA/DESNZ 2026 (OGL v3.0), US EPA GHG Emission Factors Hub 2025 (US-Gov public domain), and ADEME Base Carbone v23.11 via Base Empreinte (ADEME Base Empreinte terms of use). GLEC = methodology citation only. (v1 (DEFRA 2026 + EPA 2025 + ADEME Base Carbone v23.11))",
+        "checked": "2026-08-11",
+        "provenance_status": "verified",
+        "source_url": "https://www.freightutils.com/methodology",
+        "dataset_edition": "v1 (DEFRA 2026 + EPA 2025 + ADEME Base Carbone v23.11)",
+        "authority_current_edition": "v1 (DEFRA 2026 + EPA 2025 + ADEME Base Carbone v23.11)",
+        "checked_at": "2026-11-05"
+      },
+      "citation": {
+        "text": "12.715 kgCO2e WTW for 1 t × 100 km by road (UK DEFRA / DESNZ — Greenhouse gas reporting: conversion factors 2026 fleet-average factor). Uses ACTUAL GROSS MASS, not chargeable/volumetric weight. Fleet-average empty running is already included — do not add a separate empty-return leg.",
+        "qualifier": "Contains public sector information licensed under the Open Government Licence v3.0. Licence: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+      },
+      "normalized_input": {
+        "mass_unit": "kg",
+        "basis": "wtw",
+        "basis_used": "wtw",
+        "region": "uk",
+        "defaults_applied": [
+          "mass_unit=kg",
+          "basis=wtw"
+        ]
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        }
+      }
+    }
+  }
+}
