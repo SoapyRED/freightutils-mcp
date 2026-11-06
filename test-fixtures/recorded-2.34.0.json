@@ -1,0 +1,1314 @@
+{
+  "adr": {
+    "tool": "adr_lookup",
+    "args": {
+      "un_number": "1203"
+    },
+    "request": "/api/adr?un=1203&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ADR 2025",
+        "applies_from": "2025-01-01",
+        "may_apply_until": "2027-06-30"
+      },
+      "as_of": "2026-10-28",
+      "result": {
+        "count": 1,
+        "results": [
+          {
+            "verified": false,
+            "verification": {
+              "status": "unverified",
+              "basis": "dataset",
+              "reason": "No row-level audit. Transcribed from the UNECE ADR 2025 Table A and held by the dataset-level checks only (56 anchor rows carry a row-level audit)."
+            },
+            "un_number": "1203",
+            "proper_shipping_name": "MOTOR SPIRIT or GASOLINE or PETROL",
+            "class": "3",
+            "classification_code": "F1",
+            "packing_group": "II",
+            "labels": "3",
+            "special_provisions": "243 534 664",
+            "limited_quantity": "1 L",
+            "excepted_quantity": "E2",
+            "packing_instructions": "P001 IBC02 R001",
+            "special_packing_provisions": "BB2",
+            "mixed_packing_provisions": "MP19",
+            "portable_tank_instructions": "T4",
+            "portable_tank_special_provisions": "TP1",
+            "tank_code": "LGBF",
+            "tank_special_provisions": "TU9",
+            "vehicle_for_tank_carriage": "FL",
+            "carriage_packages": null,
+            "carriage_bulk": null,
+            "carriage_loading_unloading_handling": null,
+            "carriage_operation": "S2 S20",
+            "transport_category": "2",
+            "tunnel_restriction_code": "(D/E)",
+            "hazard_identification_number": "33",
+            "variant_index": 0,
+            "variant_count": 1,
+            "fu_id": "fu:adr:un:1203:II:F1",
+            "fu_version_id": "fu:adr:un:1203:II:F1@2025"
+          }
+        ],
+        "resolved_codes": [
+          {
+            "code": "3",
+            "family": "label",
+            "columns": [
+              "5"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Label model 3 (flammable liquids): flame, black or white.",
+            "section": "5.2.2.2.2, label model No. 3",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:label:3",
+            "fu_version_id": "fu:adr-code:label:3@2025"
+          },
+          {
+            "code": "243",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Gasoline, motor spirit and petrol for spark-ignition engines go under this entry whatever their volatility.",
+            "section": "3.3.1, special provision 243",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:sp:243",
+            "fu_version_id": "fu:adr-code:sp:243@2025"
+          },
+          {
+            "code": "534",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Petrol with a 50 °C vapour pressure up to 150 kPa (1.50 bar) in some climates is still treated as not exceeding 110 kPa (1.10 bar).",
+            "section": "3.3.1, special provision 534",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:sp:534",
+            "fu_version_id": "fu:adr-code:sp:534@2025"
+          },
+          {
+            "code": "664",
+            "family": "sp",
+            "columns": [
+              "6"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Tank-vehicles and demountable tanks for this substance may carry additive devices under set construction, approval, use, test and document rules.",
+            "section": "3.3.1, special provision 664",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:sp:664",
+            "fu_version_id": "fu:adr-code:sp:664@2025"
+          },
+          {
+            "code": "P001",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "General packing instruction for liquids: combination, single, composite packagings and pressure receptacles, with capacity/mass limits by packing group.",
+            "section": "4.1.4.1, P001",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:pi:P001",
+            "fu_version_id": "fu:adr-code:pi:P001@2025"
+          },
+          {
+            "code": "IBC02",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Liquids under IBC02 may use metal (31A/31B/31N), rigid plastics (31H1/31H2) or composite 31HZ1 IBCs, with B and BB limits per UN number.",
+            "section": "4.1.4.2, IBC02",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:pi:IBC02",
+            "fu_version_id": "fu:adr-code:pi:IBC02@2025"
+          },
+          {
+            "code": "R001",
+            "family": "pi",
+            "columns": [
+              "8"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "R001 permits light gauge metal packagings 0A1 and 0A2 up to 40 l / 50 kg for packing groups II and III; packing group I is not allowed.",
+            "section": "4.1.4.1, R001",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:pi:R001",
+            "fu_version_id": "fu:adr-code:pi:R001@2025"
+          },
+          {
+            "code": "BB2",
+            "family": "spp",
+            "columns": [
+              "9a"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "RID/ADR only: UN 1203 may use IBCs only if its actual vapour pressure stays within 110 kPa (50 °C) or 130 kPa (55 °C).",
+            "section": "4.1.4.2, IBC02, BB2",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:spp:BB2",
+            "fu_version_id": "fu:adr-code:spp:BB2@2025"
+          },
+          {
+            "code": "MP19",
+            "family": "mp",
+            "columns": [
+              "9b"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Up to 5 litres per inner packaging may be mixed with goods of other codes or classes that permit it, or with non-ADR goods.",
+            "section": "4.1.10.4, MP19",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:mp:MP19",
+            "fu_version_id": "fu:adr-code:mp:MP19@2025"
+          },
+          {
+            "code": "T4",
+            "family": "t",
+            "columns": [
+              "10"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Portable tank, Class 1 and 3–9: test 2.65 bar; shell See 6.7.2.4.2; relief Normal; bottom openings See 6.7.2.6.3.",
+            "section": "4.2.5.2.6, portable tank instruction T4",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:t:T4",
+            "fu_version_id": "fu:adr-code:t:T4@2025"
+          },
+          {
+            "code": "TP1",
+            "family": "tp",
+            "columns": [
+              "11"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Portable tank must not be filled beyond the degree of filling set by 4.2.1.9.2 (the 97-based formula).",
+            "section": "4.2.5.3, TP1",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:tp:TP1",
+            "fu_version_id": "fu:adr-code:tp:TP1@2025"
+          },
+          {
+            "code": "LGBF",
+            "family": "tank_code",
+            "columns": [
+              "12"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "ADR tank code for Classes 1 and 3–9: liquid tank, G (general minimum), openings B, valves/devices F.",
+            "section": "4.3.4.1.1, tank code LGBF",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:tank_code:LGBF",
+            "fu_version_id": "fu:adr-code:tank_code:LGBF@2025"
+          },
+          {
+            "code": "TU9",
+            "family": "tsp",
+            "columns": [
+              "13"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "UN 1203 petrol with vapour pressure at 50 °C above 110 kPa and up to 150 kPa may also use tanks designed to 6.8.2.1.14 (a) with 6.8.2.2.6 equipment.",
+            "section": "4.3.5, TU9",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:tsp:TU9",
+            "fu_version_id": "fu:adr-code:tsp:TU9@2025"
+          },
+          {
+            "code": "FL",
+            "family": "vehicle",
+            "columns": [
+              "14"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Vehicle for flammable liquids (flash point ≤ 60 °C), flammable gases or UN 2015 > 60 % in tanks above set sizes.",
+            "section": "9.1.1.2, FL vehicle",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:vehicle:FL",
+            "fu_version_id": "fu:adr-code:vehicle:FL@2025"
+          },
+          {
+            "code": "2",
+            "family": "transport_category",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Transport category 2: at most 333 per transport unit under 1.1.3.6 on its own; counts ×3 toward the 1,000-point limit.",
+            "section": "1.1.3.6.3",
+            "verification_status": "verified"
+          },
+          {
+            "code": "(D/E)",
+            "family": "tunnel_code",
+            "columns": [
+              "15"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Tanks: Prohibited in D, E (bulk or tanks). Other carriage: Prohibited in E.",
+            "section": "8.6.4",
+            "verification_status": "verified"
+          },
+          {
+            "code": "S2",
+            "family": "s",
+            "columns": [
+              "19"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Flammable liquids/gases: no ordinary portable lights in closed load compartments; FL heaters off during loading; earth FL vehicles before filling.",
+            "section": "8.5, S2",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:s:S2",
+            "fu_version_id": "fu:adr-code:s:S2@2025"
+          },
+          {
+            "code": "S20",
+            "family": "s",
+            "columns": [
+              "19"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Chapter 8.4 supervision applies above 10 000 kg in packages, or above 3 000 litres in tanks.",
+            "section": "8.5, S20",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:s:S20",
+            "fu_version_id": "fu:adr-code:s:S20@2025"
+          },
+          {
+            "code": "33",
+            "family": "hin",
+            "columns": [
+              "20"
+            ],
+            "rows": [
+              0
+            ],
+            "summary": "Hazard identification number 33 on the orange plate: highly flammable liquid (flash-point below 23 °C).",
+            "section": "5.3.2.3.2, 33",
+            "verification_status": "machine_reviewed",
+            "fu_id": "fu:adr-code:hin:33",
+            "fu_version_id": "fu:adr-code:hin:33@2025"
+          }
+        ],
+        "meta": {
+          "source": "ADR 2025 (UNECE, ECE/TRANS/352, applicable 1 Jan 2025); given legal effect by EU Directive 2008/68/EC (consolidated). Factual compilation, best-effort — not legal advice, not a regulatory authority.",
+          "edition": "ADR 2025",
+          "entries": 2939
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "UNECE ADR 2025 (ECE/TRANS/352)",
+        "checked": "2026-10-28",
+        "provenance_status": "verified",
+        "source_url": "https://unece.org/adr-2025-files",
+        "dataset_edition": "ADR 2025",
+        "authority_current_edition": "ADR 2025",
+        "checked_at": "2026-11-05"
+      },
+      "citation": {
+        "text": "UN 1203 MOTOR SPIRIT or GASOLINE or PETROL — Class 3 PG II, UNECE ADR 2025.",
+        "qualifier": "Factual compilation, not legal advice — verify against the current UNECE ADR text."
+      },
+      "legacy_source": {
+        "type": "reference",
+        "authority": "UNECE",
+        "dataset": "ADR 2025",
+        "source_url": "https://unece.org/adr-2025-files",
+        "data_vintage": "ADR 2025",
+        "licence": "factual compilation, no named open licence",
+        "retrieved_via": "freightutils.com",
+        "dataset_edition": "ADR 2025",
+        "authority_current_edition": "ADR 2025",
+        "checked_at": "2026-11-05"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        },
+        "upstream": {
+          "state": "unknown",
+          "stale": false,
+          "state_read_at": null,
+          "datasets": {
+            "adr": {
+              "state": "unknown",
+              "kind": "watched",
+              "last_success": null,
+              "window_days": 7,
+              "stale": false,
+              "reason": "not_recorded"
+            },
+            "adr-codes-hin": {
+              "state": "unknown",
+              "kind": "checksum-only",
+              "last_success": null,
+              "window_days": null,
+              "stale": false,
+              "reason": "not_recorded"
+            },
+            "adr-codes-label": {
+              "state": "unknown",
+              "kind": "checksum-only",
+              "last_success": null,
+              "window_days": null,
+              "stale": false,
+              "reason": "not_recorded"
+            },
+            "adr-codes-mp": {
+              "state": "unknown",
+              "kind": "checksum-only",
+              "last_success": null,
+              "window_days": null,
+              "stale": false,
+              "reason": "not_recorded"
+            },
+            "adr-codes-pi": {
+              "state": "unknown",
+              "kind": "checksum-only",
+              "last_success": null,
+              "window_days": null,
+              "stale": false,
+              "reason": "not_recorded"
+            },
+            "adr-codes-s": {
+              "state": "unknown",
+              "kind": "checksum-only",
+              "last_success": null,
+              "window_days": null,
+              "stale": false,
+              "reason": "not_recorded"
+            },
+            "adr-codes-sp": {
+              "state": "unknown",
+              "kind": "checksum-only",
+              "last_success": null,
+              "window_days": null,
+              "stale": false,
+              "reason": "not_recorded"
+            },
+            "adr-codes-spp": {
+              "state": "unknown",
+              "kind": "checksum-only",
+              "last_success": null,
+              "window_days": null,
+              "stale": false,
+              "reason": "not_recorded"
+            },
+            "adr-codes-t": {
+              "state": "unknown",
+              "kind": "checksum-only",
+              "last_success": null,
+              "window_days": null,
+              "stale": false,
+              "reason": "not_recorded"
+            },
+            "adr-codes-tank-code": {
+              "state": "unknown",
+              "kind": "checksum-only",
+              "last_success": null,
+              "window_days": null,
+              "stale": false,
+              "reason": "not_recorded"
+            },
+            "adr-codes-tp": {
+              "state": "unknown",
+              "kind": "checksum-only",
+              "last_success": null,
+              "window_days": null,
+              "stale": false,
+              "reason": "not_recorded"
+            },
+            "adr-codes-tsp": {
+              "state": "unknown",
+              "kind": "checksum-only",
+              "last_success": null,
+              "window_days": null,
+              "stale": false,
+              "reason": "not_recorded"
+            },
+            "adr-codes-vehicle": {
+              "state": "unknown",
+              "kind": "checksum-only",
+              "last_success": null,
+              "window_days": null,
+              "stale": false,
+              "reason": "not_recorded"
+            }
+          }
+        }
+      }
+    }
+  },
+  "hs": {
+    "tool": "hs_code_lookup",
+    "args": {
+      "code": "847130"
+    },
+    "request": "/api/hs?code=847130&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "HS 2022",
+        "applies_from": "2022-01-01",
+        "may_apply_until": null
+      },
+      "as_of": "2026-07-24",
+      "result": {
+        "hscode": "847130",
+        "description": "Automatic data processing machines; portable, weighing not more than 10kg, consisting of at least a central processing unit, a keyboard and a display",
+        "level": 6,
+        "parent": "8471",
+        "section": "XVI",
+        "ancestors": [
+          {
+            "hscode": "84",
+            "description": "Machinery and mechanical appliances, boilers, nuclear reactors; parts thereof",
+            "level": 2,
+            "parent": "TOTAL",
+            "section": "XVI",
+            "fu_id": "fu:hs:84",
+            "fu_version_id": "fu:hs:84@2022"
+          },
+          {
+            "hscode": "8471",
+            "description": "Automatic data processing machines and units thereof, magnetic or optical readers, machines for transcribing data onto data media in coded form and machines for processing such data, not elsewhere specified or included",
+            "level": 4,
+            "parent": "84",
+            "section": "XVI",
+            "fu_id": "fu:hs:8471",
+            "fu_version_id": "fu:hs:8471@2022"
+          }
+        ],
+        "children": [],
+        "sectionName": "Machinery and mechanical appliances; electrical equipment; parts thereof; sound recorders and reproducers, television image and sound recorders and reproducers, and parts and accessories of such articles",
+        "fu_id": "fu:hs:847130",
+        "fu_version_id": "fu:hs:847130@2022",
+        "meta": {
+          "source": "HS 2022 descriptions from UN Comtrade's H6 classification (UN Statistics Division); full 6-digit nomenclature diff-verified 2026-07-24 against US HTS, UK Trade Tariff and World Bank WITS",
+          "edition": "HS 2022",
+          "codes": 6937
+        },
+        "category": "top-traffic",
+        "sources": [
+          {
+            "url": "https://raw.githubusercontent.com/datasets/harmonized-system/master/data/harmonized-system.csv",
+            "accessed_at": "2026-07-24",
+            "authority": "UN Comtrade H6 (WCO HS 2022, UN Statistics Division)"
+          },
+          {
+            "url": "https://hts.usitc.gov/reststop/exportList",
+            "accessed_at": "2026-07-24",
+            "authority": "US HTS (USITC)"
+          },
+          {
+            "url": "https://www.trade-tariff.service.gov.uk/commodities/8471300000",
+            "accessed_at": "2026-07-24",
+            "authority": "UK Trade Tariff (HMRC)"
+          },
+          {
+            "url": "https://wits.worldbank.org/API/V1/wits/datasource/trn/product/all",
+            "accessed_at": "2026-07-24",
+            "authority": "World Bank WITS (UNCTAD TRAINS)"
+          }
+        ],
+        "audited_at": "2026-07-24",
+        "verified": true,
+        "decision_rationale": "Verified via the scripted full HS 2022 diff (scripts/hs-verify-diff.mjs) against UN Comtrade H6 (UN Statistics Division), US HTS (USITC), UK Trade Tariff (HMRC) and World Bank WITS on 2026-07-24 — present in 4/4 independent authorities at the correct level/parent with an accurate description; part of the full 6,936-code diff that found zero invented/missing/parent discrepancies. See docs/audit/hs-verification-2026-07-24.md."
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "World Customs Organization (HS 2022)",
+        "checked": "2026-07-24",
+        "provenance_status": "verified",
+        "dataset_edition": "HS 2022",
+        "authority_current_edition": "HS 2022",
+        "checked_at": "2026-11-05"
+      },
+      "citation": {
+        "text": "847130 — Automatic data processing machines; portable, weighing not more than 10kg, consisting of at least a central processing unit, a keyboard and a display (WCO HS 2022).",
+        "qualifier": "WCO HS 2022 (6-digit international level) — national tariff lines (8–10 digit) and duty rates are set per-country; verify with the destination customs tariff."
+      },
+      "legacy_source": {
+        "type": "reference",
+        "authority": "World Customs Organization",
+        "dataset": "HS 2022",
+        "data_vintage": "HS 2022",
+        "licence": "WCO nomenclature as published by the UN Statistics Division (UN Comtrade H6); no named open licence",
+        "retrieved_via": "freightutils.com",
+        "dataset_edition": "HS 2022",
+        "authority_current_edition": "HS 2022",
+        "checked_at": "2026-11-05"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        },
+        "upstream": {
+          "state": "unknown",
+          "stale": false,
+          "state_read_at": null,
+          "datasets": {
+            "hs-codes-csv": {
+              "state": "unknown",
+              "kind": "watched",
+              "last_success": null,
+              "window_days": 7,
+              "stale": false,
+              "reason": "not_recorded"
+            }
+          }
+        }
+      }
+    }
+  },
+  "unlocode": {
+    "tool": "unlocode_lookup",
+    "args": {
+      "code": "GBLON"
+    },
+    "request": "/api/unlocode?code=GBLON&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "UN/LOCODE 2025-1",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-10-29",
+      "result": {
+        "code": "GBLON",
+        "country": "GB",
+        "location_code": "LON",
+        "name": "London",
+        "name_ascii": "London",
+        "subdivision": "LND",
+        "functions": [
+          "port",
+          "postal"
+        ],
+        "status": "AF",
+        "coordinates": null,
+        "iata_code": null,
+        "change_indicator": null,
+        "entry_status": "active",
+        "fu_id": "fu:locode:GBLON",
+        "fu_version_id": "fu:locode:GBLON@2025-1"
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "UNECE (UN/LOCODE 2025-1)",
+        "checked": "2026-10-29",
+        "provenance_status": "pending-verification",
+        "dataset_edition": "UN/LOCODE 2025-1",
+        "authority_current_edition": "UN/LOCODE 2025-1",
+        "checked_at": "2026-11-05"
+      },
+      "citation": {
+        "text": "GBLON — London, LND (UN/LOCODE 2025-1).",
+        "qualifier": "UN/LOCODE 2025-1 — administrative code list; confirm operational status/coordinates with the port/authority. UN/LOCODE © UNECE, CC BY 4.0 (as UNECE states for UN/CEFACT standards); parsed by FreightUtils, which withholds coordinates the published strings put out of range. Licence: https://creativecommons.org/licenses/by/4.0/"
+      },
+      "warnings": [
+        {
+          "code": "PROVENANCE_PENDING",
+          "message": "unlocode provenance is pending independent verification."
+        }
+      ],
+      "legacy_source": {
+        "type": "reference",
+        "authority": "UNECE",
+        "provenance_status": "pending-verification",
+        "dataset_edition": "UN/LOCODE 2025-1",
+        "authority_current_edition": "UN/LOCODE 2025-1",
+        "checked_at": "2026-11-05"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        },
+        "upstream": {
+          "state": "unknown",
+          "stale": false,
+          "state_read_at": null,
+          "datasets": {
+            "unlocode": {
+              "state": "unknown",
+              "kind": "watched",
+              "last_success": null,
+              "window_days": 7,
+              "stale": false,
+              "reason": "not_recorded"
+            }
+          }
+        }
+      }
+    }
+  },
+  "airport": {
+    "tool": "airport_lookup",
+    "args": {
+      "iata": "LHR"
+    },
+    "request": "/api/airports?iata=LHR&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "OurAirports (public domain)",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-10-30",
+      "result": {
+        "count": 1,
+        "results": [
+          {
+            "ident": "EGLL",
+            "icao_code": "EGLL",
+            "iata_code": "LHR",
+            "name": "London Heathrow Airport",
+            "type": "large_airport",
+            "municipality": "London",
+            "region": "England",
+            "country": "GB",
+            "country_name": "United Kingdom",
+            "latitude": 51.470748,
+            "longitude": -0.459909,
+            "elevation_ft": 83,
+            "scheduled_service": true,
+            "iso_region": "GB-ENG",
+            "gps_code": null,
+            "keywords": "LON, Londres",
+            "fu_id": "fu:airport:EGLL",
+            "fu_version_id": "fu:airport:EGLL@2026-10-30"
+          }
+        ],
+        "disclaimer": "Airport reference data from OurAirports (public domain), cross-checked against OpenFlights and Wikidata. Reference-only, best-effort — coordinates are the airport reference point (not runway thresholds) and are intended for search and nearest-airport ranking, NOT navigation or regulatory filing. Verify current IATA / ICAO codes with the airport authority. Small, closed, heliport and seaplane entries are less authoritative; a few very new airports carry a provisional ident.",
+        "meta": {
+          "source": "Airport reference data from OurAirports (ourairports.com/data), dedicated to the public domain. All large airports cross-checked against OpenFlights + an independent Wikidata sample (codes + coordinates). Reference-only, best-effort — not authoritative for navigation or regulatory filing; verify current codes with IATA / ICAO.",
+          "airports": 86248,
+          "last_verified": "June 2026"
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "OurAirports (public domain)",
+        "checked": "2026-10-30",
+        "provenance_status": "verified",
+        "source_url": "https://ourairports.com/data/"
+      },
+      "citation": {
+        "text": "London Heathrow Airport (LHR) — OurAirports.",
+        "qualifier": "Reference-only, best-effort — not authoritative for navigation or regulatory filing; verify current codes with IATA / ICAO."
+      },
+      "legacy_source": {
+        "type": "reference",
+        "authority": "OurAirports (community-maintained open data)",
+        "dataset": "OurAirports 2026-10-30",
+        "source_url": "https://ourairports.com/data/",
+        "data_vintage": "OurAirports 2026-10-30",
+        "licence": "Public Domain (OurAirports — dedicated to the public domain)",
+        "retrieved_via": "freightutils.com"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        },
+        "upstream": {
+          "state": "unknown",
+          "stale": false,
+          "state_read_at": null,
+          "datasets": {
+            "airport": {
+              "state": "unknown",
+              "kind": "watched",
+              "last_success": null,
+              "window_days": 7,
+              "stale": false,
+              "reason": "not_recorded"
+            }
+          }
+        }
+      }
+    }
+  },
+  "ics2": {
+    "tool": "ics2_check",
+    "args": {
+      "description": "mens cotton t-shirts"
+    },
+    "request": "/api/ics2-check?description=mens+cotton+t-shirts&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "ICS2 Common Repository stop-words, EU CIRCABC current-in-force version 3 August 2026 (initial list Spring 2025 + 01.08.2025, 02.02.2026, 04.05.2026 and 03.08.2026 waves)",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-11-06",
+      "result": {
+        "description": "mens cotton t-shirts",
+        "flagged": [],
+        "clean": true,
+        "caveat": "The EU ICS2 stop-words list is non-exhaustive and updated periodically. A \"clean\" result means no listed stop-word was found — it does NOT mean the entry summary declaration will be accepted; your goods description must still be specific enough for customs to identify the product.",
+        "disclaimer": "Reference check only. This flags terms from the official EU ICS2 stop-words list, which is non-exhaustive and updated periodically. A flagged term will likely cause an ENS rejection; a clean result does NOT guarantee acceptance — your goods description must still be specific enough to identify the product. This is not an ENS filing, not a customs-compliance determination, and not legal advice. Verify against the current official ICS2 requirements; for filing, use your customs broker or filer."
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "European Commission DG TAXUD — EU ICS2 Common Repository stop-words list (ref TAXUD.A.3.003/TA) (ICS2 Common Repository stop-words, EU CIRCABC current-in-force version 3 August 2026 (initial list Spring 2025 + 01.08.2025, 02.02.2026, 04.05.2026 and 03.08.2026 waves))",
+        "checked": "2026-08-03",
+        "provenance_status": "verified",
+        "source_url": "https://taxation-customs.ec.europa.eu/customs/customs-security/import-control-system-2_en",
+        "dataset_edition": "ICS2 Common Repository stop-words, EU CIRCABC current-in-force version 3 August 2026 (initial list Spring 2025 + 01.08.2025, 02.02.2026, 04.05.2026 and 03.08.2026 waves)",
+        "authority_current_edition": "ICS2 Common Repository stop-words, EU CIRCABC current-in-force version 3 August 2026 (initial list Spring 2025 + 01.08.2025, 02.02.2026, 04.05.2026 and 03.08.2026 waves)",
+        "checked_at": "2026-11-04"
+      },
+      "citation": {
+        "text": "No EU ICS2 stop-words found in the description.",
+        "qualifier": "EU ICS2 stop-words list is non-exhaustive and updated periodically — a clean result does NOT guarantee ENS acceptance; this is not a customs filing or legal advice."
+      },
+      "validity": {
+        "effective_from": "2026-08-03",
+        "effective_to": null,
+        "as_of": "2026-08-03"
+      },
+      "legacy_source": {
+        "type": "reference",
+        "authority": "European Commission DG TAXUD — EU ICS2 Common Repository stop-words list (ref TAXUD.A.3.003/TA)",
+        "dataset": "EU ICS2 unacceptable goods-description terms (stop-words)",
+        "legal_basis": "Commission Delegated Regulation (EU) 2015/2446, Annex B, data element 18 05 000 000 (Description of goods)",
+        "list_in_force": "2026-08-03",
+        "source_url": "https://taxation-customs.ec.europa.eu/customs/customs-security/import-control-system-2_en",
+        "licence": "Factual term list published by the European Commission; legal basis Commission Delegated Regulation (EU) 2015/2446 (DE 18 05 000 000). EU Commission documents are reusable under Decision 2011/833/EU; the legal text itself is not reproduced.",
+        "retrieved": "2026-08-03",
+        "non_exhaustive": true,
+        "retrieved_via": "freightutils.com"
+      },
+      "legacy_source_pos": 4,
+      "_meta": {
+        "upstream": {
+          "state": "unknown",
+          "stale": false,
+          "state_read_at": null,
+          "datasets": {
+            "ics2": {
+              "state": "unknown",
+              "kind": "watched",
+              "last_success": null,
+              "window_days": 7,
+              "stale": false,
+              "reason": "not_recorded"
+            }
+          }
+        },
+        "check_id": "chk_JZRegoCLSOSQy15aUxa3XQ",
+        "receipt_url": "https://www.freightutils.com/api/receipts/chk_JZRegoCLSOSQy15aUxa3XQ"
+      }
+    }
+  },
+  "emissions": {
+    "tool": "emissions_calculator",
+    "args": {
+      "mass": 10,
+      "mass_unit": "tonnes",
+      "distance_km": 500,
+      "mode": "road",
+      "region": "uk"
+    },
+    "request": "/api/emissions?mass=10&mass_unit=tonnes&distance_km=500&mode=road&region=uk&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "v1 (DEFRA 2026 + EPA 2025 + ADEME Base Carbone v23.11)",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-08-11",
+      "result": {
+        "available": true,
+        "inputs": {
+          "mass": 10,
+          "mass_unit": "tonnes",
+          "mass_tonnes": 10,
+          "distance_km": 500,
+          "mode": "road",
+          "sub_mode": "HGV (all types, average laden)",
+          "region": "uk",
+          "basis": "wtw"
+        },
+        "tonne_km": 5000,
+        "factor": {
+          "id": "defra_hgv_avg",
+          "mode": "road",
+          "sub_mode": "HGV (all types, average laden)",
+          "authority": "UK DEFRA / DESNZ — Greenhouse gas reporting: conversion factors",
+          "edition": "2026",
+          "region": "uk",
+          "unit": "kgCO2e/tonne-km",
+          "wtw": 0.12715,
+          "ttw": 0.10356,
+          "fu_id": "fu:emission-factor:defra_hgv_avg",
+          "fu_version_id": "fu:emission-factor:defra_hgv_avg@v1"
+        },
+        "emissions": {
+          "wtw_kgco2e": 635.75,
+          "ttw_kgco2e": 517.8,
+          "primary_kgco2e": 635.75,
+          "basis_used": "wtw"
+        },
+        "basis_requested": "wtw",
+        "mass_basis": "actual_gross_mass",
+        "empty_running": "sector_average_included",
+        "representativeness": "medium",
+        "confidence": "medium — fleet-average factor representative for the mode",
+        "summary": "635.75 kgCO2e WTW for 10 t × 500 km by road (UK DEFRA / DESNZ — Greenhouse gas reporting: conversion factors 2026 fleet-average factor). Uses ACTUAL GROSS MASS, not chargeable/volumetric weight. Fleet-average empty running is already included — do not add a separate empty-return leg.",
+        "methodology": "ISO 14083:2023 / GLEC Framework v3.2",
+        "disclaimer": "Best-effort estimate computed using the ISO 14083 / GLEC distance-based method with published emission factors (DEFRA, EPA, ADEME). Reference + computation only — NOT a verified or audited carbon report, not legal advice, and not a regulatory determination. Factors are fleet/sector averages and load assumptions vary; use actual gross mass (not chargeable/volumetric weight) and verify against the current source before reporting.",
+        "_source": {
+          "type": "methodology",
+          "standard": "ISO 14083:2023 / GLEC Framework v3.2",
+          "reference": "ISO 14083 / GLEC v3.2 — DEFRA 2026 + EPA 2025 + ADEME Base Carbone v23.11 (published factors)",
+          "source_url": "https://www.freightutils.com/methodology",
+          "computed_by": "freightutils.com",
+          "factor": {
+            "authority": "UK DEFRA / DESNZ — Greenhouse gas reporting: conversion factors",
+            "edition": "2026",
+            "value": 0.12715,
+            "unit": "kgCO2e/tonne-km",
+            "basis": "wtw",
+            "last_verified": "2026-08-10",
+            "source_url": "https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2026",
+            "licence": "Open Government Licence v3.0"
+          }
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "ISO 14083:2023 / GLEC Framework v3.2 methodology; factors from UK DEFRA/DESNZ 2026 (OGL v3.0), US EPA GHG Emission Factors Hub 2025 (US-Gov public domain), and ADEME Base Carbone v23.11 via Base Empreinte (ADEME Base Empreinte terms of use). GLEC = methodology citation only. (v1 (DEFRA 2026 + EPA 2025 + ADEME Base Carbone v23.11))",
+        "checked": "2026-08-11",
+        "provenance_status": "verified",
+        "source_url": "https://www.freightutils.com/methodology",
+        "dataset_edition": "v1 (DEFRA 2026 + EPA 2025 + ADEME Base Carbone v23.11)",
+        "authority_current_edition": "v1 (DEFRA 2026 + EPA 2025 + ADEME Base Carbone v23.11)",
+        "checked_at": "2026-11-05"
+      },
+      "citation": {
+        "text": "635.75 kgCO2e WTW for 10 t × 500 km by road (UK DEFRA / DESNZ — Greenhouse gas reporting: conversion factors 2026 fleet-average factor). Uses ACTUAL GROSS MASS, not chargeable/volumetric weight. Fleet-average empty running is already included — do not add a separate empty-return leg.",
+        "qualifier": "Contains public sector information licensed under the Open Government Licence v3.0. Licence: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+      },
+      "normalized_input": {
+        "mass_unit": "tonnes",
+        "basis": "wtw",
+        "basis_used": "wtw",
+        "region": "uk",
+        "defaults_applied": [
+          "basis=wtw"
+        ]
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        },
+        "upstream": {
+          "state": "unknown",
+          "stale": false,
+          "state_read_at": null,
+          "datasets": {
+            "emissions": {
+              "state": "unknown",
+              "kind": "watched",
+              "last_success": null,
+              "window_days": 7,
+              "stale": false,
+              "reason": "not_recorded"
+            }
+          }
+        }
+      }
+    }
+  },
+  "uld": {
+    "tool": "uld_lookup",
+    "args": {
+      "type": "AKE"
+    },
+    "request": "/api/uld?type=AKE&envelope=1.2&legacy_source=1",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "IATA ULD Technical Manual + carrier-published specifications",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-05-13",
+      "result": {
+        "result": {
+          "code": "AKE",
+          "name": "LD3",
+          "slug": "ake-ld3",
+          "category": "container",
+          "deck_position": "lower",
+          "external_dimensions": {
+            "length": 156,
+            "width": 153,
+            "height": 163
+          },
+          "internal_dimensions": {
+            "length": 150,
+            "width": 147,
+            "height": 155
+          },
+          "internal_dimensions_basis": "unverified",
+          "door_dimensions": {
+            "width": 147,
+            "height": 152
+          },
+          "max_gross_weight": 1588,
+          "max_gross_weight_basis": "structural-mgw-manufacturer",
+          "max_gross_weight_basis_qualifier": "Jettainer (pool operator) publishes 'Max. gross weight 1.588 kg | 3,500 lbs' with no aircraft or deck qualifier; AirBridgeCargo prints 1,588 kg. ANA Cargo's 1,587 sits under the column 'Weight Lim Inc ULD Tare Wt' scoped to B747/B777/B767 and is therefore the operational figure, not the structural rating.",
+          "deck_limits": [],
+          "tare_weight": 82,
+          "tare_weight_basis": "unverified",
+          "tare_basis_qualifier": "Served 82 kg is matched only by AirBridgeCargo, whose AKE prose and 'AS1825 volume' label appear to be the same boilerplate that aclairshop.com (a reseller already cited on this record) publishes — so it is not treated as independent. ANA Cargo publishes 90-100 kg for the standard AKE and 71 kg for the LIGHT WEIGHT TYPE; IAG Cargo publishes 74 kg. Observed band across carriers 71-100 kg, spanning documented build variants.",
+          "usable_volume": 4.3,
+          "capacity_basis": "carrier-published",
+          "max_build_up_height_cm": null,
+          "max_build_up_height_deck": null,
+          "compatible_aircraft": [
+            "B777",
+            "A330",
+            "B747",
+            "A380",
+            "B787"
+          ],
+          "notes": "Most common lower-deck container worldwide. Contoured to fit narrow-body and wide-body lower holds. Rectangular base 156×153 cm; contour broadens at top to ~200 cm (ACL Airshop reports the contour-top width, hence its '200.7 cm' figure for the same container). MGW 1588 kg (Unilode, ACL, AviusULD, DSV 1587 within tolerance).",
+          "provenance": {
+            "status": "pending",
+            "sources": [
+              {
+                "url": "https://www.unilode.com/uld-specification/",
+                "accessed_at": "2026-08-03T09:08:13.920Z",
+                "source_class": "primary-fetchable",
+                "verdict": "CONFIRMED",
+                "verdict_at": "2026-08-03T09:08:13.920Z",
+                "fields_confirmed": [
+                  "externalDimensions",
+                  "usableVolume",
+                  "maxGrossWeight"
+                ],
+                "fields_not_on_page": [
+                  "tareWeight"
+                ]
+              },
+              {
+                "url": "https://www.cargolux.com/fleet-equipment/ulds/",
+                "accessed_at": "2026-08-03T09:30:53.855Z",
+                "source_class": "primary-fetchable",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-03T09:30:53.855Z",
+                "fields_confirmed": [
+                  "externalDimensions",
+                  "usableVolume"
+                ],
+                "mismatch_detail": "internal: 150x147x155cm vs \"1460x1432x1524\" mm; tare: 82 vs \"100\"; MGW: 1588 vs \"1587 M/D\""
+              },
+              {
+                "url": "https://www.aclairshop.com/container_specs.php",
+                "accessed_at": "2026-08-03T09:31:41.835Z",
+                "source_class": "tertiary",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-03T09:31:41.835Z",
+                "fields_confirmed": [
+                  "maxGrossWeight",
+                  "usableVolume"
+                ],
+                "mismatch_detail": "ext: L156/W153/H163 vs \"1,534 (60.4) x 2,007 (79) x 1,626 (64)\" mm (contour-top axis)"
+              },
+              {
+                "url": "https://www.dsv.com/en/our-solutions/modes-of-transport/air-freight/unit-load-devices/ld3-ake-ave-container",
+                "accessed_at": "2026-08-03T09:13:02.903Z",
+                "source_class": "secondary-fetchable",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-03T09:13:02.903Z",
+                "fields_confirmed": [
+                  "externalDimensions",
+                  "tareWeight"
+                ],
+                "mismatch_detail": "MGW: 1588 vs \"1,587 kg\""
+              },
+              {
+                "url": "https://www.aviusuld.com/products/ake/",
+                "accessed_at": "2026-08-03T09:14:13.924Z",
+                "source_class": "tertiary",
+                "verdict": "CONFIRMED",
+                "verdict_at": "2026-08-03T09:14:13.924Z",
+                "fields_confirmed": [
+                  "externalDimensions",
+                  "maxGrossWeight",
+                  "usableVolume"
+                ],
+                "fields_not_on_page": [
+                  "tareWeight",
+                  "internalDimensions"
+                ]
+              },
+              {
+                "url": "https://en.wikipedia.org/wiki/Unit_load_device",
+                "accessed_at": "2026-08-03T09:19:03.806Z",
+                "source_class": "tertiary",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-03T09:19:03.806Z",
+                "fields_confirmed": [
+                  "identity"
+                ],
+                "mismatch_detail": "vol: 4.3 vs \"4.5 (159)\" (LD3 row)"
+              },
+              {
+                "url": "https://www.anacargo.jp/en/int/specification/pdf/container.pdf",
+                "accessed_at": "2026-08-04T04:36:04.978Z",
+                "source_class": "secondary-fetchable",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-04T04:36:04.978Z",
+                "fields_confirmed": [
+                  "externalDimensions"
+                ],
+                "mismatch_detail": "maxGrossWeight: served 1588 vs page '1,587kg'; usableVolume: served 4.3 vs page '4.4'/'4.0' (variant-dependent)"
+              },
+              {
+                "url": "https://www.anacargo.jp/en/int/specification/cm_container.html",
+                "accessed_at": "2026-08-04T04:33:18.576Z",
+                "source_class": "secondary-fetchable",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-04T04:33:18.576Z",
+                "fields_confirmed": [
+                  "externalDimensions"
+                ],
+                "fields_not_on_page": [
+                  "internalDimensions"
+                ],
+                "mismatch_detail": "maxGrossWeight: served 1588 vs page '1,587'; usableVolume: served 4.3 vs page '4.4'"
+              },
+              {
+                "url": "https://www.airbridgecargo.com/en/page/70/loading-devices",
+                "accessed_at": "2026-08-04T04:33:43.517Z",
+                "source_class": "secondary-fetchable",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-04T04:33:43.517Z",
+                "fields_confirmed": [
+                  "maxGrossWeight",
+                  "tareWeight"
+                ],
+                "fields_not_on_page": [
+                  "externalDimensions",
+                  "internalDimensions"
+                ],
+                "mismatch_detail": "usableVolume: served 4.3 vs page 'AS1825 volume: 4.5 m3'"
+              },
+              {
+                "url": "https://www.jettainer.com/fileadmin/user_upload/Misc/Show_flyer_Final_englisch_01.pdf",
+                "accessed_at": "2026-08-04T04:36:29.488Z",
+                "source_class": "secondary-fetchable",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-04T04:36:29.488Z",
+                "fields_confirmed": [
+                  "maxGrossWeight"
+                ],
+                "fields_not_on_page": [
+                  "internalDimensions",
+                  "tareWeight",
+                  "usableVolume"
+                ],
+                "mismatch_detail": "externalDimensions: served 156x153x163 cm vs page '200x153x162cm' — probable source-data error, resembles RKN's footprint"
+              },
+              {
+                "url": "https://www.iagcargo.com/en/fleet/ulds/",
+                "accessed_at": "2026-08-04T04:33:57.566Z",
+                "source_class": "secondary-fetchable",
+                "verdict": "MISMATCH",
+                "verdict_at": "2026-08-04T04:33:57.566Z",
+                "fields_confirmed": [
+                  "tareWeight"
+                ],
+                "fields_not_on_page": [
+                  "externalDimensions",
+                  "internalDimensions",
+                  "maxGrossWeight"
+                ],
+                "mismatch_detail": "usableVolume: served 4.3 vs page '4.2 cubic m'"
+              }
+            ],
+            "audited_at": "2026-05-12",
+            "chrome_verified_at": "2026-08-03",
+            "soap_signoff_at": null,
+            "field_confirmations": {
+              "external_dimensions": [
+                "unilode.com",
+                "aviusuld.com"
+              ],
+              "internal_dimensions": [],
+              "max_gross_weight": [
+                "unilode.com",
+                "aviusuld.com"
+              ],
+              "tare_weight": [],
+              "usable_volume": [
+                "unilode.com",
+                "aviusuld.com"
+              ]
+            },
+            "tier_bar_outcome": "PENDING — field bar unmet on 5 field(s) — externalDimensions: one credited source, need an independent corroborator | internalDimensions: no source carries read-evidence (CONFIRMED + stamped accessed_at + basis matched) | maxGrossWeight: one credited source, need an independent corroborator | tareWeight: no source carries read-evidence (CONFIRMED + stamped accessed_at + basis matched) | usableVolume: one credited source, need an independent corroborator",
+            "notes": "6 authoritative sources hit. Base dims 156×153 cm and height 163 cm agree across Unilode/Cargolux/DSV/AviusULD/Wikipedia within ±2 cm. MGW 1588 kg (Unilode/AviusULD) and 1587 kg (Cargolux/DSV) agree within ±100 kg. Tare 82 kg (DSV) within published range 82–100 kg (Cargolux 100, AviusULD not listed). Volume 4.3 m³ (Unilode, AviusULD, Cargolux, DSV all agree).",
+            "decision_rationale": "Rule 1 (rounding noise). 6 of 6 authoritative sources concur within tolerance on dims, MGW, tare, and volume. Most-published values taken as headline. No genuine contradictions to resolve. [2026-07-26 ULD lane] provenance.status \"verified\" -> \"pending\". The dataset claimed verified on all 16 records while chromeVerifiedAt and soapSignoffAt were null on all 16 — the second agent in the documented two-agent model had never run — and the sources array was bare strings with NO SLOT for accessed_at, so the dataset was structurally incapable of recording the timestamp its own \"verified\" bar requires. sources is now [{url, accessed_at}]. Every one of this record's 6 cited URLs was HEAD-checked on 2026-07-26 and ALL RESOLVED (dataset-wide: 29/29 distinct URLs, 100%), so this is NOT link rot — the citations are live. What is still missing is a content read: accessed_at stays null because a liveness probe proves a URL answers, not that the page still says what was transcribed from it. Per the project's own rule (multi-source-complete requires accessed_at populated on all records), the honest status is pending, not verified. [2026-08-03 Chrome layer-2 ingest] The second agent ran for the first time; 6 cited source(s) were read and each carries a verdict. 2 CONFIRMED (1 non-tertiary), 4 MISMATCH. Tier bar: bar NOT met — only 1 non-tertiary confirmation(s), need 2. NO non-tertiary source confirms: internalDimensions, tareWeight. Those values remain as transcribed and are NOT evidenced by this run. Disagreements recorded verbatim on each source as mismatchDetail. NO SERVED VALUE WAS CHANGED in this pass: every disagreement is either (a) rounding within the documented tolerance, (b) an axis/row-convention difference already explained in this record's notes, or (c) a genuine contradiction whose resolution needs a source this run could not settle. Changing a figure on a single contested read is the \"plausible reconstruction\" this dataset already refused once on UN/LOCODE, and the record stays pending so nothing is over-claimed. [2026-08-03 lane 4 — basis layer] maxGrossWeight and tareWeight now state WHAT KIND of quantity they are, because the numbers were mislabelled before they were wrong. maxGrossWeightBasis = structural-mgw-manufacturer. Jettainer (pool operator) publishes 'Max. gross weight 1.588 kg | 3,500 lbs' with no aircraft or deck qualifier; AirBridgeCargo prints 1,588 kg. ANA Cargo's 1,587 sits under the column 'Weight Lim Inc ULD Tare Wt' scoped to B747/B777/B767 and is therefore the operational figure, not the structural rating. tareWeightBasis = unverified. Served 82 kg is matched only by AirBridgeCargo, whose AKE prose and 'AS1825 volume' label appear to be the same boilerplate that aclairshop.com (a reseller already cited on this record) publishes — so it is not treated as independent. ANA Cargo publishes 90-100 kg for the standard AKE and 71 kg for the LIGHT WEIGHT TYPE; IAG Cargo publishes 74 kg. Observed band across carriers 71-100 kg, spanning documented build variants. deckLimits is empty: no fetched source published a deck-split table for this record. Back-filling it by inference is the failure this lane exists to prevent. NO SERVED VALUE CHANGED on this record. Variant-record split for deck limits was considered and REJECTED: REJECTED for deck limits. Splitting PAG into PAG-main / PAG-lower would fabricate IATA codes that appear on no air waybill and in no source, and would break lookup by code. The deck/aircraft dependency is expressed as a BASIS plus a sparse deckLimits array, not as new records. (Skill rule 2 governs documented industry variants such as PMC vs PMC-Q7, which DO have distinct published identities; a deck is not such a variant.) [2026-08-04 lane 4C — Chrome delta] The second agent read 5 of this record's delta citation(s). 0 CONFIRMED, 5 MISMATCH, 0 BASIS-MISMATCH, 0 NOT-ON-PAGE. MISMATCH anacargo.jp: maxGrossWeight: served 1588 vs page '1,587kg'; usableVolume: served 4.3 vs page '4.4'/'4.0' (variant-dependent). MISMATCH anacargo.jp: maxGrossWeight: served 1588 vs page '1,587'; usableVolume: served 4.3 vs page '4.4'. MISMATCH airbridgecargo.com: usableVolume: served 4.3 vs page 'AS1825 volume: 4.5 m3'. MISMATCH jettainer.com: externalDimensions: served 156x153x163 cm vs page '200x153x162cm' — probable source-data error, resembles RKN's footprint. MISMATCH iagcargo.com: usableVolume: served 4.3 vs page '4.2 cubic m'. NO SERVED VALUE CHANGED on this record in this pass. [carried-forward disagreements] Recorded by earlier passes and named here because W1b requires every non-CONFIRMED verdict to appear in prose: MISMATCH cargolux.com — internal: 150x147x155cm vs \"1460x1432x1524\" mm; tare: 82 vs \"100\"; MGW: 1588 vs \"1587 M/D\"; MISMATCH dsv.com — MGW: 1588 vs \"1,587 kg\"; MISMATCH en.wikipedia.org — vol: 4.3 vs \"4.5 (159)\" (LD3 row)."
+          },
+          "fu_id": "fu:uld:ake-ld3"
+        },
+        "meta": {
+          "source": "IATA ULD Technical Manual + carrier-published specifications (per-entry provenance; ≥4 cited sources per record; second-agent coverage COMPLETE — every one of the 122 cited pairings has been opened and verdicted, and 145 of 148 citations carry a timestamped read while 3 were never opened; corroboration is counted by publisher rather than by URL, so those 148 citations resolve to 125 distinct sources. Coverage is not agreement: all 16 records remain pending).",
+          "total": 16,
+          "last_audited": "2026-05-12"
+        }
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "IATA ULD Technical Manual + carrier-published specifications",
+        "checked": "2026-05-13",
+        "provenance_status": "pending-verification"
+      },
+      "citation": {
+        "text": "AKE — LD3 (container, lower deck).",
+        "qualifier": "ULD dimensions vary by manufacturer/series and airline variant — confirm operationally critical dimensions against the operator/IATA ULD Technical Manual."
+      },
+      "warnings": [
+        {
+          "code": "PROVENANCE_PENDING",
+          "message": "ULD-spec provenance is pending independent verification."
+        }
+      ],
+      "legacy_source": {
+        "type": "reference",
+        "authority": "IATA ULD Technical Manual + carrier-published specifications",
+        "provenance_status": "pending-verification"
+      },
+      "_meta": {
+        "ids": {
+          "scheme": 1,
+          "pattern": "fu:<namespace>:<segment>[:<segment>…][@<edition>]"
+        },
+        "upstream": {
+          "state": "unknown",
+          "stale": false,
+          "state_read_at": null,
+          "datasets": {
+            "uld": {
+              "state": "unknown",
+              "kind": "checksum-only",
+              "last_success": null,
+              "window_days": null,
+              "stale": false,
+              "reason": "not_recorded"
+            }
+          }
+        }
+      }
+    }
+  }
+}
