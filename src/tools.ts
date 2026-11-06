@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { apiGet, apiPost, type ApiOpts } from './api.js';
-import { loose, resultShape } from './envelope.js';
+import { FU_ID_FIELDS, loose, resultShape } from './envelope.js';
 import { normaliseKey, strictInput } from './strict-input.js';
 
 // ─────────────────────────────────────────────────────────────
@@ -80,6 +80,14 @@ const EDITIONS = 'edition ("2025" | "2027") and as_of (YYYY-MM-DD) choose the AD
 const CASING = 'Field names as this package serves them (snake_case); the hosted /api/mcp endpoint serves the same fields in camelCase (e.g. total_cbm → totalCbm).';
 // Totals from unrounded values (2.22.0, probe S1/S2): only displayed figures are rounded.
 const UNROUNDED = 'totals are computed from unrounded figures and rounded only for display';
+const RESOLVE_MAX_QUERY_LENGTH = 32;
+const RESOLVE_MAX_FU_ID_LENGTH = 200;
+
+// 2.33.0: an ADR Table A row echoed inside a check answer (an exemption engine item, a document line's candidate
+// rows), with the identifiers the API puts on it; the rows it stands for (equivalent_variants) carry them too.
+const ADR_ECHO_ROW = loose({ ...FU_ID_FIELDS, equivalent_variants: z.array(loose({ ...FU_ID_FIELDS })) });
+// 2.33.0: the clause each record tool's description carries (one wording, never typed per tool).
+const IDS = 'Each record carries fu_id, a stable FreightUtils identifier (and fu_version_id where the dataset has editions); resolve_reference resolves one to exactly its record.';
 
 // LIST answers an agent can read (2.22.0, probe S21): summary rows (a subset of each record's own
 // fields) with total / truncated / next_offset by default; full: true returns full records five per
@@ -300,6 +308,7 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
     limit: z.number(),
     next_offset: z.number(),
     results: z.array(loose({
+      ...FU_ID_FIELDS,
       un_number: z.string(),
       proper_shipping_name: z.string(),
       class: z.string(),
@@ -346,6 +355,7 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
     // served once however many rows carry it — rows[] are the results[] indexes, columns[] the
     // Table A columns. "full" adds url, title, meaning, parameters, applies_to, references.
     resolved_codes: z.array(loose({
+      ...FU_ID_FIELDS,
       code: z.string(),
       family: z.string(),
       columns: z.array(z.string()),
@@ -605,6 +615,7 @@ Related: airport_lookup (searches AIRPORTS, not carriers), validate (checks an A
   resultSchema: resultShape({
     count: z.number(),
     results: z.array(loose({
+      ...FU_ID_FIELDS,
       slug: z.string(),
       airline_name: z.string(),
       iata_code: z.string(),
@@ -687,6 +698,7 @@ Related: validate (checks a container NUMBER's ISO 6346 check digit — not spec
   }).strict(),
 
   resultSchema: resultShape({
+    ...FU_ID_FIELDS,
     slug: z.string(),
     name: z.string(),
     iso_code: z.string(),
@@ -750,11 +762,14 @@ Related: uk_duty_calculator (duty/VAT for a code found here), ics2_check (EU ENS
   }).strict(),
 
   resultSchema: resultShape({
+    ...FU_ID_FIELDS,
     query: z.string(),
     code: z.string(),
     section: z.string(),
     count: z.number(),
-    results: z.array(z.record(z.string(), z.unknown())),
+    results: z.array(loose({ ...FU_ID_FIELDS })),
+    ancestors: z.array(loose({ ...FU_ID_FIELDS })),
+    children: z.array(loose({ ...FU_ID_FIELDS })),
     meta: z.record(z.string(), z.unknown()),
   }),
 
@@ -787,6 +802,7 @@ Related: uk_duty_calculator (accepts an incoterm when composing the CIF value), 
   }).strict(),
 
   resultSchema: resultShape({
+    ...FU_ID_FIELDS,
     code: z.string(),
     name: z.string(),
     slug: z.string(),
@@ -802,7 +818,7 @@ Related: uk_duty_calculator (accepts an incoterm when composing the CIF value), 
     best_for: z.string(),
     watch_out: z.string(),
     count: z.number(),
-    results: z.array(z.unknown()),
+    results: z.array(loose({ ...FU_ID_FIELDS })),
   }),
 
   annotations: readOnlyAnnotations('Incoterms 2020 Lookup'),
@@ -1017,6 +1033,7 @@ Related: airport_lookup (airport-specific records including ICAO codes), nearest
   }).strict(),
 
   resultSchema: resultShape({
+    ...FU_ID_FIELDS,
     code: z.string(),
     country: z.string(),
     location_code: z.string(),
@@ -1028,7 +1045,7 @@ Related: airport_lookup (airport-specific records including ICAO codes), nearest
     coordinates: loose({ lat: z.number(), lon: z.number() }),
     iata_code: z.string(),
     count: z.number(),
-    results: z.array(z.unknown()),
+    results: z.array(loose({ ...FU_ID_FIELDS })),
     audited_at: z.string(),
     verified: z.boolean(),
   }),
@@ -1230,8 +1247,8 @@ Related: chargeable_weight_calculator (what the cargo inside is billed at), cont
   }).strict(),
 
   resultSchema: resultShape({
-    result: z.record(z.string(), z.unknown()),
-    results: z.array(z.unknown()),
+    result: loose({ ...FU_ID_FIELDS }),
+    results: z.array(loose({ ...FU_ID_FIELDS })),
     count: z.number(),
     meta: z.record(z.string(), z.unknown()),
   }),
@@ -1268,8 +1285,8 @@ Related: ldm_calculator (whether a pallet load fits), pallet_fitting_calculator,
   }).strict(),
 
   resultSchema: resultShape({
-    result: z.record(z.string(), z.unknown()),
-    results: z.array(z.unknown()),
+    result: loose({ ...FU_ID_FIELDS }),
+    results: z.array(loose({ ...FU_ID_FIELDS })),
     count: z.number(),
     meta: z.record(z.string(), z.unknown()),
   }),
@@ -1325,6 +1342,7 @@ Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exempt
     mode: z.string(),
     overall_status: z.string(),
     items: z.array(loose({
+      ...FU_ID_FIELDS,
       un_number: z.string(),
       variant_index: z.number(),
       substance: z.string(),
@@ -1341,6 +1359,7 @@ Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exempt
       not_subject_to_adr: z.boolean(),
       carriage_prohibited: z.boolean(),
       conditions_ref: z.string(),
+      equivalent_variants: z.array(loose({ ...FU_ID_FIELDS })),
     })),
     summary: loose({
       total_items: z.number(),
@@ -1353,6 +1372,7 @@ Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exempt
     // Ambiguous-UN path: no verdict, candidates to disambiguate.
     human_review_required: z.boolean(),
     candidates: z.array(loose({
+      ...FU_ID_FIELDS,
       item_index: z.number(),
       un_number: z.string(),
       variant_index: z.number(),
@@ -1478,7 +1498,7 @@ Related: adr_exemption_calculator (the 1.1.3.6 check alone), adr_lq_eq_check (LQ
     as_of: z.string(),
     edition_basis: z.string(),
     lines: z.array(loose({ line_index: z.number(), un_number: z.string(), dangerous_goods: z.boolean(), description: z.string() })),
-    exemption_1_1_3_6: loose({ verdict: CC_VERDICT, basis: z.string(), conditions: z.array(z.string()), notes: z.array(z.string()), engine: z.record(z.string(), z.unknown()) }),
+    exemption_1_1_3_6: loose({ verdict: CC_VERDICT, basis: z.string(), conditions: z.array(z.string()), notes: z.array(z.string()), engine: loose({ items: z.array(ADR_ECHO_ROW) }) }),
     limited_quantities: loose({ verdict: CC_VERDICT, lines: z.array(CC_QTY_LINE) }),
     excepted_quantities: loose({ verdict: CC_VERDICT, lines: z.array(CC_QTY_LINE) }),
     lq_eq_status_verdict: CC_VERDICT,
@@ -1493,7 +1513,7 @@ Related: adr_exemption_calculator (the 1.1.3.6 check alone), adr_lq_eq_check (LQ
     }),
     transport_document: loose({
       verdict: CC_VERDICT,
-      lines: z.array(loose({ line_index: z.number(), un_number: z.string(), entry: z.string().nullable(), edition: z.string(), variant_index: z.number(), elements: loose({ a: z.string(), b: z.array(z.string()), c: z.string(), d: z.string(), k: z.string() }), strings: z.array(z.string()), tunnel_code_required: z.boolean(), equivalent_rows: z.number(), notes: z.array(z.string()), reason: z.string(), candidates: z.array(z.record(z.string(), z.unknown())) })),
+      lines: z.array(loose({ line_index: z.number(), un_number: z.string(), entry: z.string().nullable(), edition: z.string(), variant_index: z.number(), elements: loose({ a: z.string(), b: z.array(z.string()), c: z.string(), d: z.string(), k: z.string() }), strings: z.array(z.string()), tunnel_code_required: z.boolean(), equivalent_rows: z.number(), notes: z.array(z.string()), reason: z.string(), candidates: z.array(ADR_ECHO_ROW) })),
       order: z.string(),
       exemption_1_1_3_6_statement: loose({ applies: z.boolean(), rule: z.string(), per_transport_category: z.array(loose({ transport_category: z.string(), total_quantity: z.array(loose({ value: z.number(), unit: z.string() })), calculated_value: z.number() })), wording: z.string() }),
       conditions: z.array(z.string()),
@@ -1655,6 +1675,7 @@ Related: distinct from cbm_calculator / ldm_calculator / chargeable_weight_calcu
     inputs: z.record(z.string(), z.unknown()),
     tonne_km: z.number(),
     factor: loose({
+      ...FU_ID_FIELDS,
       id: z.string(), mode: z.string(), sub_mode: z.string(), authority: z.string(),
       edition: z.string(), region: z.string(), unit: z.string(),
       wtw: z.number(), ttw: z.number(),
@@ -1794,7 +1815,7 @@ Related: hs_code_lookup (commodity codes — a different field of the ENS), uk_d
 
   resultSchema: resultShape({
     description: z.string(),
-    flagged: z.array(loose({ term: z.string(), note: z.string() })),
+    flagged: z.array(loose({ ...FU_ID_FIELDS, term: z.string(), note: z.string() })),
     clean: z.boolean(),
     caveat: z.string(),
     disclaimer: z.string(),
@@ -1819,6 +1840,7 @@ Related: hs_code_lookup (commodity codes — a different field of the ENS), uk_d
 
 const airportTypeEnum = z.enum(['large_airport', 'medium_airport', 'small_airport', 'heliport', 'closed', 'seaplane_base']);
 const airportRecord = loose({
+  ...FU_ID_FIELDS,
   ident: z.string(),
   iata_code: z.string(),
   name: z.string(),
@@ -1921,7 +1943,7 @@ const resolveReference: ToolDef = {
   name: 'resolve_reference',
   description: `Resolve an arbitrary freight identifier — one opaque string in, typed and cited candidates out. Use when you hold one identifier-ish token ("176", "UN1845", "NLRTM", "FOB", "22G1", "MSKU1100810", "D/E") and do not know what kind of identifier it is: each candidate names its entity type and carries the api_url and canonical_url of its full record.
 
-Provide q: ONE identifier (single token, max 32 chars). Fourteen grammars all run — UN numbers, AWB prefixes, airline IATA/ICAO, airport IATA/ICAO, UN/LOCODE, ISO 6346 container numbers (check digit computed), HS codes (6-10 digits; national lines resolve at their 6-digit international parent), Incoterms, ADR tunnel codes, ADR Table A codes (special provisions, packing instructions and their PP/B/L provisions, MP, T/BK/TP, tank codes, TU/TC/TE/TA/TT/TM, V/VC/AP/CV/S, vehicle designations, labels, hazard identification numbers — e.g. "TU9" → its meaning, section and review status; a well-formed code no Table A row carries, e.g. "P999", is pattern_only), ULD serials, ISO container size/type codes. Ambiguity is the product: colliding grammars return MULTIPLE ranked candidates ("LHR" is Heathrow AND an Egyptian carrier's ICAO; "336" is an ADR special provision AND a hazard identification number), never a silent guess.
+Provide q: ONE identifier (single token, max 32 chars) — or an fu: identifier, the fu_id or fu_version_id of any record in an answer (up to 200 chars), which resolves to exactly its one record or to none. Fourteen grammars all run — UN numbers, AWB prefixes, airline IATA/ICAO, airport IATA/ICAO, UN/LOCODE, ISO 6346 container numbers (check digit computed), HS codes (6-10 digits; national lines resolve at their 6-digit international parent), Incoterms, ADR tunnel codes, ADR Table A codes (special provisions, packing instructions and their PP/B/L provisions, MP, T/BK/TP, tank codes, TU/TC/TE/TA/TT/TM, V/VC/AP/CV/S, vehicle designations, labels, hazard identification numbers — e.g. "TU9" → its meaning, section and review status; a well-formed code no Table A row carries, e.g. "P999", is pattern_only), ULD serials, ISO container size/type codes. Ambiguity is the product: colliding grammars return MULTIPLE ranked candidates ("LHR" is Heathrow AND an Egyptian carrier's ICAO; "336" is an ADR special provision AND a hazard identification number), never a silent guess.
 
 Behavior: deterministic — normalize (trim, uppercase, collapse spaces/dashes, strip a UN prefix), match ALL grammars, rank by record-hit > verification status > static dataset prior (airlines/adr/unlocode first) > stable tiebreak; every candidate carries rank_basis so the ordering is inspectable. Zero candidates is a VALID result (count 0 + note), never an error. A failed container check digit returns a candidate with valid:false rather than dropping it. ${RATE}
 
@@ -1931,7 +1953,11 @@ Limitations: v1 is SINGLE-TOKEN resolution, not free-text extraction — pass on
 
 Related: every lookup tool this resolves into — adr_lookup, airline_lookup, airport_lookup, unlocode_lookup, hs_code_lookup, incoterms_lookup, container_lookup, uld_lookup, validate.`,
   schema: z.object({
-    q: z.string().min(1).max(32).refine((s) => s.trim().length > 0, 'q must not be blank').describe('One freight identifier — e.g. "176", "UN1845", "NLRTM", "FOB", "LHR", "22G1", "MSKU1100810", "090111", "AKE12345AB", "D/E", "TU9".'),
+    // 2.33.0 (as the hosted tool since freightutils.com run 0.1b): an fu: identifier may be up to 200 characters;
+    // every other identifier keeps the 32-character limit.
+    q: z.string().min(1).max(RESOLVE_MAX_FU_ID_LENGTH).refine((s) => s.trim().length > 0, 'q must not be blank')
+      .refine((s) => s.trim().startsWith('fu:') || s.length <= RESOLVE_MAX_QUERY_LENGTH, { message: `Too big: expected string to have <=${RESOLVE_MAX_QUERY_LENGTH} characters (an fu: identifier may have up to ${RESOLVE_MAX_FU_ID_LENGTH})` })
+      .describe('One freight identifier — e.g. "176", "UN1845", "NLRTM", "FOB", "LHR", "22G1", "MSKU1100810", "090111", "AKE12345AB", "D/E", "TU9" — or an fu: identifier from any answer\'s fu_id / fu_version_id (e.g. "fu:adr:un:1203:II:F1@2025"), which resolves to exactly its one record or to none.'),
   }).strict(),
   resultSchema: resultShape({
     query: z.string(),
@@ -1943,7 +1969,7 @@ Related: every lookup tool this resolves into — adr_lookup, airline_lookup, ai
       identifier_type: z.string(),
       value_normalized: z.string(),
       summary: z.string(),
-      record: z.record(z.string(), z.unknown()),
+      record: loose({ ...FU_ID_FIELDS, variants: z.array(loose({ ...FU_ID_FIELDS })) }),
       verification_status: z.string(),
       verification_basis: z.string(),
       rank_basis: z.string(),
@@ -1996,3 +2022,17 @@ export const ALL_TOOLS: ToolDef[] = [
   adrConsignmentCheck,
   getSubscribeLink,
 ];
+
+/**
+ * 2.33.0: the fifteen tools whose answers carry records — each record has fu_id (and fu_version_id where the
+ * dataset has editions), put there by the API (freightutils.com run 0.1b). Their descriptions carry one clause
+ * saying so, the same words on every tool, added here rather than typed fifteen times.
+ */
+export const ID_RECORD_TOOLS: ReadonlySet<string> = new Set([
+  'adr_lookup', 'adr_lq_eq_check', 'adr_consignment_check', 'hs_code_lookup', 'unlocode_lookup', 'airport_lookup',
+  'nearest_airport', 'airline_lookup', 'uld_lookup', 'container_lookup', 'vehicle_lookup', 'incoterms_lookup',
+  'resolve_reference', 'ics2_check', 'emissions_calculator',
+]);
+for (const t of ALL_TOOLS) if (ID_RECORD_TOOLS.has(t.name)) t.description = `${t.description}
+
+Identifiers: ${IDS}`;

@@ -1,5 +1,42 @@
 # Changelog
 
+## 2.33.0 — 2026-11-06
+
+Types the stable identifiers the API has put on every record since 6 Nov 2026 (freightutils.com run 0.1b): each record
+of the fifteen record tools carries `fu_id`, and `fu_version_id` where the dataset has editions; an answer whose records
+carry them has `_meta.ids`. 2.32.0 already passed all three through untyped — nothing was refused — but its schemas did
+not show them, so an agent reading `tools/list` could not learn that a record has a join key. A minor: fields are added
+to the output schemas and `resolve_reference` accepts longer input; nothing is removed and nothing a 2.32.0 caller sends
+or receives is refused.
+
+### Added
+
+- `fu_id` (`fu:<namespace>:<key>`, the same across editions) and `fu_version_id` (`fu_id@<edition>`) declared as
+  optional strings on every record: `adr_lookup` results[] and resolved_codes[]; `adr_lq_eq_check` items[] (and their
+  equivalent_variants[]) and candidates[]; `adr_consignment_check` exemption_1_1_3_6.engine.items[] and
+  transport_document.lines[].candidates[] (and their equivalent_variants[]); `hs_code_lookup` (the code answer, its
+  ancestors[] / children[], search results[]); `unlocode_lookup`, `incoterms_lookup` and `container_lookup` (the record
+  answer, and list results[]); `airport_lookup` / `nearest_airport` results[]; `airline_lookup` results[];
+  `uld_lookup` / `vehicle_lookup` result and results[]; `resolve_reference` candidates[].record (and its variants[]);
+  `ics2_check` flagged[]; `emissions_calculator` factor. Airlines, ULDs, containers and vehicles have no editions, so
+  their records carry `fu_id` only. Every record schema stays passthrough and both fields are optional, so a record
+  without them (an answer from an older deploy) still validates.
+- `_meta.ids { scheme, pattern }` on the envelope: scheme 1, pattern `fu:<namespace>:<segment>[:<segment>…][@<edition>]`.
+- One clause at the end of the fifteen record tools' descriptions, the same words on each: "Each record carries fu_id, a
+  stable FreightUtils identifier (and fu_version_id where the dataset has editions); resolve_reference resolves one to
+  exactly its record."
+- `test-fixtures/recorded-2.33.0.json`: seventeen answers recorded on production through this package's server, one per
+  namespace (ADR rows, ADR codes, LQ items, a consignment check's engine items, HS, UN/LOCODE, airports, airlines, ULD,
+  containers, vehicles, Incoterms, three resolve candidates, ICS2, an emission factor); each parsed on the typed branch,
+  and again with the identifiers removed. The 2.25.0, 2.27.0 and 2.30.0 recordings (before the identifiers) still parse
+  typed.
+
+### Changed
+
+- `resolve_reference` `q`: an fu: identifier (the `fu_id` or `fu_version_id` of any record) may be up to 200 characters
+  and resolves to exactly its one record or to none, as the hosted tool already does; every other identifier keeps the
+  32-character limit. The description says so.
+
 ## 2.32.0 — 2026-11-05
 
 Mirrors build 2d of the website's POST /api/adr/consignment-check: `adr_consignment_check` now reads the UN packaging
