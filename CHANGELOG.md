@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.34.1 — 2026-11-06
+
+A description patch: `hs_code_lookup` now says how the API's free-text search answers since freightutils.com run C1.
+The search matches whole words only (a word inside a longer word, such as "charger" in "dischargers", never matches);
+when the HS text holds the word only weakly, the UK Trade Tariff search references are asked as well and their answer is
+served ("charger" → heading 8504, "trainers" → chapter 64); when neither has a confident match the answer is count 0 with
+an empty `results[]`, the NO_MATCH warning naming any weak candidates. No schema, input or output change: the
+calculators' new `_meta.upstream` (run C1) is the optional, open object 2.34.0 already types on every tool's envelope.
+Still 26 tools.
+
 ## 2.34.0 — 2026-11-06
 
 Types the upstream state the API has put on every answer drawn from a served dataset since 6 Nov 2026 (freightutils.com
