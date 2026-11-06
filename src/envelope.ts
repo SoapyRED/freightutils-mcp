@@ -16,6 +16,22 @@ import { z } from 'zod';
  * omitted when absent; confidence.score present ONLY for basis=match_quality;
  * ok=false exactly when blocking_errors are present.
  */
+const UPSTREAM_STATE = z.enum(['in_step', 'changed_upstream', 'schema_drift', 'unreachable', 'window_missed', 'unknown']);
+/** _meta.upstream (2.34.0). Open objects throughout, so a later field never refuses an answer. */
+export const UPSTREAM_META = z.object({
+  state: UPSTREAM_STATE.describe('The worst state of the datasets below.'),
+  stale: z.boolean().describe('True only when a dataset below missed its upstream check window (window_missed).'),
+  state_read_at: z.string().nullable().describe('When the site upstream check recorded the state (ISO 8601); null when it could not be read.'),
+  datasets: z.record(z.string(), z.object({
+    state: UPSTREAM_STATE,
+    kind: z.string().nullable().describe('watched (its upstream is fetched daily) or checksum-only (no upstream of its own).'),
+    last_success: z.string().nullable().describe('The last day (YYYY-MM-DD) the upstream check succeeded; null when none is recorded.'),
+    window_days: z.number().nullable(),
+    stale: z.boolean(),
+    reason: z.string().optional().describe('Why the state is unknown.'),
+  }).passthrough()),
+}).passthrough();
+
 export function envelopeShape(result: z.ZodTypeAny): z.ZodRawShape {
   return {
     envelope_version: z.enum(['1', '1.1', '1.2']),
@@ -43,6 +59,11 @@ export function envelopeShape(result: z.ZodTypeAny): z.ZodRawShape {
       // ids (2.33.0; freightutils.com run 0.1b): present on an answer whose records carry fu_id — the identifier
       // scheme (1) and its pattern, "fu:<namespace>:<segment>[:<segment>…][@<edition>]".
       ids: z.object({ scheme: z.number().int(), pattern: z.string() }).passthrough().optional(),
+      // upstream (2.34.0; freightutils.com run 0.2b): the upstream state of the datasets the answer was drawn from.
+      // stale is true only when a dataset had no successful upstream check inside its window (window_missed); the
+      // answer is still the last verified edition. unknown: the state could not be read — never read it as in step.
+      // It says whether the upstream was checked inside its window, not that the answer is right.
+      upstream: UPSTREAM_META.optional(),
       receipt: z.object({
         stored: z.literal(false),
         // 2.28.0 (website 0C): "quota" — the key's daily stored-receipt allowance for the day is used up;

@@ -1,5 +1,25 @@
 # Changelog
 
+## 2.34.0 — 2026-11-06
+
+Types the upstream state the API has put on every answer drawn from a served dataset since 6 Nov 2026 (freightutils.com
+run 0.2b). 2.33.0 already passed it through untyped under `_meta` — nothing was refused — but its schema did not show it.
+A minor: one optional field is added to the envelope's `_meta`; nothing is removed and nothing a 2.33.0 caller sends or
+receives is refused.
+
+### Added
+
+- `_meta.upstream { state, stale, state_read_at, datasets: { <dataset id>: { state, kind, last_success, window_days, stale,
+  reason? } } }` on the envelope, optional, every object passthrough. `state` is one of `in_step`, `changed_upstream`,
+  `schema_drift`, `unreachable`, `window_missed`, `unknown` (the state could not be read — never in step); `stale` is
+  true only when a dataset missed its upstream check window, and the answer is still the last verified edition held. It
+  says whether the upstream was checked inside its window, not that an answer is right.
+- `test-fixtures/recorded-2.34.0.json`: answers recorded on production (keyed, envelope 1.2), one per watched dataset
+  family, each driven through the real server and the validating client; a synthetic `window_missed` and `unknown` answer
+  validate; the 2.33.0 recordings (before the state existed) still validate.
+
+The package never sends `?if_stale=refuse`, so it never receives the API's opt-in HTTP 424. Still 26 tools.
+
 ## 2.33.0 — 2026-11-06
 
 Types the stable identifiers the API has put on every record since 6 Nov 2026 (freightutils.com run 0.1b): each record
