@@ -741,7 +741,7 @@ Related: validate (checks a container NUMBER's ISO 6346 check digit — not spec
 
 const hsCodeLookup: ToolDef = {
   name: 'hs_code_lookup',
-  description: `Search 6,940 WCO Harmonized System (HS 2022) commodity codes — the 6-digit international customs classification layer. The first 2 digits are the chapter, 4 the heading, 6 the subheading.
+  description: `Search the 6,936 codes of the WCO Harmonized System (HS 2022) — 96 chapters, 1,228 headings and 5,612 subheadings — the 6-digit international customs classification layer. The first 2 digits are the chapter, 4 the heading, 6 the subheading.
 
 Provide ONE of: query (free-text description search, min 2 chars), code (2-6 digit lookup, written with or without dots or spaces — "8471.30" is 847130 — returns the code plus its hierarchy), or section (Roman numeral I-XXI to browse a section).
 
