@@ -1,5 +1,21 @@
 # Changelog
 
+## 2.34.2 — 2026-11-13
+
+A description-and-README patch. `hs_code_lookup` said it searched 6,940 HS 2022 codes; the dataset behind it
+(freightutils.com `lib/data/hs-codes.json`, unchanged since 24 July 2026) holds 6,937 rows, one of which is `TOTAL`
+("Total of all HS2022 commodities"), an aggregate row and not a code. Counted from the data: 96 chapters, 1,228
+headings and 5,612 subheadings, 6,936 codes. The description and the README's tool table now say 6,936 with that
+breakdown; the old figure matched neither the rows nor the codes. The WCO's own pages
+(wcoomd.org "What is the Harmonized System" and "HS Nomenclature 2022 edition") were read and give no
+chapter / heading / subheading count for HS 2022 — only "more than 5,000 commodity groups; each identified by a six
+digit code" — so the figure rests on the dataset's own count. The README's consignment-check summary no longer says
+plates and placards, vehicle equipment, driver training and packaging codes are not checked: it now says what the
+2.31.0 and 2.32.0 notes say — the vehicle side (5.3, 8.1, 8.2) from 2.31.0, the UN packaging mark (6.1.3.1) from
+2.32.0, and that the packaging kind against the packing instruction is not checked. The npm package description was
+299 characters and the registry cut it at 255 mid-word; it is now 247 characters, whole sentences, the same claims.
+No schema, input or output change. Still 26 tools.
+
 ## 2.34.1 — 2026-11-06
 
 A description patch: `hs_code_lookup` now says how the API's free-text search answers since freightutils.com run C1.
