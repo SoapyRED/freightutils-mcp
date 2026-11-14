@@ -12,7 +12,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ALL_TOOLS } from './tools.js';
+import { ALL_TOOLS, INSTRUCTIONS } from './tools.js';
 
 const get = (name: string) => {
   const t = ALL_TOOLS.find((x) => x.name === name);
@@ -78,7 +78,6 @@ test('descriptions state the contracts the sweep fixed', () => {
   assert.ok(get('shipment_summary').description.includes('TOTAL for the dangerous-goods line'));
   assert.ok(get('pallet_fitting_calculator').description.includes('volume_utilisation_percent'));
   assert.ok(get('uk_duty_calculator').description.includes('never padded'));
-  for (const name of ['cbm_calculator', 'ldm_calculator', 'pallet_fitting_calculator', 'uk_duty_calculator']) {
-    assert.ok(get(name).description.includes('camelCase'), `${name} does not say the hosted endpoint serves camelCase`);
-  }
+  // 2.34.3 (run TW1, the tool-list diet): the casing sentence is said once, in the server's instructions.
+  assert.ok(INSTRUCTIONS.includes('the hosted /api/mcp endpoint serves the same fields in camelCase'), 'the instructions do not say the hosted endpoint serves camelCase');
 });

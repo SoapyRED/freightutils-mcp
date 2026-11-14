@@ -8,7 +8,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import type { z } from 'zod';
+import { toJSONSchema, type z } from 'zod';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createServer } from './server.js';
@@ -60,19 +60,19 @@ const entry = (sc: { result: Record<string, unknown> }, k: string) => (sc.result
 test('2.31.0: the description names the vehicle side, its inputs and the 2c limitations', () => {
   const t = ALL_TOOLS.find((x) => x.name === NAME)!;
   assert.match(t.description, /the vehicle side — orange-coloured plates and placards \(5\.3\), the documents, fire extinguishers and equipment on the transport unit \(8\.1\), and driver training \(8\.2\)/);
-  assert.match(t.description, /placards_and_plates_5_3 \{verdict, basis, requirements\[\]/);
-  assert.match(t.description, /equipment_8_1 \{verdict/);
-  assert.match(t.description, /driver_training_8_2 \{verdict/);
-  assert.match(t.description, /crew \{adr_training_certificate, specialisations\[\]/);
-  assert.match(t.description, /Limitations: the packaging check reads the mark, not the packaging kind/); // since 2.32.0 (build 2d)
+  // 2.34.3 (run TW1, the tool-list diet): answer fields and their enums are the typed output schema's, the inputs
+  // the input schema's; the description keeps the scope, what not_applicable means and what is not checked.
+  const out = JSON.stringify(toJSONSchema(t.resultSchema));
+  for (const k of ['placards_and_plates_5_3', 'equipment_8_1', 'driver_training_8_2', '"1.1.3.6"', '"full_adr"', '"undetermined"']) assert.ok(out.includes(k), k);
+  const inp = JSON.stringify(toJSONSchema(t.schema));
+  for (const k of ['adr_training_certificate', 'specialisations']) assert.ok(inp.includes(k), k);
+  assert.match(t.description, /Not checked: whether the packaging kind is one the packing instruction allows/); // since 2.32.0 (build 2d)
   assert.doesNotMatch(t.description, /does not yet check plates and placards/);
-  // website run 2x: what fail, not_applicable and regime mean
-  assert.match(t.description, /regime \("1\.1\.3\.6" \| "full_adr" \| "undetermined"/);
-  assert.match(t.description, /a relief that does not apply is not_applicable, not fail, and does not change the status/);
+  // website run 2x: what fail and not_applicable mean
+  assert.match(t.description, /a relief that does not apply is not_applicable, not fail/);
   assert.doesNotMatch(t.description, /the line fails only when it fits neither/);
-  assert.match(t.description, /regime names the rules the checks answered under: "1\.1\.3\.6" .*"full_adr" .*"undetermined"/);
   // what the vehicle side does not check
-  assert.match(t.description, /the vehicle side does not assess the vehicle approval of Part 9, the elevated temperature mark \(5\.3\.3/);
+  assert.match(t.description, /the vehicle approval of Part 9, the elevated temperature mark \(5\.3\.3/);
   assert.match(t.description, /handling and stowage \(7\.5\.7\)/);
   // the regime input says the new reading in the schema too
   const line = (t.schema.shape.lines as unknown as { element: z.ZodObject }).element;

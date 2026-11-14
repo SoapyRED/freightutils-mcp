@@ -68,13 +68,15 @@ const ENV = 'plus confidence, _source and citation (the FreightUtils v1 response
 // Build 1 mirror (freightutils.com, 2026-10-30): the ADR edition arguments of the five tools that read
 // ADR data — the same names, values and words as the hosted server (app/api/mcp, EDITION_ARGS).
 const EDITION_SHAPE = {
-  edition: z.enum(['2025', '2027']).optional().describe('ADR edition: "2025" or "2027". Wins over as_of. Omit it and as_of picks the edition by the legal timeline: before 2027-01-01 ADR 2025; from 2027-01-01 ADR 2027 (ADR 2025 may still be applied until 2027-06-30 under 1.6.1.1 — edition "2025" answers on it until then); from 2027-07-01 ADR 2027 only. An ADR 2027 answer for a date before 2027-01-01 carries an EDITION_NOT_YET_APPLICABLE warning.'),
-  as_of: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'as_of must be a date written YYYY-MM-DD, e.g. 2027-01-15').optional().describe('YYYY-MM-DD the answer is for (default today, UTC); picks the ADR edition when edition is omitted, and is echoed in the answer and its check receipt.'),
+  edition: z.enum(['2025', '2027']).optional().describe('ADR edition; wins over as_of. Omitted: as_of picks it.'),
+  as_of: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'as_of must be a date written YYYY-MM-DD, e.g. 2027-01-15').optional().describe('The date the answer is for, YYYY-MM-DD (default today, UTC).'),
 };
 // The ADR code registry's verification_status (2.28.0, website G2 / G2-2): the set /api/adr and the code
 // pages serve (lib/adr/codes.ts VerificationStatus on freightutils.com).
 const ADR_CODE_STATUS = z.enum(['paraphrase_unreviewed', 'machine_reviewed', 'contested', 'owner_reviewed', 'dg_reviewed', 'needs_fix', 'verified']);
 const EDITIONS = 'edition ("2025" | "2027") and as_of (YYYY-MM-DD) choose the ADR edition — edition wins, else the date picks it (ADR 2025 before 2027-01-01, ADR 2027 from then; ADR 2025 may still be applied until 2027-06-30). An answer on a named edition carries adr_edition; neither sent, the answer is ADR 2025 until 2027-01-01.';
+// 2.34.3 (run TW1): the one edition sentence each ADR-reading tool keeps; the whole rule is said once, in INSTRUCTIONS.
+const EDITION_CLAUSE = 'edition ("2025" | "2027") and as_of choose the ADR edition; neither sent, ADR 2025 until 2027-01-01.';
 // The field names a description lists are the snake_case ones this package serves (from the REST
 // API); the hosted endpoint at /api/mcp serves the same fields in camelCase (2.22.0, probe S22).
 const CASING = 'Field names as this package serves them (snake_case); the hosted /api/mcp endpoint serves the same fields in camelCase (e.g. total_cbm → totalCbm).';
@@ -93,9 +95,9 @@ const IDS = 'Each record carries fu_id, a stable FreightUtils identifier (and fu
 // fields) with total / truncated / next_offset by default; full: true returns full records five per
 // page; a single-record call always returns the full record. Sent to REST as view=summary.
 const LIST_FIELDS = {
-  full: z.boolean().optional().describe('Lists only: true returns full records (provenance, sources, rationale) instead of summary rows, five per page by default. A single-record call always returns the full record.'),
-  offset: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER).optional().describe('Lists only: rows to skip (default 0). The response gives total and next_offset.'),
-  limit: z.number().int().min(1).max(100).optional().describe('Lists only: rows per page (default: every summary row; 5 with full: true).'),
+  full: z.boolean().optional().describe('Lists only: true returns full records instead of summary rows.'),
+  offset: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER).optional().describe('Lists only: rows to skip (default 0).'),
+  limit: z.number().int().min(1).max(100).optional().describe('Lists only: rows per page.'),
 };
 const LIST_TEXT = 'A list (no single record asked for) returns summary rows with total, truncated, next_offset and detail_hint; full: true returns full records five per page, with offset / limit to page.';
 const listQuery = (args: Record<string, unknown>, isList: boolean, summaryLimit?: number) => isList
@@ -135,19 +137,13 @@ const wholeMax = (field: string) => [WHOLE_MAX, `${field} must be at most 900719
 
 const cbmCalculator: ToolDef = {
   name: 'cbm_calculator',
-  description: `Calculate cubic metres (CBM) for a shipment from per-piece dimensions. CBM is the standard volume unit in international shipping: 1 CBM = 1m x 1m x 1m = 1,000 litres, and ocean freight prices per "freight tonne" (1 CBM or 1,000 kg, whichever is greater).
-
-Behavior: deterministic — identical inputs always return identical figures; total volume = pieces x per-piece CBM (${UNROUNDED}), with conversions to cubic feet, cubic inches and litres (exact factors: 1 ft = 0.3048 m). Missing or non-positive dimensions error with a validation message naming the parameter. ${RATE}
-
-Returns: cbm_per_piece, total_cbm, cubic_feet, litres, cubic_inches and pieces under result, ${ENV} ${CASING}
-
-Related: chargeable_weight_calculator (air billing weight from the same dims), consignment_calculator (multi-line totals), unit_converter (single conversions), shipment_summary (full composite analysis).`,
+  description: `Cubic metres (CBM) of a shipment from per-piece dimensions in cm and a piece count, with cubic feet, litres and cubic inches. Volume only: for air billing weight from the same dimensions use chargeable_weight_calculator, for multi-line totals consignment_calculator, for one unit conversion unit_converter, for a full composite analysis shipment_summary. Deterministic; ${UNROUNDED}.`,
 
   schema: z.object({
-    length_cm: z.number().positive().describe('Length of one piece in centimetres (> 0). Example: 120.'),
-    width_cm: z.number().positive().describe('Width of one piece in centimetres (> 0). Example: 80.'),
-    height_cm: z.number().positive().describe('Height of one piece in centimetres (> 0). Example: 100.'),
-    pieces: z.number().int().positive().max(...wholeMax('pieces')).optional().describe('Number of identical pieces — total volume scales linearly. Default: 1.'),
+    length_cm: z.number().positive().describe('Length of one piece, cm.'),
+    width_cm: z.number().positive().describe('Width of one piece, cm.'),
+    height_cm: z.number().positive().describe('Height of one piece, cm.'),
+    pieces: z.number().int().positive().max(...wholeMax('pieces')).optional().describe('Number of identical pieces. Default 1.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -173,21 +169,15 @@ Related: chargeable_weight_calculator (air billing weight from the same dims), c
 
 const chargeableWeightCalculator: ToolDef = {
   name: 'chargeable_weight_calculator',
-  description: `Calculate air freight chargeable weight — the greater of actual gross weight and volumetric weight, which is what airlines bill. Volumetric weight (kg) = (L x W x H in cm) / divisor; the IATA-standard divisor is 6,000 (1 CBM = 166.67 kg), while express integrators (DHL, FedEx, UPS) typically use 5,000.
-
-Behavior: deterministic; the dimensions are per piece and gross_weight_kg is the TOTAL for all pieces; ${UNROUNDED} (10,000 pieces of 5 x 5 x 6 cm = 250 kg); basis reports which weight governs ("volumetric" = cargo is light for its size, "actual" = dense). Air mode only — sea W/M (1 CBM = 1,000 kg) is covered by consignment_calculator with mode=sea. Missing or non-positive inputs error with the failing parameter named. ${RATE}
-
-Returns: chargeable_weight_kg, basis, volumetric_weight_kg (the total; the hosted endpoint names it volumetricWeightTotalKg) and volumetric_weight_per_piece_kg, gross_weight_kg, cbm, ratio, factor and pieces under result; normalized_input echoes the interpreted inputs (gross_weight_basis, dimensions_basis) and any defaults applied; ${ENV} ${CASING}
-
-Related: cbm_calculator (volume only), consignment_calculator (multi-line, all modes), uld_lookup (the equipment the freight flies in).`,
+  description: `Air freight chargeable weight — the greater of actual gross weight and volumetric weight, which is what airlines bill. The dimensions are per piece and gross_weight_kg is the TOTAL for all pieces; factor is the volumetric divisor (default 6000, the IATA standard; express integrators typically use 5000). Air only: sea W/M is consignment_calculator with mode=sea; volume alone is cbm_calculator; multi-line loads in any mode consignment_calculator; the equipment the freight flies in uld_lookup. Deterministic; ${UNROUNDED}.`,
 
   schema: z.object({
-    length_cm: z.number().positive().describe('Length of one piece in centimetres (> 0). Example: 120.'),
-    width_cm: z.number().positive().describe('Width of one piece in centimetres (> 0). Example: 80.'),
-    height_cm: z.number().positive().describe('Height of one piece in centimetres (> 0). Example: 100.'),
-    gross_weight_kg: z.number().positive().describe('Actual gross weight of the WHOLE shipment (all pieces) in kilograms. Example: 500.'),
-    pieces: z.number().int().positive().max(...wholeMax('pieces')).optional().describe('Number of identical pieces. Default: 1.'),
-    factor: z.number().int().positive().max(...wholeMax('factor')).optional().describe('Volumetric divisor in cm³/kg. Default: 6000 (IATA standard); express carriers typically 5000.'),
+    length_cm: z.number().positive().describe('Length of one piece, cm.'),
+    width_cm: z.number().positive().describe('Width of one piece, cm.'),
+    height_cm: z.number().positive().describe('Height of one piece, cm.'),
+    gross_weight_kg: z.number().positive().describe('Gross weight of the WHOLE shipment (all pieces), kg.'),
+    pieces: z.number().int().positive().max(...wholeMax('pieces')).optional().describe('Number of identical pieces. Default 1.'),
+    factor: z.number().int().positive().max(...wholeMax('factor')).optional().describe('Volumetric divisor, cm³/kg. Default 6000.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -218,25 +208,19 @@ Related: cbm_calculator (volume only), consignment_calculator (multi-line, all m
 
 const ldmCalculator: ToolDef = {
   name: 'ldm_calculator',
-  description: `Calculate loading metres (LDM) for European road freight — how much trailer length a pallet load occupies. 1 LDM = 1 linear metre of a 2.4m-wide trailer; a standard artic is 13.6 LDM.
-
-Provide a pallet preset OR custom length_mm + width_mm — omitting both errors with a usage hint. Behavior: deterministic; stackable=true with stack_height 2 or 3 divides the floor footprint accordingly; fits is true only when the load fits the vehicle's LENGTH, its pallet FLOOR POSITIONS and — when weight_kg is given — its max PAYLOAD; each failed limit is named in warnings[] with its numbers. Euro and UK pallets count as their own floor positions (pallet_spaces.basis says which), other footprints as Euro equivalents. The vehicle's floor positions are its record's own count only when that count is a floor count; a weight-limited or unverified count (the 7.5t rigid stores 8, its 6.1 x 2.4 m deck holds 15) is not, and the positions come from the deck instead — pallet_spaces.floor_positions_basis says which, record_count is the stored figure. Without weight_kg the payload is not checked: payload_checked is false and an info warning gives the payload. utilisation_percent is of the vehicle's length. ${RATE}
-
-Returns: ldm, vehicle (name, length_m, max_payload_kg), utilisation_percent, pallet_spaces (used, available, basis, floor_positions_basis, floor_positions_note, record_count, record_count_basis), total_weight_kg, payload_checked, fits and warnings under result, ${ENV} ${CASING}
-
-Related: vehicle_lookup (the trailer specs behind the vehicle presets), pallet_fitting_calculator (boxes onto one pallet), consignment_calculator (mixed lines including LDM).`,
+  description: `Loading metres (LDM) for European road freight — how much trailer length a pallet load occupies (1 LDM = 1 linear metre of a 2.4 m-wide trailer; a standard artic is 13.6 LDM) — and whether it fits. Provide a pallet preset OR custom length_mm + width_mm; omitting both errors. fits is true only when the load fits the vehicle's length, its pallet floor positions and, when weight_kg is given, its max payload; without weight_kg the payload is not checked. For the trailer specs behind the presets use vehicle_lookup; for boxes onto one pallet pallet_fitting_calculator; for mixed lines consignment_calculator.`,
 
   schema: z.object({
     pallet: z.enum(['euro', 'uk', 'half', 'quarter']).optional()
-      .describe('Pallet preset: euro=1200x800mm, uk=1200x1000mm, half=800x600mm, quarter=600x400mm. Provide this OR length_mm + width_mm.'),
-    length_mm: z.number().positive().optional().describe('Custom pallet length in millimetres (use with width_mm instead of a preset). Example: 1140.'),
+      .describe('Pallet preset (euro 1200x800, uk 1200x1000, half 800x600, quarter 600x400 mm). Provide this OR length_mm + width_mm.'),
+    length_mm: z.number().positive().optional().describe('Custom pallet length, mm (with width_mm, instead of a preset).'),
     width_mm: z.number().positive().optional().describe('Custom pallet width in millimetres. Example: 980.'),
     quantity: z.number().int().positive().max(...wholeMax('quantity')).optional().describe('Number of pallets. Default: 1.'),
-    stackable: z.boolean().optional().describe('Whether pallets can be double/triple-stacked — halves (or thirds) the floor footprint. Default: false.'),
+    stackable: z.boolean().optional().describe('Pallets can be stacked (2 or 3 high). Default false.'),
     stack_height: z.number().int().min(2).max(3).optional().describe('Stack height when stackable: 2 or 3. Default: 2.'),
     weight_kg: z.number().positive().optional().describe('Weight per pallet in kg — enables the payload side of the fits check.'),
     vehicle: z.enum(['artic', 'rigid10', 'rigid75', 'luton', 'us53', 'us48', 'custom']).optional()
-      .describe('Vehicle preset: artic = 13.6m curtainsider (default), rigid10 = DEPRECATED, removal in 3.0.0 (it still answers with the same figures and returns a DEPRECATED advisory in warnings[]; its 10 m length is published by no manufacturer for any rigid — use custom with vehicle_length_m, or artic), rigid75 = 7.5t rigid, luton = 3.5t Luton van, us53 = 53ft US/Canada trailer, us48 = 48ft US trailer, or custom. EU presets divide by the 2.40 m loading-metre convention; US trailers divide by their own 2.591 m internal width, because loading metres are not the North American pricing unit.'),
+      .describe('Vehicle preset (default artic = 13.6m curtainsider; rigid75 = 7.5t rigid; luton = 3.5t Luton van; us53 / us48 = US trailers; custom needs vehicle_length_m). rigid10 is DEPRECATED (removal in 3.0.0).'),
     vehicle_length_m: z.number().positive().optional()
       .describe('Custom vehicle load length in metres (required when vehicle=custom).'),
   }).strict(),
@@ -269,34 +253,22 @@ Related: vehicle_lookup (the trailer specs behind the vehicle presets), pallet_f
 
 const adrLookup: ToolDef = {
   name: 'adr_lookup',
-  description: `Look up the full European road dangerous-goods (ADR 2025) Table A entry for a substance — all 20 columns, from class, packing group and labels through special provisions, limited/excepted quantities, packing instructions, tank codes, carriage provisions, transport category, tunnel restriction code and hazard identification number — and what each of those codes means (resolved_codes). Covers 2,939 entries across all 9 hazard classes, from UNECE ADR 2025 (ECE/TRANS/352).
-
-Provide exactly ONE of: un_number (exact lookup — returns every packing-group variant of that UN number), search (case-insensitive partial match on the proper shipping name), or hazard_class (all entries in a class or division). un_number is normalised — "1203", "UN1203" and "un 1203" are equivalent, and normalized_input reports the correction; explosives keep their leading zero ("0004").
-
-Behavior: read-only reference lookup; a name search or class filter is a paged list — total, truncated and next_offset, with offset and limit (at most 50 per search page, 100 per class page) — never a silently cut list. A search with no hits errors with suggestions: the closest proper shipping names in Table A ("acetne" → ACETONE, UN 1090). 28 Table A rows carry a scope remark instead of a packing group: those return packing_group null plus not_subject_to_adr (with conditions_ref, e.g. "5.5.3" for UN 1845 dry ice) or carriage_prohibited, and table_a_remark preserves the verbatim Table A text. ${RATE}
-
-Returns: count and results[] — per entry, all 20 Table A columns: un_number, proper_shipping_name, class, classification_code, packing_group, labels, special_provisions, limited_quantity, excepted_quantity, packing_instructions, special_/mixed_packing_provisions, portable_tank_instructions/_special_provisions, tank_code, tank_special_provisions, vehicle_for_tank_carriage, carriage_packages/_bulk/_loading_unloading_handling/_operation, transport_category, tunnel_restriction_code, hazard_identification_number, variant_index/variant_count and, on scope-flagged rows, not_subject_to_adr/carriage_prohibited/conditions_ref/table_a_remark — plus resolved_codes[] beside results[]: one entry per distinct code in columns (5)–(20) across the answer, with its code, family, columns, rows (the results[] indexes that carry it), summary, ADR section and verification_status (include_codes "full" adds url, title, meaning, parameters, applies_to, references; "none" omits the list; default compact for un_number, none for search, hazard_class and un_numbers; a code's page is https://www.freightutils.com/adr/codes/{family}/{code}). The meanings are FreightUtils' paraphrases of ADR 2025, cited to section and page; verification_status says how each one has been reviewed, in the registry's own words: paraphrase_unreviewed (not yet reviewed), machine_reviewed (two independent readings of the UNECE text, compared with the record; the owner adjudicates every disagreement), contested (the readings disagree and no person has reviewed it yet), owner_reviewed (the owner's ok), dg_reviewed (the owner's and the DG reviewer's ok), needs_fix (the latest review asks for a fix), or verified on the transport category and tunnel code entries, which are read from the 1.1.3.6.3 and 8.6.4 tables — under result, ${ENV}
-
-Editions: ${EDITIONS}
-
-Limitations: a factual compilation of the ADR table, not legal or compliance advice; classification remains the consignor's responsibility — verify against the current UNECE ADR text.
-
-Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned here), adr_exemption_calculator (1.1.3.6 small-load points), consignment_calculator (flags dangerous-goods lines by UN number).`,
+  description: `The European road dangerous-goods (ADR 2025) Table A entry for a substance — all 20 columns, from class, packing group and labels to special provisions, limited/excepted quantities, packing and tank codes, transport category, tunnel restriction code and hazard identification number — and what each code means (resolved_codes). 2,939 entries across all 9 classes, from UNECE ADR 2025. Provide exactly ONE of: un_number (every packing-group variant of it; "1203", "UN1203" and "un 1203" are equivalent; explosives keep their leading zero), search (partial proper shipping name), hazard_class, or un_numbers (batch). A search with no hits errors with the closest names. For an LQ/EQ quantity check use adr_lq_eq_check; for 1.1.3.6 small-load points adr_exemption_calculator; for an identifier of unknown kind resolve_reference. ${EDITION_CLAUSE} A factual compilation of the ADR table, not legal or compliance advice; classification remains the consignor's responsibility.`,
 
   schema: z.object({
     // "UN 1203" — the form a transport document prints (ADR 5.4.1.1.1 (a)) — is accepted, as this
     // tool's description promises and the API always did; the pattern refused the space until 2.21.2.
     // The same pattern as the hosted adr_lookup (the website's app/api/mcp route) — the two must match.
-    un_number: z.string().regex(/^(?:UN\s*)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN" (e.g., "1203", "UN1203" or "UN 1203")').optional().describe('Exact UN number — 4 digits, optionally "UN"-prefixed; explosives keep their leading zero. Examples: "1203", "UN1203", "UN 1203", "0004".'),
+    un_number: z.string().regex(/^(?:UN\s*)?\d{4}$/i, 'UN number must be 4 digits, optionally prefixed with "UN" (e.g., "1203", "UN1203" or "UN 1203")').optional().describe('Exact UN number, 4 digits, optionally "UN"-prefixed ("0004" keeps its zero).'),
     search: z.string().min(2, 'Search term must be at least 2 characters').optional().describe('Case-insensitive partial match on the proper shipping name (min 2 characters). Example: "acetone".'),
     // Table A column (3a) gives every explosive the class "1"; the division is part of the
     // classification code (column (3b), e.g. "1.4S"), so the old example "1.4" answered not found.
-    un_numbers: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 UN numbers. Send alone; answered as results[] in input order, each with its own status. One call against the daily limit, N against the Pro monthly allowance.'),
-    hazard_class: z.string().optional().describe('All entries in an ADR class (Table A column (3a)). Examples: "3" (flammable liquids), "6.1" (toxic), "1" (explosives — the division and compatibility group are in classification_code, e.g. "1.4S").'),
+    un_numbers: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 UN numbers. Send alone.'),
+    hazard_class: z.string().optional().describe('All entries in an ADR class (Table A column (3a)), e.g. "3", "6.1", "1" (explosives; "1.4S" is a classification_code).'),
     offset: z.number().int().nonnegative().max(...wholeMax('offset')).optional().describe('search / hazard_class only: rows to skip (default 0). The response gives total and next_offset.'),
-    limit: z.number().int().min(1).max(100).optional().describe('search / hazard_class only: rows per page (default and maximum 50 for a search, 100 for a class).'),
-    include_codes: z.enum(['none', 'compact', 'full']).optional().describe('resolved_codes beside results[] — what each Table A code means, once per answer with the rows that carry it: "compact" (code, family, columns, rows, summary, section, verification_status), "full" (adds url, title, meaning, parameters, applies_to, references) or "none". Default compact for un_number, none for search, hazard_class and un_numbers (may go beside un_numbers).'),
-    include_statements: z.boolean().optional().describe('true adds statements[] to every row: plain-word statements (tunnel, transport category, labels, packing, tanks, carriage) assembled from the code meanings and the 8.6.4 / 1.1.3.6.3 tables, each with basis, codes and verification_status (the lowest of the codes it draws on). Default false.'),
+    limit: z.number().int().min(1).max(100).optional().describe('search / hazard_class only: rows per page (default and max 50 for a search, 100 for a class).'),
+    include_codes: z.enum(['none', 'compact', 'full']).optional().describe('What each Table A code means (resolved_codes): compact, full or none. Default compact for un_number, none otherwise.'),
+    include_statements: z.boolean().optional().describe('true adds plain-word statements[] to every row. Default false.'),
     ...EDITION_SHAPE,
   }).strict(),
 
@@ -384,52 +356,32 @@ Related: adr_lq_eq_check (checks quantities against the LQ/EQ values returned he
 
 const adrExemptionCalculator: ToolDef = {
   name: 'adr_exemption_calculator',
-  description: `Calculate ADR 1.1.3.6 "small load" exemption points for a dangerous-goods load and say whether it qualifies. Each substance's transport category (Table A column (15), 0-4) sets a points multiplier (1.1.3.6.4: category 1 x50, 2 x3, 3 x1, 4 x0; the nine ADR 1.1.3.6.3 note-a entries UN 0081/0082/0084/0241/0331/0332/0482/1005/1017 are x20); points = quantity x multiplier. The rule (1.1.3.6.2), for dangerous goods carried in packages: goods of ONE transport category qualify when their TOTAL on the transport unit stays within that category's 1.1.3.6.3 column (3) maximum — category 1: 20, 2: 333, 3: 1,000 (kg or L); note-a entries 50 kg; category 4 unlimited; category 0: 0 — however it is split across lines; goods of DIFFERENT categories qualify when the 1.1.3.6.4 points sum does not exceed 1,000. This calculator also holds every line, and every substance summed across its lines, to its category maximum — on a mixed load that is stricter than 1.1.3.6.4 (the conservative side). Transport category 0 substances can NEVER use this exemption — has_category_zero flags them.
+  description: `ADR 1.1.3.6 "small load" exemption points for a dangerous-goods road load, and whether it qualifies; points = quantity x the transport category multiplier. The rule (1.1.3.6.2), for dangerous goods carried in packages: goods of ONE transport category qualify when their TOTAL on the transport unit stays within that category's 1.1.3.6.3 column (3) maximum (category 1: 20, 2: 333, 3: 1,000 kg or L; 4 unlimited; 0: 0); goods of DIFFERENT categories qualify when the 1.1.3.6.4 points sum does not exceed 1,000. Transport category 0 can never use the exemption. For limited/excepted quantity relief use adr_lq_eq_check; for a substance's row and variant_index adr_lookup; for the whole ADR picture of a load (tunnels, documents, plates) adr_consignment_check.
 
-Provide un_number + quantity for a single substance, OR items[] for a load — never both: every field of the single-substance form (un_number, quantity, packing_group, variant_index, unit, basis) sent beside items[] is refused (the API answers 400 naming the field), never dropped — put it on the item it belongs to, a substance as an item of its own. Quantities are in kg or litres per the substance's ADR unit. An item quantity may be 0: the goods are not carried, the line is left out of the load (state EXCLUDED_NIL) and named in a warning — a load of nothing but zeros is refused, never cleared. un_number also takes an ID-prefixed air-only number (e.g. "ID8000") — see Routing.
-
-Multi-variant UNs: a UN number with more than one ADR Table A row (packing group / concentration variant — e.g. UN 1789 PG II vs PG III have different transport categories) needs packing_group (I|II|III) or variant_index (from adr_lookup) to pin one row. A packing_group that still leaves several rows is enough when those rows agree on class, transport category, scope and the 1.1.3.6.3 counted dimension (UN 1790 PG I: two concentration bands, both category 1) — the verdict is returned with items[].equivalent_variants + variant_note naming the rows it holds for; only when the rows DISAGREE (UN 2215 PG III: MOLTEN is category 0, the solid category 3) does it still ask for variant_index, and candidates[] then lists only that packing group's rows. With no disambiguator at all: a single-line call, or a load where EVERY line is ambiguous, returns blocking_errors[AMBIGUOUS_UN_VARIANT] + human_review_required + candidates[] (each candidate's item_index, un_number, variant_index, packing_group, proper_shipping_name, transport_category, multiplier) and NO verdict — blocking_errors is in the text content as well as structuredContent; a MIXED load withholds only the ambiguous line (items[].withheld true, points null, row fields null) while every other line keeps its points; total_points is null (1.1.3.6.4 sums every line, one term is unknown) and exempt is null UNLESS the resolved lines alone already disqualify the load — a CARRIAGE PROHIBITED entry, a category 0 entry, a per-substance maximum exceeded, or a partial sum already over 1,000 — in which case exempt is false with the ladder message (and carriage_prohibited true where that is the reason), because no packing group can undo those. warnings state the resolved lines' partial sum, candidates[] carry expected_unit (the 1.1.3.6.3 counted dimension — the only difference for UN 3375 PG II, liquid in L vs solid in kg), and the envelope carries human_review_required + candidates[] plus one AMBIGUOUS_UN_VARIANT warning per withheld line. Never a silently guessed row. Single-row UNs are unchanged.
-
-Scope verdicts: Table A rows listed "NOT SUBJECT TO ADR" or "CARRIAGE PROHIBITED" never enter the points math. An all-not-subject load (e.g. UN 1845 dry ice) returns not_subject_to_adr true with a dedicated message ("Not subject to ADR (road). Section 5.5.3 applies: ...") and, for dry ice, conditions[] quoting the ADR 2025 section 5.5.3 requirements verbatim (ventilation, package marking, warning mark, documentation, training). A load containing a CARRIAGE PROHIBITED entry returns exempt false with carriage_prohibited true. In a mixed load, not-subject items are excluded from the points and the exclusion is stated in warnings.
-
-Routing: every returned line carries state, in the words the FreightUtils document check uses — COUNTED (evaluated on one Table A row: its points, or a category 0 / CARRIAGE PROHIBITED row that settles the load), AIR_ONLY_ID, NOT_SUBJECT_TO_ADR, BLOCKED (no points from the line as sent — withheld, basis_mismatch, category_unresolved or entry_required; the line's own flag says which) or EXCLUDED_NIL (a stated quantity of 0, read as not carried: left out of every sum and test, items[].nil_quantity true, and named in a warning). An ID-prefixed number such as ID 8000 (consumer commodity) is an air-only identifier with no ADR Table A entry. It is counted out of 1.1.3.6 — AIR_ONLY_ID, nothing counted, items[].air_only_id true, row fields null — only when the request states, with icao_limited_quantity: true on that line, that the packages are limited quantities to the ICAO Technical Instructions (the 3.4.8 mark, or 3.4.10): 3.4.9 and 3.4.10 deem them to meet 3.4.1-3.4.4, and goods exempted under 1.1.3.4.2 are not taken into account by 1.1.3.6.5; goods not in such packages must be entered under their own UN numbers. Without that statement the ID line is BLOCKED (items[].entry_required true) and the load has no verdict unless the other lines settle it. icao_limited_quantity on a UN-numbered line is refused (the API answers 400). Only the ID prefix makes a line air-only — an ID number is never read as the UN number with the same digits — and a load whose every line is a stated air-only line returns total_points 0, exempt true with its own message, never "1.1.3.6 exemption applies" and never not_subject_to_adr.
-
-Gross figures: ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging. A gross mass (basis "gross") on an entry counted by mass is read as an upper bound of the net mass: the load is answered exempt on it only when it clears even on the gross figure — then figure_basis is "upper_bound_gross" and the line carries upper_bound_gross true (its true points are lower). Otherwise, and always for an entry counted in litres, the line gets no points (basis_mismatch): send the net quantity.
-
-ADR 2027 basis: an ADR 2027 answer carries basis — what the verdict rests on: "adr_2027", or, on a stated as_of from 1 January 2027, a transitional measure open on that date that clears a load ADR 2027 itself does not: "1.6.1.61" (the ADR 2025 note-a rule, ×20 with a 50 kg maximum, until 31 December 2030) before "1.6.1.1" (the whole of ADR 2025, until 30 June 2027). Such an answer headlines the transitional basis that clears the load, names it, gives basis_until (the last day it may be applied) and puts the strict ADR 2027 figure beside it (strict_adr_2027: basis, total_points, exempt, has_category_zero, has_quantity_exceedance). A line whose entry is deleted in ADR 2027 (e.g. UN 2941) has no ADR 2027 figure at all: on a stated as_of from 2027-01-01 to 2027-06-30 the whole load is answered on ADR 2025 under 1.6.1.1 (basis "1.6.1.1", every line edition_basis "2025") and strict_adr_2027 carries entry_deleted true, deleted_un_numbers and message, its four figures null; outside that window, or without a stated as_of, the call is refused naming the deleted entry. Without a stated as_of, the strict ADR 2027 reading stays the headline. transitional_1_6_1_61 (a load with one of the nine note-a UN numbers) and transitional_1_6_1_1 (inside the 1.6.1.1 window, where ADR 2027 itself is not exempt) state the load on each basis: measure, basis, points_on_this_basis, exempt_on_this_basis, until, note.
-
-Behavior: deterministic points arithmetic over ADR 2025 reference data; a UN that cannot be found returns blocking_errors (NOT_FOUND); exempt is the overall verdict. ${UNKNOWN_FIELDS_REFUSED} ${RATE}
-
-Returns: items[] (each with state, packing_group, variant_index, transport_category, multiplier, points, air_only_id + icao_limited_quantity or entry_required on an ID-prefixed line, nil_quantity on a 0 line, upper_bound_gross on a gross mass counted as an upper bound, edition_basis on an answer resting on 1.6.1.1 for an entry deleted in ADR 2027, quantity_unit/quantity_basis/expected_unit when a unit or basis was declared, scope flags where applicable, withheld + ambiguity_reason on an unpinned multi-variant line, and equivalent_variants + variant_note when a packing group resolved by equivalence), total_points (NULL when no verdict was reached), threshold (1000), exempt (NULL when no verdict was reached — never false as a stand-in), has_category_zero, has_quantity_exceedance, warnings, message, figure_basis, and on ADR 2027 answers basis, basis_until, strict_adr_2027 (with entry_deleted, deleted_un_numbers and message when an entry is deleted in ADR 2027), transitional_1_6_1_61, transitional_1_6_1_1, human_review_required + candidates[] when any line is withheld, and — on scope verdicts — not_subject_to_adr/conditions_ref/conditions[]/carriage_prohibited under result — or, when every line is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
-
-Editions: ${EDITIONS}
-
-Limitations: a deterministic calculation over reference data, not legal advice — 1.1.3.6 relieves goods carried in packages only (not in bulk or in tanks), and this calculator takes no packaging input; even exempt loads keep core duties (packaging, marking, documentation), and mixed-packing rules still apply; verify against the current UNECE ADR text.
-
-Related: adr_lookup (per-substance data incl. transport category + variant_index), adr_lq_eq_check (the LQ/EQ relief routes instead of 1.1.3.6).`,
+Send un_number + quantity for one substance OR items[] for a load — never both: a single-substance field sent beside items[] is refused, never dropped. Quantities are kg or litres per the substance's ADR unit; a quantity of 0 means not carried, and a load of nothing but zeros is refused. A UN number whose Table A rows disagree needs packing_group or variant_index, else that line has no verdict (AMBIGUOUS_UN_VARIANT with candidates[]) — never a guessed row. An ID-prefixed air-only number (e.g. "ID8000") is counted out of 1.1.3.6 only with icao_limited_quantity: true on that line, otherwise BLOCKED. A gross mass (basis "gross") is only an upper bound: send the net quantity. ${EDITION_CLAUSE} A calculation over reference data, not legal advice: 1.1.3.6 relieves goods carried in packages only (not in bulk or in tanks), and exempt loads keep core duties; verify against the current UNECE ADR text.`,
 
   strictKeys: true,
   schema: strictInput({
-    un_number: z.string().regex(EXEMPTION_IDENTIFIER_PATTERN, EXEMPTION_IDENTIFIER_MESSAGE).optional().describe('UN number for a single-substance check — 4 digits, optionally "UN"-prefixed — or an ID-prefixed air-only number such as "ID8000", which has no ADR Table A entry: counted out of 1.1.3.6 (AIR_ONLY_ID) only with icao_limited_quantity: true; without it the line is BLOCKED. Single-substance form only — sent beside items[] it is refused; send the substance as an item. Example: "1203".'),
-    quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').optional().describe('Quantity for the single-substance check, in kg or litres per the substance\'s ADR unit. Single-substance form only — sent beside items[] it is refused. Example: 100.'),
-    packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group (I, II or III) — only needed to disambiguate a UN with more than one ADR Table A row (e.g. UN 1789). Ignored for single-row UNs. Single-substance form only — sent beside items[] it is refused; set it on each item.'),
-    variant_index: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER, 'variant_index must be a safe integer').optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants that share a packing group (concentration bands). Ignored for single-row UNs. Single-substance form only — sent beside items[] it is refused; set it on each item.'),
-    unit: z.enum(['L', 'kg']).optional().describe("OPTIONAL. The dimension `quantity` is stated in. Omit it and the number is taken as already on the ADR 1.1.3.6.3 basis (unchanged behaviour). Supply it and it is CHECKED against the dimension 1.1.3.6.3 counts for that Table A row — litres for liquids and for compressed or adsorbed gases, kilograms for solids, liquefied/refrigerated/dissolved gases and articles. A mismatch returns total_points null, exempt null and items[].basis_mismatch true, naming the dimension the entry is counted in. Single-substance form only — sent beside items[] it is refused; set it on each item."),
-    basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. 'net' or 'gross'. ADR 1.1.3.6.3 counts the dangerous goods themselves, never the packaging. A 'gross' mass on an entry counted by mass is used only as an upper bound of the net mass: the load is answered exempt on it only when it clears even on the gross figure (figure_basis upper_bound_gross); otherwise, and always for an entry counted in litres, no points — send the net quantity. Single-substance form only — sent beside items[] it is refused; set it on each item."),
+    un_number: z.string().regex(EXEMPTION_IDENTIFIER_PATTERN, EXEMPTION_IDENTIFIER_MESSAGE).optional().describe('UN number (4 digits, optionally "UN"-prefixed) or an ID-prefixed air-only number ("ID8000"). Single-substance form only.'),
+    quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').optional().describe('Quantity in kg or litres per the substance\'s ADR unit. Single-substance form only.'),
+    packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group, to pin one row of a multi-row UN. Single-substance form only.'),
+    variant_index: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER, 'variant_index must be a safe integer').optional().describe('ADR Table A variant index (from adr_lookup), to pin one row. Single-substance form only.'),
+    unit: z.enum(['L', 'kg']).optional().describe('The dimension quantity is stated in, checked against the one ADR 1.1.3.6.3 counts for the row (a mismatch gives no points). Omitted: taken as already on that basis. Single-substance form only.'),
+    basis: z.enum(['net', 'gross']).optional().describe('net or gross; a gross mass is only an upper bound of the net (send the net quantity). Single-substance form only.'),
     // T2b-2 (website #328, cc-036): the hosted tool's description verbatim. GET cannot carry it, so a
     // single-substance call that sends it goes as a one-item POST (the hosted tool's own mapping).
-    icao_limited_quantity: z.boolean().optional().describe('OPTIONAL, only with an ID-prefixed un_number (e.g. ID8000): true states that the packages are limited quantities conforming to the ICAO Technical Instructions (the 3.4.8 mark, or 3.4.10). Only then is the line counted out of 1.1.3.6; without it the ID line is BLOCKED and the load has no verdict unless the other lines settle it.'),
+    icao_limited_quantity: z.boolean().optional().describe('ID-prefixed un_number only: true states the packages are ICAO Technical Instructions limited quantities (the 3.4.8 mark, or 3.4.10).'),
     items: z.array(strictInput({
-      un_number: z.string().regex(EXEMPTION_IDENTIFIER_PATTERN, EXEMPTION_IDENTIFIER_MESSAGE).describe('UN number — 4 digits, optionally "UN"-prefixed — or an ID-prefixed air-only number such as "ID8000" (AIR_ONLY_ID with icao_limited_quantity: true on the item, else BLOCKED). Example: "1263".'),
+      un_number: z.string().regex(EXEMPTION_IDENTIFIER_PATTERN, EXEMPTION_IDENTIFIER_MESSAGE).describe('UN number (4 digits, optionally "UN"-prefixed) or an ID-prefixed air-only number ("ID8000").'),
       // T2b-2 (cc-042): 0 is accepted — not carried, the line is left out (EXCLUDED_NIL); all zeros is refused by the API.
-      quantity: z.number().nonnegative().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').describe('Quantity in kg or litres per the substance\'s ADR unit. 0 means not carried: the line is left out of the load (EXCLUDED_NIL) and named in a warning; a load of nothing but zeros is refused.'),
+      quantity: z.number().nonnegative().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').describe('Quantity in kg or litres per the substance\'s ADR unit; 0 = not carried.'),
       packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group for a multi-variant UN.'),
       variant_index: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER, 'variant_index must be a safe integer').optional().describe('ADR Table A variant index for a multi-variant UN.'),
-      unit: z.enum(['L', 'kg']).optional().describe("OPTIONAL. The dimension `quantity` is stated in. Omit it and the number is taken as already on the ADR 1.1.3.6.3 basis (unchanged behaviour). Supply it and it is CHECKED against the dimension 1.1.3.6.3 counts for that Table A row — litres for liquids and for compressed or adsorbed gases, kilograms for solids, liquefied/refrigerated/dissolved gases and articles. A mismatch returns total_points null, exempt null and items[].basis_mismatch true, naming the dimension the entry is counted in."),
-      basis: z.enum(['net', 'gross']).optional().describe("OPTIONAL. As the top-level basis: a 'gross' mass is used only as an upper bound on an entry counted by mass, and only when the load clears on it."),
+      unit: z.enum(['L', 'kg']).optional().describe('The dimension quantity is stated in, checked against the one ADR 1.1.3.6.3 counts for the row (a mismatch gives no points). Omitted: taken as already on that basis.'),
+      basis: z.enum(['net', 'gross']).optional().describe('net or gross; a gross mass is only an upper bound of the net.'),
       icao_limited_quantity: z.boolean().optional().describe('OPTIONAL, ID-prefixed lines only: as the top-level icao_limited_quantity.'),
-    }, { hints: EXEMPTION_KEY_HINTS, acceptedLabel: 'Accepted on each item' })).min(1, 'items must hold at least one item').optional().describe('Mixed-load items (use INSTEAD of un_number/quantity).'),
-    consignment: z.record(z.string(), z.unknown()).optional().describe('Alternative to the other arguments: the consignment object (https://www.freightutils.com/schema/consignment-object.v1.json) — lines[], journey, vehicle, options. Send it alone; an input this tool needs and the object lacks comes back in missing_inputs.'),
+    }, { hints: EXEMPTION_KEY_HINTS, acceptedLabel: 'Accepted on each item' })).min(1, 'items must hold at least one item').optional().describe('Mixed-load items, INSTEAD of un_number/quantity.'),
+    consignment: z.record(z.string(), z.unknown()).optional().describe('The consignment object, instead of the other arguments. Send it alone.'),
     ...EDITION_SHAPE,
   }, {
     hints: EXEMPTION_KEY_HINTS,
@@ -590,25 +542,15 @@ Related: adr_lookup (per-substance data incl. transport category + variant_index
 
 const airlineLookup: ToolDef = {
   name: 'airline_lookup',
-  description: `Search 6,356 airlines by name, IATA code, ICAO code, AWB prefix, or country. AWB prefixes are the first 3 digits of an air waybill number and identify the issuing carrier (e.g. 176 = Emirates).
-
-Provide ONE parameter: query is a ranked fuzzy search across names and codes; iata / icao / prefix / country are exact filters.
-
-Behavior: read-only; fuzzy query hits report their match quality through the envelope's confidence (basis match_quality, score 0-1) with a FUZZY_BEST_MATCH advisory naming the matched field; a query that contains no name falls back to the closest names in the dataset ("Emirats" → Emirates). A query or country answer is a list: summary rows, 25 per page, with total, truncated and next_offset (full: true for full records); an iata / icao / prefix answer is the holder records in full. ${RATE}
-
-Returns: count and results[] — per airline: airline_name, iata_code, icao_code, awb_prefix[], callsign, country, has_cargo and verification fields (aliases and sources in full records); prefix_shared + prefix_holders on every record with a prefix; on cargo records operational_status (active / ceased / unknown) with operational_status_basis, restrictions[] when the EU or UK Air Safety List names the carrier, and carrier-published cargo_website / tracking_url_template / dg_acceptance_url where they exist — under result, ${ENV}
-
-Limitations: this dataset's provenance is pending independent verification (the envelope's provenance_status says so) — confirm operationally critical codes with IATA/ICAO or the carrier.
-
-Related: airport_lookup (searches AIRPORTS, not carriers), validate (checks an AWB number's check digit and names its airline from this dataset when one record holds the prefix, otherwise lists the candidates).`,
+  description: `Find airlines (6,356) by name, IATA code, ICAO code, AWB prefix (the first 3 digits of an air waybill number, e.g. 176 = Emirates) or country. Provide ONE parameter: query is a ranked fuzzy search; iata / icao / prefix / country are exact filters. Searches carriers, not airports — for airports use airport_lookup; to check an AWB number's check digit use validate. Provenance pending independent verification — confirm operationally critical codes with IATA/ICAO or the carrier.`,
 
   schema: z.object({
-    query: z.string().min(2, 'Query must be at least 2 characters').refine((s) => s.trim().length >= 2, 'Query must be at least 2 characters, not counting spaces').optional().describe('Ranked fuzzy search across name, codes, prefix and country (min 2 chars). Example: "emirates".'),
-    iata: z.string().regex(/^[A-Za-z0-9]{2}$/, 'IATA code must be 2 letters or digits (e.g., "EK", "U2")').optional().describe('Exact IATA code — 2 alphanumeric characters. Examples: "EK", "U2".'),
-    icao: z.string().regex(/^[A-Za-z]{3}$/, 'ICAO code must be 3 letters (e.g., "UAE", "BAW")').optional().describe('Exact ICAO code — 3 letters. Examples: "UAE", "BAW".'),
-    prefix: z.string().regex(/^\d{3}$/, 'AWB prefix must be exactly 3 digits').optional().describe('Exact AWB prefix — the first 3 digits of an air waybill. Example: "176".'),
-    country: z.string().min(2, 'Country must be at least 2 characters').optional().describe('Filter by country name (min 2 chars). Example: "Netherlands".'),
-    codes: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 airline codes — 2 characters IATA, 3 letters ICAO, 3 digits AWB prefix. Send alone; answered as results[] in input order, each with its own status. One call against the daily limit, N against the Pro monthly allowance.'),
+    query: z.string().min(2, 'Query must be at least 2 characters').refine((s) => s.trim().length >= 2, 'Query must be at least 2 characters, not counting spaces').optional().describe('Ranked fuzzy search across names and codes.'),
+    iata: z.string().regex(/^[A-Za-z0-9]{2}$/, 'IATA code must be 2 letters or digits (e.g., "EK", "U2")').optional().describe('Exact 2-character IATA code.'),
+    icao: z.string().regex(/^[A-Za-z]{3}$/, 'ICAO code must be 3 letters (e.g., "UAE", "BAW")').optional().describe('Exact 3-letter ICAO code.'),
+    prefix: z.string().regex(/^\d{3}$/, 'AWB prefix must be exactly 3 digits').optional().describe('Exact AWB prefix, 3 digits.'),
+    country: z.string().min(2, 'Country must be at least 2 characters').optional().describe('Country name filter.'),
+    codes: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 airline codes (IATA, ICAO or AWB prefix). Send alone.'),
     ...LIST_FIELDS,
   }).strict(),
 
@@ -674,25 +616,15 @@ Related: airport_lookup (searches AIRPORTS, not carriers), validate (checks an A
 
 const containerLookup: ToolDef = {
   name: 'container_lookup',
-  description: `Get ISO shipping-container specifications, with optional load-fit maths. Covers 10 types: 20ft/40ft standard, 40ft and 45ft high-cube, 20ft/40ft reefer, 20ft/40ft open-top and 20ft/40ft flat-rack.
-
-Provide type as a slug (e.g. "20ft-standard", "40ft-high-cube") for one container's record; omit it to list all 10 as summary rows (full: true for full records). Add item dimensions (item_length_cm/width_cm/height_cm, optional item_weight_kg and item_quantity) to also compute how many such items fit.
-
-Behavior: read-only reference data with per-record provenance (sources, audited_at, decision_rationale); type is read in any letter case, as the ISO size-type code ("45G1") or the short form of its name ("40HC"); an unknown type errors with the valid slugs and the closest one ("20ft-standrd" → 20ft-standard). Fit calculations are geometric best-effort — they do not model load distribution, securing or mixed cargo. ${RATE}
-
-Returns: the container record — internal/external/door dimensions (cm), capacity_cbm, tare_weight_kg, max_gross_kg, max_payload_kg and euro/GMA pallet counts — under result, ${ENV} ${CASING} ${LIST_TEXT}
-
-Limitations: manufacturer-typical specs, provenance pending independent verification (the envelope's provenance_status says so) — actual equipment varies by lessor and line; confirm against the carrier's equipment guide.
-
-Related: validate (checks a container NUMBER's ISO 6346 check digit — not specs), cbm_calculator / consignment_calculator (the cargo volume to fill it), uld_lookup (the air-freight equivalent).`,
+  description: `ISO shipping-container specifications for 10 types (20ft/40ft standard, 40ft and 45ft high-cube, reefer, open-top and flat-rack), with optional load-fit maths. type (a slug such as "40ft-high-cube", the ISO size-type code "45G1" or the short form "40HC") gives one record; omit it to list all 10; add item dimensions to compute how many items fit. For a container NUMBER's check digit use validate; for the air-freight equivalent uld_lookup; for the cargo volume cbm_calculator / consignment_calculator. Manufacturer-typical specs, provenance pending — confirm against the carrier's equipment guide.`,
 
   schema: z.object({
     type: z.string().min(2, 'Container type must be at least 2 characters').optional()
-      .describe('Container slug. Examples: "20ft-standard", "40ft-high-cube", "20ft-reefer". Omit to list all 10 types.'),
+      .describe('Container slug ("40ft-high-cube"), ISO code or short form. Omit to list all.'),
     item_length_cm: z.number().positive().optional().describe('Item length in cm — provide all three item dims to get a load-fit calculation.'),
     item_width_cm: z.number().positive().optional().describe('Item width in cm.'),
     item_height_cm: z.number().positive().optional().describe('Item height in cm.'),
-    item_weight_kg: z.number().nonnegative().optional().describe('Weight of ONE item in kg — caps the fit by max payload. 0 or omitted: no weight check.'),
+    item_weight_kg: z.number().nonnegative().optional().describe('Weight of ONE item, kg; caps the fit by max payload.'),
     item_quantity: z.number().int().positive().max(...wholeMax('item_quantity')).optional().describe('Number of items to check against the container.'),
     ...LIST_FIELDS,
   }).strict(),
@@ -741,24 +673,14 @@ Related: validate (checks a container NUMBER's ISO 6346 check digit — not spec
 
 const hsCodeLookup: ToolDef = {
   name: 'hs_code_lookup',
-  description: `Search the 6,936 codes of the WCO Harmonized System (HS 2022) — 96 chapters, 1,228 headings and 5,612 subheadings — the 6-digit international customs classification layer. The first 2 digits are the chapter, 4 the heading, 6 the subheading.
-
-Provide ONE of: query (free-text description search, min 2 chars), code (2-6 digit lookup, written with or without dots or spaces — "8471.30" is 847130 — returns the code plus its hierarchy), or section (Roman numeral I-XXI to browse a section).
-
-Behavior: read-only; description search runs first against the HS 2022 descriptions (UN Comtrade H6), on whole words only (a word inside a longer word never matches); when none contains the words, or the best match is weak, it asks the UK Trade Tariff search references (HMRC's index of everyday goods names) and serves their answer, so "laptop" finds 847130, "computers" heading 8471 and "charger" heading 8504. A fallback match is medium confidence: matched_via names HMRC's index, the citation asks you to confirm the code, and the formal tariff wording ("automatic data processing machines") stays the surest search. count 0 with an empty results[] is still a valid answer when neither has a confident match — the NO_MATCH warning then names any weak candidates, which are not the answer. ${RATE}
-
-Returns: the query/code echo, count and results[] (hscode, description and hierarchy context) under result, ${ENV}
-
-Limitations: the 6-digit international level only — national tariff lines (8-10 digits) and duty rates are set per country; classification here is indicative, not a binding ruling.
-
-Related: uk_duty_calculator (duty/VAT for a code found here), ics2_check (EU ENS goods-description quality — a different check entirely).`,
+  description: `Search the 6,936 codes of the WCO Harmonized System (HS 2022), the 6-digit international customs classification (2 digits chapter, 4 heading, 6 subheading). Provide ONE of: query (free-text description), code (2-6 digits, dots or spaces ignored; returns the code with its hierarchy) or section (Roman numeral I-XXI). A description search matches whole words, then asks HMRC's everyday goods names at medium confidence; count 0 with an empty results[] is a valid answer (NO_MATCH). For UK duty/VAT on a code use uk_duty_calculator; for ENS goods-description screening ics2_check. The 6-digit level only — national tariff lines and duty rates are set per country; indicative, not a binding ruling.`,
 
   schema: z.object({
-    query: z.string().min(2, 'Search term must be at least 2 characters').optional().describe('Search words (min 2 chars), matched against the official HS descriptions first, then HMRC everyday goods names (medium confidence). Examples: "automatic data", "laptop".'),
+    query: z.string().min(2, 'Search term must be at least 2 characters').optional().describe('Search words, matched against the HS descriptions, then HMRC everyday goods names.'),
     // "8471.30" / "8471 30" — the written form — read as its digits (2.22.0, probe S14).
-    code: z.string().refine((c) => /^\d{2,6}$/.test(c.trim().replace(/[\s.-]/g, '')), 'HS code must be 2–6 digits; dots, spaces and hyphens are ignored (e.g. "847130", "8471.30")').optional().describe('Exact HS code or prefix — 2, 4 or 6 digits, with or without dots or spaces. Examples: "8471", "8471.30".'),
-    section: z.string().regex(/^[ivxIVX]{1,5}$/, 'Section must be a Roman numeral I–XXI').optional().describe('Browse a section by Roman numeral I-XXI. Example: "XVI" (machinery).'),
-    codes: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 HS codes. Send alone; answered as results[] in input order, each with its own status. One call against the daily limit, N against the Pro monthly allowance.'),
+    code: z.string().refine((c) => /^\d{2,6}$/.test(c.trim().replace(/[\s.-]/g, '')), 'HS code must be 2–6 digits; dots, spaces and hyphens are ignored (e.g. "847130", "8471.30")').optional().describe('HS code or prefix, 2, 4 or 6 digits; dots and spaces ignored ("8471.30").'),
+    section: z.string().regex(/^[ivxIVX]{1,5}$/, 'Section must be a Roman numeral I–XXI').optional().describe('A section, Roman numeral I-XXI.'),
+    codes: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 HS codes. Send alone.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -785,18 +707,10 @@ Related: uk_duty_calculator (duty/VAT for a code found here), ics2_check (EU ENS
 
 const incotermsLookup: ToolDef = {
   name: 'incoterms_lookup',
-  description: `Look up the 11 Incoterms 2020 trade rules — who pays for transport, insurance and customs clearance, and where risk transfers from seller to buyer. 7 rules work for any transport mode (EXW, FCA, CPT, CIP, DAP, DPU, DDP); 4 are sea/inland-waterway only (FAS, FOB, CFR, CIF).
-
-Provide code for one rule, category (any_mode | sea_only) for a filtered list, or neither to list all 11 (a list is summary rows — code, name, category, summary — with full: true for the full rules). Behavior: read-only reference; an unknown code errors with the valid code list, and DAT — replaced in Incoterms 2020 — names its successor, DPU (ICC). ${RATE}
-
-Returns: the rule record — name, category, summary, seller_responsibility, buyer_responsibility, risk_transfer, cost_transfer, insurance, export/import clearance, best_for and watch_out — under result, ${ENV}
-
-Limitations: summarised guidance on ICC Incoterms 2020; the ICC publication is the binding text and specific contract wording prevails.
-
-Related: uk_duty_calculator (accepts an incoterm when composing the CIF value), shipment_summary (composite analysis).`,
+  description: `The 11 Incoterms 2020 rules — who pays for transport, insurance and customs clearance, and where risk transfers from seller to buyer. code gives one rule; category (any_mode | sea_only) filters; neither lists all 11. An unknown code errors with the valid list; DAT names its successor, DPU. Related: uk_duty_calculator (takes an incoterm when composing the CIF value), shipment_summary. Summarised guidance; the ICC publication is the binding text.`,
 
   schema: z.object({
-    code: z.string().regex(/^[A-Za-z]{3}$/, 'Incoterm code must be 3 letters (e.g., "FOB", "CIF", "EXW")').optional().describe('Three-letter Incoterms 2020 code. Examples: "FOB", "CIF", "EXW", "DAP".'),
+    code: z.string().regex(/^[A-Za-z]{3}$/, 'Incoterm code must be 3 letters (e.g., "FOB", "CIF", "EXW")').optional().describe('Three-letter Incoterms 2020 code.'),
     category: z.enum(['any_mode', 'sea_only']).optional().describe('Filter the list: any_mode (7 rules) or sea_only (4 rules).'),
     ...LIST_FIELDS,
   }).strict(),
@@ -833,20 +747,12 @@ Related: uk_duty_calculator (accepts an incoterm when composing the CIF value), 
 
 const palletFittingCalculator: ToolDef = {
   name: 'pallet_fitting_calculator',
-  description: `Calculate how many identical boxes fit on a pallet: boxes per layer (trying 90-degree rotation when allowed), layer count within the max height, totals, footprint and volume utilisation, and weight capping.
-
-Behavior: deterministic geometric packing of one box size in aligned rows and columns — it does not model interlocked or mixed-orientation patterns; weight_limited reports when max_payload_kg caps the count below the geometric fit, counted in whole layers (notes say when a part layer is left out, and why nothing fits when no box fits); pallet_deck_height_cm defaults to 15. Missing or non-positive dimensions error naming the parameter. ${RATE}
-
-Returns: boxes_per_layer, layers, total_boxes, orientation, boxes_per_row/col, usable_height_cm, utilisation_percent (the share of the pallet FOOTPRINT one layer covers), volume_utilisation_percent (box volume over the usable envelope), total_box_volume_cbm, wasted_space_cbm, max_boxes_by_weight, notes and the weight fields under result, ${ENV} ${CASING}
-
-Limitations: a theoretical best-effort fit — real stacking obeys carton strength, overhang and load-stability rules it does not model.
-
-Related: ldm_calculator (pallets into trailer length), vehicle_lookup (pallet capacity per vehicle), container_lookup (pallets into containers).`,
+  description: `How many identical boxes fit on one pallet: boxes per layer (trying 90-degree rotation when allowed), layers within the max height, totals, footprint and volume utilisation (volume_utilisation_percent), capped in whole layers by max_payload_kg. One box size in aligned rows — no interlocked or mixed patterns. For pallets into trailer length use ldm_calculator; pallet capacity per vehicle vehicle_lookup; pallets into containers container_lookup. A theoretical best-effort fit — carton strength, overhang and load stability are not modelled.`,
 
   schema: z.object({
-    pallet_length_cm: z.number().positive().describe('Pallet length in cm. Example: 120 (euro pallet).'),
-    pallet_width_cm: z.number().positive().describe('Pallet width in cm. Example: 80 (euro pallet).'),
-    pallet_max_height_cm: z.number().positive().describe('Maximum stack height in cm INCLUDING the pallet deck. Example: 180.'),
+    pallet_length_cm: z.number().positive().describe('Pallet length, cm.'),
+    pallet_width_cm: z.number().positive().describe('Pallet width, cm.'),
+    pallet_max_height_cm: z.number().positive().describe('Maximum stack height in cm INCLUDING the pallet deck.'),
     pallet_deck_height_cm: z.number().positive().optional().describe('Pallet deck height in cm. Default: 15.'),
     box_length_cm: z.number().positive().describe('Box length in cm.'),
     box_width_cm: z.number().positive().describe('Box width in cm.'),
@@ -891,18 +797,12 @@ Related: ldm_calculator (pallets into trailer length), vehicle_lookup (pallet ca
 
 const unitConverter: ToolDef = {
   name: 'unit_converter',
-  description: `Convert freight and logistics units: weight (kg, lbs, oz, tonnes, short_tons, long_tons), volume (cbm, cuft, cuin, litres, gal_us, gal_uk), length (cm, inches, m, feet, mm), plus two freight-specific targets valid only FROM cbm — chargeable_kg (air volumetric weight at the IATA 6,000 divisor: m³ x 1,000,000 / 6000) and freight_tonnes (sea W/M, 1 CBM = 1 freight tonne).
-
-Behavior: deterministic, on the exact legal factors (1 lb = 0.45359237 kg, 1 in = 2.54 cm); the response names both units and states the formula used. Cross-dimension conversions (e.g. kg to litres), a negative value and freight targets from a non-cbm source are refused with the accepted units listed by category. Note: short ton (US) = 2,000 lb, long ton (UK) = 2,240 lb, metric tonne = 2,204.6 lb. ${RATE}
-
-Returns: input {value, unit, name}, result {value, unit, name}, formula and note under result, ${ENV}
-
-Related: cbm_calculator (dimensions to volume first), chargeable_weight_calculator (proper air billing weight with pieces and a custom divisor).`,
+  description: `Convert freight weight, volume and length units, plus chargeable_kg (air volumetric weight at the IATA 6,000 divisor) and freight_tonnes (sea W/M, 1 CBM = 1 freight tonne), both only FROM cbm. Cross-dimension conversions (e.g. kg to litres) and a negative value are refused. For dimensions to volume use cbm_calculator; for air billing weight with pieces and a custom divisor chargeable_weight_calculator.`,
 
   schema: z.object({
-    value: z.number().nonnegative('value must be 0 or more — a mass, volume or length is never negative').describe('The numeric value to convert, 0 or more. Example: 5.'),
-    from: z.enum(['kg','lbs','oz','tonnes','short_tons','long_tons','cbm','cuft','cuin','litres','gal_us','gal_uk','cm','inches','m','feet','mm']).describe('Source unit — weight (kg, lbs, oz, tonnes, short_tons, long_tons), volume (cbm, cuft, cuin, litres, gal_us, gal_uk) or length (cm, inches, m, feet, mm). Must be the same dimension as "to".'),
-    to: z.enum(['kg','lbs','oz','tonnes','short_tons','long_tons','cbm','cuft','cuin','litres','gal_us','gal_uk','cm','inches','m','feet','mm','chargeable_kg','freight_tonnes']).describe('Target unit — any same-dimension unit, plus chargeable_kg and freight_tonnes (both only valid from cbm).'),
+    value: z.number().nonnegative('value must be 0 or more — a mass, volume or length is never negative').describe('The value to convert, 0 or more.'),
+    from: z.enum(['kg','lbs','oz','tonnes','short_tons','long_tons','cbm','cuft','cuin','litres','gal_us','gal_uk','cm','inches','m','feet','mm']).describe('Source unit; the same dimension as "to".'),
+    to: z.enum(['kg','lbs','oz','tonnes','short_tons','long_tons','cbm','cuft','cuin','litres','gal_us','gal_uk','cm','inches','m','feet','mm','chargeable_kg','freight_tonnes']).describe('Target unit; chargeable_kg and freight_tonnes only from cbm.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -924,19 +824,7 @@ Related: cbm_calculator (dimensions to volume first), chargeable_weight_calculat
 
 const consignmentCalculator: ToolDef = {
   name: 'consignment_calculator',
-  description: `Calculate per-line and grand totals for a multi-item mixed consignment: CBM, loading metres (LDM), volumetric weight, and the mode-specific chargeable figure (air chargeable weight, sea revenue tonnes, road LDM), plus objective advisory flags.
-
-Provide mode (sea | air | road, default road) and either lines[] (canonical — per line: quantity, dims {l,w,h,unit}, weight {value,unit}, optional description / hs_code / un_number / stackable) or the legacy flat items[] (dimensions in cm, weight in kg). Air uses an IATA volumetric divisor (default 6000, settable via options.air_volumetric_divisor); options.container_number / options.awb_number add a check-digit sanity flag.
-
-Behavior: deterministic; flags are advisory only — implausible density, mode/option mismatch, dangerous-goods presence by UN number against ADR 2025, and container/AWB check-digit validity — and never state that a shipment is permitted or compliant. Invalid lines error naming the offending field. Canonical schema: https://www.freightutils.com/schema/consignment.v1.json. ${RATE}
-
-Returns: schema_version, mode, per_line[] (cbm, gross_weight_kg, density, volumetric_weight_kg, ldm, revenue_tonnes, chargeable_weight_kg), totals (incl. billing_basis) and flags[] under result, ${ENV}
-
-Editions: ${EDITIONS}
-
-Limitations: best-effort deterministic calculation and reference data — not regulatory, customs or dangerous-goods compliance advice; classification, documentation and carrier acceptance remain your responsibility.
-
-Related: cbm_calculator / chargeable_weight_calculator / ldm_calculator (single-figure versions), shipment_summary (adds vehicle/container suggestion and duty estimates), adr_lookup (what a flagged UN number is).`,
+  description: `Per-line and grand totals for a multi-item mixed consignment: CBM, loading metres, volumetric weight and the mode's chargeable figure (air chargeable weight, sea revenue tonnes, road LDM), plus advisory flags (implausible density, mode/option mismatch, dangerous goods by UN number, container/AWB check digits). Send mode (sea | air | road, default road) and lines[] (each line with its own dimension and weight units), or the legacy flat items[] in cm and kg. For a vehicle/container suggestion and duty estimates use shipment_summary; for one figure cbm_calculator / chargeable_weight_calculator / ldm_calculator; for what a flagged UN number is adr_lookup. ${EDITION_CLAUSE} Flags are advisory and never state that a shipment is permitted or compliant; not regulatory, customs or dangerous-goods compliance advice.`,
 
   schema: z.object({
     mode: z.enum(['sea', 'air', 'road']).optional().describe('Transport mode: sea | air | road. Default: road.'),
@@ -972,7 +860,7 @@ Related: cbm_calculator / chargeable_weight_calculator / ldm_calculator (single-
       container_number: z.string().max(20, 'container_number must be at most 20 characters').optional().describe('ISO 6346 container number — check-digit validated into flags.'),
       awb_number: z.string().max(20, 'awb_number must be at most 20 characters').optional().describe('IATA 11-digit air waybill number — check-digit validated into flags.'),
     }).strict().optional().describe('Optional settings.'),
-    consignment: z.record(z.string(), z.unknown()).optional().describe('Alternative to the other arguments: the consignment object (https://www.freightutils.com/schema/consignment-object.v1.json) — lines[], journey, vehicle, options. Send it alone; an input this tool needs and the object lacks comes back in missing_inputs.'),
+    consignment: z.record(z.string(), z.unknown()).optional().describe('The consignment object, instead of the other arguments. Send it alone.'),
     ...EDITION_SHAPE,
   }).strict(),
 
@@ -1010,26 +898,16 @@ Related: cbm_calculator / chargeable_weight_calculator / ldm_calculator (single-
 
 const unlocodeLookup: ToolDef = {
   name: 'unlocode_lookup',
-  description: `Search 116,086 UN/LOCODE transport locations worldwide — ports, airports, rail and road terminals, inland container depots and border crossings. Codes are 5 characters: a 2-letter ISO country code + a 3-character location code (GBLHR = London Heathrow, NLRTM = Rotterdam).
-
-Provide code for an exact record, or query (name search, min 2 chars) optionally narrowed by country and function_type; limit caps results (default 20, max 100). The spaced notation "GB LHR" reads as GBLHR in either.
-
-Behavior: read-only; exact code hits are provenance-based while fuzzy name hits report match quality via the envelope's confidence (basis match_quality); an unknown code errors with a not-found message. ${RATE}
-
-Returns: the location record(s) — code, name and name_ascii, country, subdivision, functions[], status, coordinates {lat, lon} and iata_code where assigned — under result, ${ENV}
-
-Limitations: an administrative code list (UNECE UN/LOCODE 2025-1) — confirm operational status and coordinates with the port or authority before critical use.
-
-Related: airport_lookup (airport-specific records including ICAO codes), nearest_airport (find airports by coordinates).`,
+  description: `Search 116,086 UN/LOCODE transport locations — ports, airports, rail and road terminals, inland container depots and border crossings (5 characters: country + location, e.g. NLRTM = Rotterdam; "GB LHR" reads as GBLHR). code gives an exact record; query searches names, narrowed by country and function_type; an unknown code errors. For airport records with ICAO codes use airport_lookup; for airports near a coordinate nearest_airport. An administrative code list — confirm operational status and coordinates with the port or authority.`,
 
   schema: z.object({
-    query: z.string().min(2, 'Query must be at least 2 characters').optional().describe('Location name search (min 2 chars). Examples: "rotterdam", "heathrow".'),
+    query: z.string().min(2, 'Query must be at least 2 characters').optional().describe('Location name search.'),
     // "GB LHR", the official spaced notation, is GBLHR (2.22.0, probe S15) — as the hosted tool.
-    code: z.string().regex(/^\s*[A-Za-z]{2}[\s-]?[A-Za-z0-9]{3}\s*$/, 'UN/LOCODE must be 5 characters: 2-letter country + 3-char location, optionally spaced (e.g. "GBLHR" or "GB LHR")').optional().describe('Exact UN/LOCODE — 5 characters, optionally spaced. Examples: "GBLHR", "GB LHR", "NLRTM".'),
-    country: z.string().regex(/^[A-Za-z]{2}$/, 'Country must be a 2-letter ISO code (e.g. "GB", "NL")').optional().describe('Filter by 2-letter ISO country code. Examples: "GB", "NL".'),
+    code: z.string().regex(/^\s*[A-Za-z]{2}[\s-]?[A-Za-z0-9]{3}\s*$/, 'UN/LOCODE must be 5 characters: 2-letter country + 3-char location, optionally spaced (e.g. "GBLHR" or "GB LHR")').optional().describe('Exact UN/LOCODE, 5 characters, optionally spaced ("GB LHR").'),
+    country: z.string().regex(/^[A-Za-z]{2}$/, 'Country must be a 2-letter ISO code (e.g. "GB", "NL")').optional().describe('2-letter ISO country filter.'),
     function_type: z.enum(['port', 'airport', 'rail', 'road', 'icd', 'border']).optional().describe('Filter by location function.'),
     limit: z.number().int().min(1).max(100).optional().describe('Maximum results. Default: 20, max: 100.'),
-    codes: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 UN/LOCODEs. Send alone; answered as results[] in input order, each with its own status. One call against the daily limit, N against the Pro monthly allowance.'),
+    codes: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 UN/LOCODEs. Send alone.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -1066,24 +944,14 @@ Related: airport_lookup (airport-specific records including ICAO codes), nearest
 
 const ukDutyCalculator: ToolDef = {
   name: 'uk_duty_calculator',
-  description: `Estimate UK import duty and VAT for a commodity code using the LIVE GOV.UK Trade Tariff — rates are fetched per request, not from a static table. The CIF value is composed from customs_value + freight_cost + insurance_cost; duty = CIF x the duty rate for the origin country; VAT (typically 20%) applies on the duty-inclusive value.
-
-Provide commodity_code (a declarable 10-digit code), origin_country (ISO-2) and customs_value in GBP; freight_cost, insurance_cost and incoterm are optional refinements.
-
-Behavior: live lookup plus deterministic arithmetic on the returned rate; a 6- or 8-digit code is refused — never padded with zeros to a code you did not send — with declarable_codes, the 10-digit codes beneath it in the UK Trade Tariff (610910 → 6109100010, 6109100090); an origin that is not an ISO 3166-1 country is refused; origin-dependent measures the tariff cannot resolve automatically surface in warnings. ${RATE}
-
-Returns: commodity_code and description, origin country, cif_value, duty_rate (+ percent), duty_amount, vat_rate, vat_amount, total_import_taxes, total_landed_cost and warnings under result (amounts in GBP); validity.as_of marks the live-rate timestamp; ${ENV} ${CASING}
-
-Limitations: an estimate, not a customs ruling — excise, quotas, anti-dumping measures, reliefs and origin-proof requirements can change the outcome; confirm with a customs broker or HMRC before relying on it.
-
-Related: hs_code_lookup (find the 6-digit code first), incoterms_lookup (who actually pays these costs).`,
+  description: `Estimate UK import duty and VAT for a commodity code from the LIVE GOV.UK Trade Tariff: CIF = customs_value + freight_cost + insurance_cost (GBP); duty = CIF x the rate for the origin country; VAT on the duty-inclusive value. commodity_code must be the declarable 10 digits: a 6- or 8-digit code is refused — never padded with zeros — with the declarable codes beneath it. To find the code first use hs_code_lookup; for who pays these costs incoterms_lookup. An estimate, not a customs ruling — confirm with a customs broker or HMRC.`,
 
   schema: z.object({
     // Spaces allowed, as the API and the hosted tool accept ("8471 30 00 00").
-    commodity_code: z.string().regex(/^[\d\s]{6,14}$/, 'Commodity code must be 6–10 digits (spaces allowed)').refine((c) => /^\d{6,10}$/.test(c.replace(/\s/g, '')), 'Commodity code must be 6–10 digits (spaces allowed)').optional().describe('Required unless lines[] is sent. UK tariff commodity code — the declarable 10 digits. Example: "8471300000" (portable computers). A 6- or 8-digit code is refused with the declarable codes beneath it.'),
-    origin_country: z.string().regex(/^[A-Za-z]{2}$/, 'Origin country must be a 2-letter ISO code (e.g., "CN", "DE")').optional().describe('Required unless lines[] is sent. ISO 2-letter country of origin. Examples: "CN", "DE", "US".'),
-    customs_value: z.number().positive().optional().describe('Goods value in GBP. Required unless lines[] is sent. Example: 1000.'),
-    lines: z.array(z.record(z.string(), z.unknown())).min(1).max(10).optional().describe('Batch: up to 10 lines, each { commodity_code, origin_country, customs_value, freight_cost?, insurance_cost?, incoterm? }. Send alone; answered as results[] in input order, each line its own receipt. One call against the daily limit, N against the Pro monthly allowance.'),
+    commodity_code: z.string().regex(/^[\d\s]{6,14}$/, 'Commodity code must be 6–10 digits (spaces allowed)').refine((c) => /^\d{6,10}$/.test(c.replace(/\s/g, '')), 'Commodity code must be 6–10 digits (spaces allowed)').optional().describe('Required unless lines[] is sent. The declarable 10-digit UK commodity code, e.g. "8471300000".'),
+    origin_country: z.string().regex(/^[A-Za-z]{2}$/, 'Origin country must be a 2-letter ISO code (e.g., "CN", "DE")').optional().describe('Required unless lines[] is sent. ISO 2-letter country of origin.'),
+    customs_value: z.number().positive().optional().describe('Goods value, GBP. Required unless lines[] is sent.'),
+    lines: z.array(z.record(z.string(), z.unknown())).min(1).max(10).optional().describe('Batch: up to 10 lines, each { commodity_code, origin_country, customs_value, freight_cost?, insurance_cost?, incoterm? }. Send alone.'),
     // A cost is 0 or more: -1000 took 1,000 off the dutiable value until 2.21.2, here, on the API
     // and on the hosted endpoint alike. The API now refuses a negative cost too.
     freight_cost: z.number().nonnegative('freight_cost must be 0 or more — a cost is never negative').optional().describe('Freight cost in GBP, 0 or more — added to the CIF value. Default: 0.'),
@@ -1123,19 +991,7 @@ Related: hs_code_lookup (find the 6-digit code first), incoterms_lookup (who act
 
 const shipmentSummary: ToolDef = {
   name: 'shipment_summary',
-  description: `Composite shipment analysis in one call: volume (CBM), gross and chargeable weight, road LDM with pallet spaces and a vehicle suggestion (road mode), volumetric weight (air), revenue tonnes with a container suggestion (sea), dangerous-goods presence for items carrying un_number, and UK duty estimates for items carrying hs_code + customs_value.
-
-Provide mode (road | air | sea | multimodal) and items[] (dims in cm, weight in kg PER ITEM, quantity; optional stackable, pallet_type, hs_code, un_number, customs_value PER ITEM, and adr_quantity — the TOTAL for the dangerous-goods line, all pieces together); origin/destination and incoterm refine the duty leg.
-
-Behavior: calls the ldm_calculator, adr_lookup and uk_duty_calculator engines directly; CBM, volumetric weight and revenue tonnes are the same arithmetic inline rather than a call out. Road LDM uses the 2.40 m loading-metre convention divisor and, like ldm_calculator, treats an item with no stackable flag as NOT stacked. modeSpecific.palletSpaces is pallet FLOOR POSITIONS (the figure ldm_calculator reports); palletRows is the separate row count. The suggested vehicle is the smallest that holds the load by its length, its payload and its pallet floor positions — the record's own count when it is a floor count, otherwise worked from its deck (a 7.5t rigid holds 15 Euro pallets on the floor; modeSpecific.suggestedVehicleFloorPositions says which) — and trailerUtilisation is of that vehicle (utilisationBasis names it); the suggested container is the smallest dry box whose record holds the volume and payload. Sections that cannot run (e.g. duty without a customs value) surface in warnings instead of failing the whole call. ${UNKNOWN_FIELDS_REFUSED} ${RATE}
-
-Returns: mode, itemCount, totals {pieces, grossWeight, volumeCBM, chargeableWeight, billingBasis}, modeSpecific (LDM / pallet floor positions / pallet rows / suggested vehicle, or revenue tonnes / container), warnings and dataVersion (road mode attributes the vehicle dataset and the LDM divisor) under result — note this composite's result uses camelCase field names (legacy shape); ${ENV}
-
-Editions: ${EDITIONS}
-
-Limitations: a planning summary, not a quotation or compliance determination.
-
-Related: consignment_calculator (canonical snake_case lines[] shape with advisory flags), cbm_calculator, chargeable_weight_calculator, ldm_calculator, adr_lookup, uk_duty_calculator. ldm_calculator, adr_lookup and uk_duty_calculator are the engines this actually calls; the rest are the single-purpose equivalents of arithmetic it does inline.`,
+  description: `Composite shipment analysis in one call: volume (CBM), gross and chargeable weight, and by mode road LDM with pallet floor positions and a suggested vehicle, air volumetric weight, or sea revenue tonnes with a suggested container; plus dangerous-goods presence for items with un_number and UK duty estimates for items with hs_code + customs_value. weight and customs_value are PER ITEM; adr_quantity is the TOTAL for the dangerous-goods line, all pieces together. An item with no stackable flag is not stacked. Sections that cannot run surface in warnings instead of failing the call. Its result uses camelCase field names (legacy shape). For canonical snake_case lines[] totals with advisory flags use consignment_calculator; single figures cbm_calculator, chargeable_weight_calculator, ldm_calculator; ldm_calculator, adr_lookup and uk_duty_calculator are the engines it calls. ${EDITION_CLAUSE} A planning summary, not a quotation or compliance determination.`,
 
   strictKeys: true,
   schema: strictInput({
@@ -1145,22 +1001,22 @@ Related: consignment_calculator (canonical snake_case lines[] shape with advisor
       length: z.number().positive().describe('Length in cm.'),
       width: z.number().positive().describe('Width in cm.'),
       height: z.number().positive().describe('Height in cm.'),
-      weight: z.number().nonnegative('weight must be 0 or more').describe('Gross weight in kg PER ITEM (per piece) — multiplied by quantity.'),
+      weight: z.number().nonnegative('weight must be 0 or more').describe('Gross weight in kg PER ITEM.'),
       quantity: z.number().int().positive().max(1_000_000, 'quantity must be at most 1,000,000 — the API refuses more').describe('Number of items.'),
       stackable: z.boolean().optional().describe('Whether this item can be stacked (affects pallet fitting).'),
       pallet_type: z.enum(['euro', 'uk', 'us', 'custom', 'none']).optional().describe('Pallet standard the item sits on, if any.'),
       hs_code: z.string().optional().describe('HS code — enables the duty section together with customs_value.'),
       un_number: z.string().optional().describe('UN number — enables the dangerous-goods section.'),
-      adr_quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').optional().describe("OPTIONAL ADR 1.1.3.6.3 quantity for this dangerous-goods line — the total for the whole line, all pieces together (never per piece), in adr_quantity_unit. SEPARATE from weight, which is gross package mass — 1.1.3.6.3 counts none of its four categories that way. Supply both on EVERY dangerous-goods line and adrFlags.totalPoints is calculated; omit either and it stays null."),
-      adr_quantity_unit: z.enum(['L', 'kg']).optional().describe("Dimension of adr_quantity. CHECKED against the dimension 1.1.3.6.3 counts for the row — a litres entry given kilograms still withholds the total."),
-      customs_value: z.number().nonnegative('customs_value must be 0 or more (GBP per item), or omitted').optional().describe('Customs value in GBP PER ITEM (per piece), 0 or more — multiplied by quantity for the line; the duty estimate uses the sum over all lines. Enables the duty section with hs_code.'),
+      adr_quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').optional().describe('ADR 1.1.3.6.3 quantity of the dangerous goods, the TOTAL for the whole line (never per piece), in adr_quantity_unit; separate from weight.'),
+      adr_quantity_unit: z.enum(['L', 'kg']).optional().describe('Dimension of adr_quantity, checked against the one ADR 1.1.3.6.3 counts for the row.'),
+      customs_value: z.number().nonnegative('customs_value must be 0 or more (GBP per item), or omitted').optional().describe('Customs value in GBP PER ITEM; enables the duty section with hs_code.'),
     }, { hints: { un: 'un_number' }, acceptedLabel: 'Accepted on each item' })).min(1, 'items must hold at least one item').max(50, 'at most 50 items — the API refuses more').optional().describe('Required unless consignment is sent. Shipment items with dimensions, weight and optional HS/UN codes.'),
     origin: strictInput({ country: z.string(), locode: z.string().optional() }, { acceptedLabel: 'Accepted in origin and destination' }).optional().describe('Origin — ISO country code and optional UN/LOCODE.'),
     destination: strictInput({ country: z.string(), locode: z.string().optional() }, { acceptedLabel: 'Accepted in origin and destination' }).optional().describe('Destination — ISO country code and optional UN/LOCODE.'),
-    incoterm: z.string().optional().describe('Incoterms 2020 three-letter code. Examples: "DAP", "EXW", "FOB".'),
+    incoterm: z.string().optional().describe('Incoterms 2020 three-letter code.'),
     freight_cost: z.number().nonnegative('freight_cost must be 0 or more (GBP), or omitted for 0').optional().describe('Freight cost in GBP for the duty calculation, 0 or more. Default: 0.'),
     insurance_cost: z.number().nonnegative('insurance_cost must be 0 or more (GBP), or omitted for 0').optional().describe('Insurance cost in GBP for the duty calculation, 0 or more. Default: 0.'),
-    consignment: z.record(z.string(), z.unknown()).optional().describe('Alternative to the other arguments: the consignment object (https://www.freightutils.com/schema/consignment-object.v1.json) — lines[], journey, vehicle, options. Send it alone; an input this tool needs and the object lacks comes back in missing_inputs.'),
+    consignment: z.record(z.string(), z.unknown()).optional().describe('The consignment object, instead of the other arguments. Send it alone.'),
     ...EDITION_SHAPE,
   }, { hints: toItemPath(SHIPMENT_ITEM_FIELDS), acceptedLabel: 'Accepted arguments' }),
 
@@ -1227,20 +1083,10 @@ Related: consignment_calculator (canonical snake_case lines[] shape with advisor
 
 const uldLookup: ToolDef = {
   name: 'uld_lookup',
-  description: `Look up air-cargo ULD (Unit Load Device) specifications — 16 types spanning lower-deck containers (AKE/LD3 and family), main-deck pallets (PMC, PAG and family) and temperature-controlled units. Each record carries external/internal/door dimensions (cm), tare and max gross weight (kg), usable volume (m³), deck position and compatible aircraft.
-
-Provide type as an IATA code ("AKE", "PMC"), slug ("ake-ld3") or the record's own name when one record carries it ("LD3" → AKE); omit it to list all 16; category (container | pallet | special) and deck (lower | main) filter the list.
-
-Behavior: read-only; an unknown type errors with the closest codes; a single record carries its provenance (sources, audited_at, decision_rationale). ${LIST_TEXT} ${RATE}
-
-Returns: the ULD record (or the list) under result, ${ENV} ${CASING}
-
-Limitations: specs are compiled from manufacturer and carrier-published sources with ≥7 cited sources per record. Provenance is PENDING, not verified — read the envelope's provenance_status rather than this sentence. Second-agent coverage is now COMPLETE — every cited record-URL pairing has been opened and verdicted by a second agent, and 145 of 148 citations carry a timestamped read (the 3 without one were never opened, and say so). COVERAGE IS NOT AGREEMENT, which is why provenance is still pending: reading every page is what made the disagreements visible, not what resolved them. The second agent also WITHDRAWS stamps — pages a first pass had confirmed turned out not to list the code, or to disagree once somebody read the words around them — so treat an unstamped citation as evidence that was tried and failed, not evidence not yet gathered. CORROBORATION IS COUNTED BY PUBLISHER, NOT BY URL: the 148 citations resolve to 125 distinct sources, because several records cite one publisher at several of its own addresses (one carrier's pallet table appears in three of its documents) and several forwarders republish a single upstream template. Two citations of the same source cannot corroborate each other, so a long source list is not the same as a well-corroborated record. Treat tare_weight with particular caution: it is confirmed by no non-tertiary source on 13 of the 16 records. PGA's 565 kg is now read-confirmed by one carrier (Cathay, basis stated on the page as including nets) while two other carrier pages publish 535 kg and 505-545 kg on that same basis, so it is the top of a contested band rather than an agreed figure. Confidence is medium and a PROVENANCE_PENDING advisory rides every response. Pallet records (PMC, PAG, PGA, PLA, PAJ, PMCQ7) have NO internal dimensions — a pallet has no walls or roof; read max_build_up_height_cm for the aircraft contour ceiling and do not multiply dimensions to get a volume. Airline-specific ULD variants still differ; confirm operationally critical dimensions with the carrier.
-
-Related: chargeable_weight_calculator (what the cargo inside is billed at), container_lookup (the sea-freight equivalent), airline_lookup (whose aircraft it flies on).`,
+  description: `Air-cargo ULD (unit load device) specifications — 16 types: lower-deck containers (AKE/LD3 and family), main-deck pallets (PMC, PAG and family) and temperature-controlled units. type as an IATA code ("AKE"), slug ("ake-ld3") or the record's own name ("LD3" → AKE) gives one record; omit it to list all 16; category and deck filter. Pallet records have no internal dimensions — read max_build_up_height_cm, and do not multiply dimensions for a volume. For the sea-freight equivalent use container_lookup; for what the cargo inside is billed at chargeable_weight_calculator; for whose aircraft it flies on airline_lookup. Provenance is pending, not verified (treat tare_weight with particular caution); confirm operationally critical dimensions with the carrier.`,
 
   schema: z.object({
-    type: z.string().min(2, 'ULD type must be at least 2 characters').optional().describe('IATA ULD code or slug. Examples: "AKE", "PMC", "ake-ld3". Omit to list all 16.'),
+    type: z.string().min(2, 'ULD type must be at least 2 characters').optional().describe('IATA ULD code ("AKE") or slug. Omit to list all.'),
     category: z.enum(['container', 'pallet', 'special']).optional().describe('Filter by ULD category.'),
     deck: z.enum(['lower', 'main']).optional().describe('Filter by deck position.'),
     ...LIST_FIELDS,
@@ -1265,20 +1111,10 @@ Related: chargeable_weight_calculator (what the cargo inside is billed at), cont
 
 const vehicleLookup: ToolDef = {
   name: 'vehicle_lookup',
-  description: `Look up road-freight vehicle and trailer specifications — 17 types: EU articulated trailers (standard/mega curtainsider, box, reefer, double-deck, flatbed, low-loader), US 53ft/48ft dry vans, rigid trucks (7.5-26 t) and vans (Luton, Transit, Sprinter). Each record carries internal dimensions, payload and gross weights, euro/UK pallet capacity, axle configuration and features.
-
-Provide slug (e.g. "standard-curtainsider") for one record; omit it to list all 17; category (articulated | rigid | van) and region (EU | US) filter the list.
-
-Behavior: read-only; an unknown slug errors with the valid list and the closest slugs; a single record carries its provenance (sources, audited_at, decision_rationale). ${LIST_TEXT} ${RATE}
-
-Returns: the vehicle record (or the list) under result, ${ENV} ${CASING}
-
-Limitations: typical specs, provenance pending independent verification (the envelope's provenance_status says so) — real equipment varies by operator and build; legal payload is set by the vehicle's plated weights.
-
-Related: ldm_calculator (whether a pallet load fits), pallet_fitting_calculator, consignment_calculator.`,
+  description: `Road-freight vehicle and trailer specifications — 17 types: EU articulated trailers, US 53ft/48ft dry vans, rigid trucks (7.5-26 t) and vans; internal dimensions, payload and gross weights, pallet capacity, axles. slug gives one record; omit it to list all 17; category (articulated | rigid | van) and region (EU | US) filter. For whether a pallet load fits use ldm_calculator; also pallet_fitting_calculator and consignment_calculator. Typical specs, provenance pending — legal payload is set by the vehicle's plated weights.`,
 
   schema: z.object({
-    slug: z.string().min(2, 'Vehicle slug must be at least 2 characters').optional().describe('Vehicle slug. Examples: "standard-curtainsider", "mega-trailer". Omit to list all 17.'),
+    slug: z.string().min(2, 'Vehicle slug must be at least 2 characters').optional().describe('Vehicle slug ("standard-curtainsider"). Omit to list all.'),
     category: z.enum(['articulated', 'rigid', 'van']).optional().describe('Filter by vehicle category.'),
     region: z.enum(['EU', 'US']).optional().describe('Filter by region.'),
     ...LIST_FIELDS,
@@ -1303,33 +1139,19 @@ Related: ldm_calculator (whether a pallet load fits), pallet_fitting_calculator,
 
 const adrLqEqCheck: ToolDef = {
   name: 'adr_lq_eq_check',
-  description: `Check whether dangerous goods qualify for ADR Limited Quantity (LQ, ADR 3.4) or Excepted Quantity (EQ, ADR 3.5) relief. LQ compares each item's per-inner-packaging quantity against that substance's LQ maximum; EQ resolves the substance's E-code (E0-E5) and checks the per-inner limit, plus the per-outer limit when inner_packaging_qty is given.
-
-Provide mode ("lq" or "eq") and 1-20 items, each with un_number, quantity and unit — ml or L for liquids, g or kg for solids; quantity is per INNER packaging, not the whole load.
-
-Unit families: column (7a) states the limit in ONE dimension — a mass for some entries, a volume for others — and ADR supplies no density, so a mass quantity against a volume limit (or the reverse) CANNOT be compared. Those items return status 'inconclusive' with the dimension named, never a pass or a fail, and a batch holding any inconclusive item never reads overall_status 'qualifies'. Send the quantity in the unit given by lq_limit_unit to get a verdict. Multi-variant UNs: a UN number with more than one ADR Table A row (packing group / concentration variant — e.g. UN 1789 PG II LQ 1 L vs PG III LQ 5 L) needs packing_group (I|II|III) or variant_index (from adr_lookup) on that item to pin one row. A packing_group that still leaves several rows is enough when those rows agree on class, column (7a), column (7b) and scope (UN 1790 PG I: two concentration bands, both LQ 0 / E0) — the item is answered with equivalent_variants + variant_note naming the rows it holds for; only when the rows DISAGREE does it still ask for variant_index, and candidates[] then lists only that packing group's rows. With no disambiguator at all: a single-item call, or a batch where EVERY item is ambiguous, returns blocking_errors[AMBIGUOUS_UN_VARIANT] + human_review_required + candidates[] (each candidate's item_index, un_number, variant_index, packing_group, proper_shipping_name, limited_quantity, excepted_quantity) and NO verdict; a MIXED batch withholds only the ambiguous item (status 'withheld', withheld true, row fields null) while the other items are answered, overall_status never reads 'qualifies' while an item is withheld, summary carries withheld, and the envelope carries human_review_required + candidates[] plus one AMBIGUOUS_UN_VARIANT warning per withheld item. Never a silently checked packing group. Single-row UNs are unchanged.
-
-Behavior: deterministic reference check; each item gets a status and reason (an LQ value of "0" or code E0 means the relief is not permitted for that substance), with overall_status and summary counts across the batch. Table A rows listed "NOT SUBJECT TO ADR" (e.g. UN 1845 dry ice) get item status not_subject — outside ADR scope, neither a pass nor a fail — and an all-not-subject batch returns overall_status not_applicable; "CARRIAGE PROHIBITED" rows are not_permitted with the prohibition stated in reason. ${UNKNOWN_FIELDS_REFUSED} ${RATE}
-
-Returns: mode, overall_status (qualifies | does_not_qualify | partial | not_applicable | inconclusive), items[] (un_number, variant_index, substance, class, packing_group, lq_limit or eq_code, quantity_entered, status — within_limit | exceeds_limit | not_permitted | not_subject | inconclusive | withheld — reason, scope flags where applicable, withheld + ambiguity_reason on a withheld item, and equivalent_variants + variant_note when a packing group resolved by equivalence), summary {total_items, qualifying, exceeding, not_permitted, not_subject?, inconclusive?, withheld?}, the ADR chapter references, and human_review_required + candidates[] when any item is withheld — all under result — or, when every item is ambiguous, human_review_required + candidates[] with blocking_errors, ${ENV}
-
-Editions: ${EDITIONS}
-
-Limitations: a quantity-threshold check only — LQ/EQ relief also requires packaging, marking and documentation conformity that this tool does not assess; not legal advice, verify against the current UNECE ADR text.
-
-Related: adr_lookup (the per-substance LQ/EQ values + variant_index), adr_exemption_calculator (the 1.1.3.6 load-points route instead).`,
+  description: `Whether dangerous goods qualify for ADR Limited Quantity (LQ, ADR 3.4) or Excepted Quantity (EQ, ADR 3.5) relief, item by item. Send mode ("lq" or "eq") and 1-20 items, each with un_number, quantity per INNER packaging (not the whole load) and unit (ml or L for liquids, g or kg for solids); inner_packaging_qty adds the EQ per-outer check. A mass against a volume limit (or the reverse) cannot be compared: that item is inconclusive — send the unit given by lq_limit_unit. A UN number whose Table A rows disagree needs packing_group or variant_index, else no verdict for it (AMBIGUOUS_UN_VARIANT with candidates[]). For the 1.1.3.6 load-points route use adr_exemption_calculator; for the per-substance LQ/EQ values and variant_index adr_lookup. ${EDITION_CLAUSE} A quantity-threshold check only — packaging, marking and documentation conformity are not assessed; not legal advice, verify against the current UNECE ADR text.`,
 
   strictKeys: true,
   schema: strictInput({
-    mode: z.enum(['lq', 'eq']).describe('Check mode: "lq" (Limited Quantity, ADR 3.4) or "eq" (Excepted Quantity, ADR 3.5).'),
+    mode: z.enum(['lq', 'eq']).describe('lq (Limited Quantity, ADR 3.4) or eq (Excepted Quantity, ADR 3.5).'),
     items: z.array(strictInput({
       // "UN 1263" accepted (2.22.0, probe S36) — the same pattern as the hosted adr_lq_eq_check.
-      un_number: z.string().regex(/^\s*(?:UN\s*)?\d{4}\s*$/i, 'UN number must be 4 digits, optionally prefixed with "UN" (e.g. "1203", "UN1263", "UN 1263")').describe('UN number — 4 digits, optionally "UN"-prefixed; explosives keep the leading zero. Examples: "1203", "UN1263", "UN 1263", "0004".'),
-      quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').describe('Quantity per INNER packaging, in the chosen unit. Example: 0.5.'),
+      un_number: z.string().regex(/^\s*(?:UN\s*)?\d{4}\s*$/i, 'UN number must be 4 digits, optionally prefixed with "UN" (e.g. "1203", "UN1263", "UN 1263")').describe('UN number, 4 digits, optionally "UN"-prefixed ("0004" keeps its zero).'),
+      quantity: z.number().positive().max(1_000_000_000, 'quantity must be at most 1,000,000,000 — the API refuses more').describe('Quantity per INNER packaging, in unit.'),
       unit: z.enum(['ml', 'L', 'g', 'kg']).describe('Unit: "ml" or "L" for liquids, "g" or "kg" for solids.'),
-      inner_packaging_qty: z.number().int().positive().max(...wholeMax('inner_packaging_qty')).optional().describe('EQ mode only: number of inner packagings per outer package, for the per-outer limit check. Example: 10.'),
-      packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group (I, II or III) — only needed to disambiguate a UN with more than one ADR Table A row (e.g. UN 1789). Ignored for single-row UNs.'),
-      variant_index: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER, 'variant_index must be a safe integer').optional().describe('ADR Table A variant index (as returned by adr_lookup) — pins one row when a UN has several variants sharing a packing group (concentration bands). Ignored for single-row UNs.'),
+      inner_packaging_qty: z.number().int().positive().max(...wholeMax('inner_packaging_qty')).optional().describe('EQ mode only: inner packagings per outer package.'),
+      packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group, to pin one row of a multi-row UN.'),
+      variant_index: z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER, 'variant_index must be a safe integer').optional().describe('ADR Table A variant index (from adr_lookup), to pin one row.'),
     }, { hints: { innerpackagings: 'inner_packaging_qty', un: 'un_number', qty: 'quantity' }, acceptedLabel: 'Accepted on each item' })).min(1).max(20).describe('Items to check (1-20 per call).'),
     ...EDITION_SHAPE,
   }, {
@@ -1397,31 +1219,31 @@ const CC_PLACE = z.string().regex(/^[A-Za-z]{2}(?:\s?[A-Za-z2-9]{3})?$/, 'a plac
 const CC_MONEY = strictInput({ amount: z.number().nonnegative().max(1e12), currency: z.string().regex(/^[A-Z]{3}$/) }, { acceptedLabel: 'Accepted in an amount' });
 const CC_LINE = strictInput({
   description: z.string().max(200).optional().describe('What the line is, at most 200 characters.'),
-  un_number: z.string().regex(/^(?:(?:UN\s?)?\d{4}|ID\s?\d{4})$/i, 'un_number must be 4 digits, optionally "UN"-prefixed (e.g. "1203", "UN1203"), or an ID-prefixed air-only number (e.g. "ID 8000")').optional().describe('UN number of a dangerous-goods line ("1203", "UN1203"), or an ID-prefixed air-only number ("ID 8000"). A line without one is listed and not read by the dangerous-goods checks.'),
+  un_number: z.string().regex(/^(?:(?:UN\s?)?\d{4}|ID\s?\d{4})$/i, 'un_number must be 4 digits, optionally "UN"-prefixed (e.g. "1203", "UN1203"), or an ID-prefixed air-only number (e.g. "ID 8000")').optional().describe('UN number ("1203", "UN1203") or ID-prefixed air-only number ("ID 8000"); a line without one is not a dangerous-goods line.'),
   packing_group: z.enum(['I', 'II', 'III']).optional().describe('Packing group, to pin one ADR Table A row of a multi-row UN.'),
   variant_index: z.number().int().nonnegative().max(1000).optional().describe('ADR Table A variant index (as adr_lookup returns it), to pin one row.'),
   quantity: strictInput({
-    value: z.number().nonnegative().max(1_000_000_000).describe('The dangerous-goods quantity for the whole line, all packages together. 0 = not carried (left out of 1.1.3.6, named in a warning).'),
-    unit: z.enum(['L', 'kg']).optional().describe('"L" or "kg" — checked against the dimension ADR 1.1.3.6.3 counts for the row.'),
+    value: z.number().nonnegative().max(1_000_000_000).describe('The dangerous-goods quantity for the whole line, all packages together; 0 = not carried.'),
+    unit: z.enum(['L', 'kg']).optional().describe('L or kg, checked against the dimension ADR 1.1.3.6.3 counts.'),
     basis: z.enum(['net', 'gross']).optional().describe('"net" or "gross"; a gross mass on a mass-counted row is an upper bound.'),
   }, { acceptedLabel: 'Accepted in quantity' }).optional().describe('The dangerous-goods quantity (ADR 1.1.3.6.3).'),
   packages: strictInput({
     count: z.number().int().positive().max(100_000),
     type: z.string().max(40).optional(),
     gross_kg: z.number().positive().max(1_000_000).optional(),
-    un_mark: z.string().min(1).max(80).optional().describe('The UN packaging mark the line\'s packagings bear, as printed (ADR 6.1.3.1), e.g. "UN 4G/Y145/S/02/NL/VL823" — read by packaging_code_validity in the order of 6.1.3.1: (a) the symbol, (b) the 6.1.2.7 code, (c) the packing-group letter X / Y / Z and the relative density or gross mass, (d) S or the test pressure in kPa, (e) the year, (f) the State, (g) the maker; the letter is held against the line\'s packing group.'),
-  }, { acceptedLabel: 'Accepted in packages' }).optional().describe('The pieces. A line in packages is "other carriage" for the ADR 8.6.4 tunnel table; a line without packages whose code treats tank and other carriage differently is asked about.'),
+    un_mark: z.string().min(1).max(80).optional().describe('The UN packaging mark as printed (ADR 6.1.3.1), e.g. "UN 4G/Y145/S/02/NL/VL823".'),
+  }, { acceptedLabel: 'Accepted in packages' }).optional().describe('The pieces; a line in packages is "other carriage" for the ADR 8.6.4 tunnel table.'),
   hs_code: z.string().regex(/^\d{6,10}$/).optional(),
   value: CC_MONEY.optional(),
   dims: strictInput({ l: z.number().positive().max(100_000), w: z.number().positive().max(100_000), h: z.number().positive().max(100_000), unit: z.enum(['mm', 'cm', 'm', 'in']) }, { acceptedLabel: 'Accepted in dims' }).optional(),
   stackable: z.boolean().optional(),
-  icao_limited_quantity: z.boolean().optional().describe('On an ID-prefixed line only: the packages are limited quantities to the ICAO Technical Instructions (3.4.8 mark / 3.4.10). Without it such a line has no 1.1.3.6 verdict.'),
+  icao_limited_quantity: z.boolean().optional().describe('ID-prefixed line only: the packages are ICAO Technical Instructions limited quantities (3.4.8 mark / 3.4.10).'),
   inner_packaging: strictInput({
     quantity: z.number().positive().max(1_000_000).describe('The quantity in ONE inner packaging.'),
     unit: z.enum(['ml', 'L', 'g', 'kg']),
     per_outer: z.number().int().min(1).max(100_000).optional().describe('Inner packagings in one outer packaging (default 1) — the excepted-quantity outer limit.'),
-    regime: z.enum(['lq', 'eq']).optional().describe('The exemption the line is meant to use; a stated regime that is missed fails. Omitted, both are checked, and a line that fits neither is not_applicable (the full requirements apply).'),
-  }, { acceptedLabel: 'Accepted in inner_packaging' }).optional().describe('The inner packaging, for the limited / excepted quantity check (Table A columns (7a) / (7b)).'),
+    regime: z.enum(['lq', 'eq']).optional().describe('The exemption the line is meant to use (a stated regime that is missed fails); omitted, both are checked and a line that fits neither is not_applicable.'),
+  }, { acceptedLabel: 'Accepted in inner_packaging' }).optional().describe('The inner packaging, for the limited / excepted quantity check.'),
 }, { acceptedLabel: 'Accepted on each line' });
 
 const CC_CITATION = loose({ section: z.string(), volume: z.string(), pdf_page: z.union([z.number(), z.array(z.number())]), document: z.string(), quote: z.string(), table_a_columns: z.string() });
@@ -1440,19 +1262,9 @@ const EQUIPMENT_8_1_5_ITEMS = ['wheel_chock', 'warning_signs', 'eye_rinsing_liqu
 
 const adrConsignmentCheck: ToolDef = {
   name: 'adr_consignment_check',
-  description: `One call on the consignment object for the ADR picture of a road load: the 1.1.3.6 small-load verdict, the limited / excepted quantity check of each line, the tunnel restriction code of the whole load against the tunnels on the route, each line's transport-document entry, mixed loading (7.5.2, with the foodstuffs precautions of 7.5.4), and the vehicle side — orange-coloured plates and placards (5.3), the documents, fire extinguishers and equipment on the transport unit (8.1), and driver training (8.2); and the UN packaging mark of each line (6.1.3.1). The rules are page-cited to the free UNECE ADR 2025 publication.
+  description: `One call on the consignment object for the ADR picture of a road load: the 1.1.3.6 small-load verdict, the limited / excepted quantity check of each line, the tunnel restriction code of the whole load against the tunnels on the route, each line's transport-document entry, mixed loading (7.5.2, with the foodstuffs precautions of 7.5.4), and the vehicle side — orange-coloured plates and placards (5.3), the documents, fire extinguishers and equipment on the transport unit (8.1), and driver training (8.2); and the UN packaging mark of each line (6.1.3.1). The rules are page-cited to the free UNECE ADR 2025 publication. For the 1.1.3.6 check alone use adr_exemption_calculator; LQ / EQ alone adr_lq_eq_check; a row's columns adr_lookup.
 
-Provide lines[] — each dangerous-goods line with un_number, quantity {value, unit, basis} and, where it applies, packing_group / variant_index, packages {count, type, gross_kg, un_mark (the UN packaging mark as printed, 6.1.3.1)}, inner_packaging {quantity, unit, per_outer?, regime?} and (ID lines only) icao_limited_quantity — and optionally journey {date, tunnels_on_route (A–E), mode}, vehicle {max_mass_t (the transport unit's maximum permissible mass — the 8.1.4.1 band, 3.4.13), foodstuffs_carried (ADR 7.5.4), fire_extinguishers_kg[], orange_plates_displayed, placards_displayed, equipment_8_1_5[] (the 8.1.5 items by name), instructions_in_writing}, crew {adr_training_certificate, specialisations[] (class_1, class_7, tanks), photo_identification, awareness_training_1_3}, edition and as_of. journey.date is the default as_of; an as_of that contradicts it is refused.
-
-Behavior: deterministic. The 1.1.3.6 check is the adr_exemption_calculator's answer, whole (basis, basis_until, strict_adr_2027, items[].state incl. EXCLUDED_NIL / BLOCKED / AIR_ONLY_ID). The LQ / EQ checks are the adr_lq_eq_check answer per line with inner_packaging. The tunnel check assigns the whole load the most restrictive code (8.6.3.2, ranked by the categories the 8.6.4 table forbids for the carriage), gives which tunnels on the route the load may use without and with the 1.1.3.6 relief (8.6.3.3: goods carried under 1.1.3 are not subject to tunnel restrictions unless the unit must bear the 3.4.13 mark), and computes the net explosive mass for B1000C / C5000D. The document entries follow 5.4.1.1.1 (a), (b), (c), (d), (k) in that order, from Table A columns (1)–(5) and (15) — e.g. "UN 1098 ALLYL ALCOHOL, 6.1 (3), I, (C/D)"; a row whose name joins names by "or" gives one entry per name (3.1.2.2); for a load within 1.1.3.6 the total quantity and calculated value per transport category (NOTE 1 to 5.4.1.1.1 (f)). A generic or N.O.S. row assigned special provision 274 or 318 is conditional on the document until its technical name is added in brackets (3.1.2.8.1 — the object carries none); a CARRIAGE PROHIBITED line and an ID line get no entry (entry null, the reason given) and leave the document insufficient_data — an ID line stated as an ICAO limited quantity carries no entry (3.4.1) and is not counted against it. Mixed loading reads the lines as one load in one transport unit: every pair of lines against the 7.5.2.1 table by the labels of Table A column (5) (subsidiary labels included; "4.1 + 1" / "5.2 + 1" as printed), Class 1 pairs against the 7.5.2.2 table by compatibility group; a lettered note the rows settle is settled (1.4S; UN 2990 / 3072 / 3268; UN 0503 with 3268), one that turns on a fact the object does not carry answers conditional with the note quoted; a line whose LQ / EQ check passes is still read as a package of its row, with the 3.4.1 / 3.5.1.1 relief and 7.5.2.4 stated as conditions; a load within 1.1.3.6 is checked all the same (1.1.3.6.2 does not lift 7.5.2); goods with CV28 engage 7.5.4 (ADR 2027: as amended). The vehicle side lists, per check, the requirements the load puts on the vehicle — read from the Table A rows (class, classification code, column (5) labels, column (19) S-provisions) and the 1.1.3.6 verdict — and checks each against its input: met → pass, not met → fail with the rule quoted, not sent → conditional (the input named, optional, in missing_inputs). Plates: two plain orange-coloured plates (5.3.2.1.1); placards on a vehicle carrying packages only for Class 1 other than 1.4S and Class 7 other than excepted packages (5.3.1.5), the model by 5.3.1.1.2; the 5.3.6 mark with placards; the 3.4.13 LQ mark as a condition on a unit over 12 t. Equipment: the 8.1.2.1 documents, the 8.1.4.1 extinguisher table by mass, the 8.1.5 items by danger label. Training: the 8.2.1 certificate and the Class 1 / Class 7 specialisation (8.2.1.4). Under 1.1.3.6 they read 1.1.3.6.2: no Chapter 5.3, one 2 kg extinguisher (8.1.4.2), the transport document, training per Chapter 1.3 (8.2.3) for a driver without the certificate. Where the text does not settle a case (a code that splits tank and other carriage on a line with no packages; a Class 1 line not in net kg) the check asks instead of assuming. fail means a check the load does not meet; a relief that does not apply is not_applicable, not fail, and does not change the status — a load outside 1.1.3.6 (the full requirements apply, and the other checks answer for a fully regulated load) or a line with no stated regime that fits neither LQ nor EQ; a stated regime that is missed, and a CARRIAGE PROHIBITED entry, still fail. The packaging check reads each line's packages.un_mark by the grammar of 6.1.3.1 — (a) the symbol, (b) the code of the 6.1.2.7 table (T / V / W may follow), (c) the packing-group letter and the relative density or gross mass, (d) S or the test pressure (rounded down to 10 kPa), (e) year, (f) State, (g) maker — and holds the letter against the line's packing group (X: I, II, III; Y: II, III; Z: III): malformed, or a letter that does not cover it → fail with the field named; no mark → conditional (optional, in missing_inputs); a line within its stated LQ / EQ regime and sent without a mark → not_applicable (3.4.1 / 3.5.1.1); a Class 7 package or a Class 2 gas in pressure receptacles (column (8) P200 / P203) → not_applicable (marked under 6.4 / 6.2), any other Class 2 line → not_assessed; an ID line, or a line that matches more than one Table A row → insufficient_data; a row without a packing group → conditional (the letter is held against the level its packing instruction sets, not read); an IBC or large-packaging mark → conditional (6.5.2.1.1 / 6.6.3.1 not read). A limited / excepted quantity line whose stated regime is met is left out of the 1.1.3.6 total (1.1.3.6.5; exemption_1_1_3_6.engine.excluded_lines names it); a line that states no regime is counted. regime names the rules the checks answered under: "1.1.3.6" (the load is within it — the vehicle side reads 1.1.3.6.2), "full_adr" (it is not — a fully regulated load), "undetermined" (the 1.1.3.6 check gave no verdict). ${RATE}
-
-Returns: status (pass | fail | conditional | insufficient_data), regime ("1.1.3.6" | "full_adr" | "undetermined" — the rules the checks answered under; null without dangerous goods), missing_inputs[] ({name, check, what}), checks_performed[] ({name, verdict, required, edition, as_of, basis, citations[] — section, volume, PDF page, a short quotation}), edition, as_of, edition_basis, lines[], exemption_1_1_3_6 {verdict, basis, conditions, engine}, limited_quantities and excepted_quantities {verdict, lines[] {line_index, verdict, reason, answer}}, tunnel_restriction {verdict, lines[], whole_load {codes, forbidden_categories, complete}, route {tunnels_on_route, without_1_1_3_6_relief, with_1_1_3_6_relief}, needs_info[]}, transport_document {verdict, lines[] (elements a–k, strings; entry null and a reason where no entry is written), exemption_1_1_3_6_statement, conditions[]}, mixed_loading_7_5_2 {verdict, basis, lines[] {line_index, un_number, labels[], classification_code, compatibility_group}, pairs[] {a, b, labels_a, labels_b, permitted (true | false | "conditional"), cell, note, source_ref}, class_1 {assessed, pairs[]}, foodstuffs {engaged, lines[], input, verdict}, conditions[], needs_info[], notes[]}, placards_and_plates_5_3 {verdict, basis, requirements[] {id, applies (true | false | "under_relief_only" | "conditional"), basis, quantity, specification, lines[], source_ref}, orange_plates {required, numbered}, placards {required, lines[] {line_index, placards[]}}, marks[], lq_mark {applies, condition}, conditions[], needs_info[], notes[]}, equipment_8_1 {verdict, basis, requirements[], fire_extinguishers {band, minimum_total_kg, minimum_largest_kg, small_load_rule, on_board, verdict}, general_equipment[] and label_specific_equipment[] {item, applies, lines[], on_board, outcome}, documents[], conditions[], needs_info[], notes[]}, driver_training_8_2 {verdict, basis, requirements[], certificate {required, under_relief, specialisations[], outcome}, awareness_training_1_3 {applies, outcome}, conditions[], needs_info[], notes[]}, packaging_code_validity {verdict, basis, lines[] {line_index, un_number, verdict, mark, field (on fail: the 6.1.3.1 sub-paragraph), parsed {symbol, code, code_suffix, letter, covers, relative_density, max_gross_mass_kg, solids_or_inner, test_pressure_kpa, year, state, manufacturer}, reason}, notes[]} — all under result — ${ENV} A call made with an API key stores a check receipt (_meta.check_id); without one the answer carries the receipt hash (_meta.receipt) and nothing is stored.
-
-Editions: ${EDITIONS}
-
-Limitations: the packaging check reads the mark, not the packaging kind — whether the packaging is one the line's packing instruction (Table A column (8)) allows is not checked (6.1.3 NOTE 1), IBC / large-packaging marks are named, not read, and on a row without a packing group (articles, most of Class 1) the letter is not held against anything; without packages.un_mark a dangerous-goods line is conditional on the packaging check; the vehicle-side checks read the load, so without the vehicle.* / crew.* inputs a dangerous-goods load is conditional (the requirements listed); the vehicle side does not assess the vehicle approval of Part 9, the elevated temperature mark (5.3.3 — the object carries no temperature), handling and stowage (7.5.7) or national equivalent training; a limited / excepted quantity relief is applied only where the line states it (inner_packaging.regime) and meets it — in the 1.1.3.6 total — and is otherwise stated as a condition, never assumed; the foodstuffs part of mixed loading needs vehicle.foodstuffs_carried (without it, a condition); column (6) special provisions that change the labels are not applied; limited / excepted quantities are not taken out of the tunnel code (the object does not say a line is carried so); not legal advice, verify against the current UNECE ADR text.
-
-Related: adr_exemption_calculator (the 1.1.3.6 check alone), adr_lq_eq_check (LQ / EQ alone), adr_lookup (a row's columns).`,
+Send lines[] (un_number, quantity {value, unit, basis} and, where they apply, packing_group / variant_index, packages with un_mark, inner_packaging) and optionally journey, vehicle and crew; journey.date is the default as_of, and an as_of that contradicts it is refused. A check whose input is not sent is conditional, the input named in missing_inputs — never assumed. status is pass | fail | conditional | insufficient_data; a relief that does not apply is not_applicable, not fail. ${EDITION_CLAUSE} Not checked: whether the packaging kind is one the packing instruction allows, IBC / large-packaging marks, the vehicle approval of Part 9, the elevated temperature mark (5.3.3), handling and stowage (7.5.7). Not legal advice, verify against the current UNECE ADR text.`,
 
   strictKeys: true,
   schema: strictInput({
@@ -1466,21 +1278,21 @@ Related: adr_exemption_calculator (the 1.1.3.6 check alone), adr_lq_eq_check (LQ
     }, { acceptedLabel: 'Accepted in journey' }).optional(),
     vehicle: strictInput({
       type: z.string().max(60).optional(),
-      max_mass_t: z.number().positive().max(100).optional().describe('The transport unit\'s maximum permissible mass, tonnes (ADR 8.1.4.1 column (1); 3.4.13).'),
+      max_mass_t: z.number().positive().max(100).optional().describe('The transport unit\'s maximum permissible mass, tonnes.'),
       axles: z.number().int().min(1).max(12).optional(),
-      foodstuffs_carried: z.boolean().optional().describe('Foodstuffs, other articles of consumption or animal feeds are carried in the same vehicle or container (ADR 7.5.4, read for goods with CV28).'),
-      fire_extinguishers_kg: z.array(z.number().positive().max(100)).max(20).optional().describe('Each portable fire extinguisher on board, kg dry powder or equivalent (ADR 8.1.4.1 / 8.1.4.2).'),
-      orange_plates_displayed: z.boolean().optional().describe('The two orange-coloured plates, front and rear (ADR 5.3.2.1.1).'),
-      placards_displayed: z.boolean().optional().describe('The placards ADR 5.3.1.5 requires (Class 1 other than 1.4S; Class 7), both sides and the rear.'),
-      equipment_8_1_5: z.array(z.enum(EQUIPMENT_8_1_5_ITEMS)).max(EQUIPMENT_8_1_5_ITEMS.length).optional().describe('The ADR 8.1.5.2 / 8.1.5.3 items on board, by name; an item not listed is read as not on board.'),
-      instructions_in_writing: z.boolean().optional().describe('The instructions in writing of ADR 5.4.3 in the driver\'s cab (8.1.2.1 (b)).'),
-    }, { acceptedLabel: 'Accepted in vehicle' }).optional().describe('Read: max_mass_t (8.1.4.1, 3.4.13), foodstuffs_carried (7.5.4) and the vehicle-side inputs (5.3, 8.1).'),
+      foodstuffs_carried: z.boolean().optional().describe('Foodstuffs or animal feeds are carried in the same vehicle or container (ADR 7.5.4).'),
+      fire_extinguishers_kg: z.array(z.number().positive().max(100)).max(20).optional().describe('Each portable fire extinguisher on board, kg (ADR 8.1.4).'),
+      orange_plates_displayed: z.boolean().optional().describe('The two orange-coloured plates are displayed.'),
+      placards_displayed: z.boolean().optional().describe('The placards ADR 5.3.1.5 requires are displayed.'),
+      equipment_8_1_5: z.array(z.enum(EQUIPMENT_8_1_5_ITEMS)).max(EQUIPMENT_8_1_5_ITEMS.length).optional().describe('The ADR 8.1.5 items on board; an item not listed is read as not on board.'),
+      instructions_in_writing: z.boolean().optional().describe('The ADR 5.4.3 instructions in writing are in the cab.'),
+    }, { acceptedLabel: 'Accepted in vehicle' }).optional().describe('The vehicle-side inputs (ADR 5.3, 7.5.4, 8.1).'),
     crew: strictInput({
       adr_training_certificate: z.boolean().optional().describe('The driver holds the ADR 8.2.1 training certificate.'),
-      specialisations: z.array(z.enum(['class_1', 'class_7', 'tanks'])).max(3).optional().describe('The specialisations on the certificate (8.2.1.3, 8.2.1.4).'),
+      specialisations: z.array(z.enum(['class_1', 'class_7', 'tanks'])).max(3).optional().describe('The specialisations on the certificate.'),
       photo_identification: z.boolean().optional().describe('Each crew member carries identification with a photograph (8.1.2.1 (d)).'),
-      awareness_training_1_3: z.boolean().optional().describe('The driver is trained according to Chapter 1.3 (8.2.3) — what a 1.1.3.6 load keeps for a driver without the certificate.'),
-    }, { acceptedLabel: 'Accepted in crew' }).optional().describe('The vehicle crew, for the driver-training and document checks (ADR 8.2, 8.1.2). Facts only — no name.'),
+      awareness_training_1_3: z.boolean().optional().describe('The driver is trained according to Chapter 1.3 (8.2.3).'),
+    }, { acceptedLabel: 'Accepted in crew' }).optional().describe('The crew, for the driver-training and document checks. Facts only — no name.'),
     options: z.record(z.string(), z.unknown()).optional().describe('The consignment object\'s options; not read by this check.'),
     ...EDITION_SHAPE,
   }, {
@@ -1590,11 +1402,7 @@ Related: adr_exemption_calculator (the 1.1.3.6 check alone), adr_lq_eq_check (LQ
 
 const getSubscribeLink: ToolDef = {
   name: 'get_subscribe_link',
-  description: `Return the FreightUtils pricing page URL with the Pro plan's request limit (50,000 per month) and price. Use when the user asks about FreightUtils plans, pricing or API limits.
-
-Behavior: static local response — no API call, never rate-limited, no account or payment action; the user opens the URL in a browser.
-
-Returns: url, tier, monthly_limit, monthly_price, currency and note under result.`,
+  description: `Return the FreightUtils pricing page URL with the Pro plan's request limit (50,000 per month) and price. Use when the user asks about FreightUtils plans, pricing or API limits. A static local response — no API call, never rate-limited, no account or payment action; the user opens the URL in a browser.`,
 
   schema: z.object({
     tier: z.enum(['pro']).optional().describe('Tier to surface. Only "pro" is supported today.'),
@@ -1646,26 +1454,16 @@ Returns: url, tier, monthly_limit, monthly_price, currency and note under result
 
 const emissionsCalculator: ToolDef = {
   name: 'emissions_calculator',
-  description: `Estimate freight transport greenhouse-gas emissions (kgCO2e) for a shipment leg, per ISO 14083:2023 / GLEC Framework v3.2: emissions = mass x distance x a published emission-intensity factor (kgCO2e/tonne-km).
-
-Provide mass + distance_km + mode (road | rail | sea | air | inland_waterway); optionally choose sub_mode, region/authority (uk = DEFRA, us = EPA, fr = ADEME) and basis (wtw default, or ttw). IMPORTANT: pass ACTUAL GROSS MASS, not chargeable/volumetric weight (a common air-freight mistake — see mass_basis in the result). Distance must be provided — this tool does NOT route, geocode, or compute distances.
-
-Behavior: deterministic given the same factor edition; the fleet-average factor already includes average empty running (see empty_running) — do NOT add your own empty-return leg; sea and air are low-representativeness generic defaults (real emissions vary materially by vessel/aircraft, load factor and routing — see representativeness and the result summary). An unknown mode/sub_mode/region returns available:false with the covered options, never a fabricated factor. ${RATE}
-
-Returns: well-to-wheel AND tank-to-wheel emissions where the factor has both, the exact factor used (value, authority, edition), the tonne-km activity and a per-result _source citing BOTH the ISO method and the specific published factor, all under result, ${ENV}
-
-Limitations: best-effort reference estimate from published factors (DEFRA / EPA / ADEME) — NOT a verified or audited carbon report.
-
-Related: distinct from cbm_calculator / ldm_calculator / chargeable_weight_calculator (those size or bill a shipment; this one estimates its CO2e).`,
+  description: `Estimate freight transport greenhouse-gas emissions (kgCO2e) for one shipment leg, per ISO 14083:2023 / GLEC Framework v3.2: mass x distance x a published emission-intensity factor (DEFRA, EPA or ADEME by region). Pass ACTUAL GROSS MASS, not chargeable/volumetric weight, and a distance you provide — this tool does NOT route, geocode or compute distances. The fleet-average factor already includes average empty running: do not add an empty-return leg. An unknown mode/sub_mode/region returns available:false with the covered options. Distinct from cbm_calculator / ldm_calculator / chargeable_weight_calculator, which size or bill a shipment. A best-effort reference estimate, not a verified or audited carbon report.`,
 
   schema: z.object({
-    mass: z.number().positive().describe('Shipment mass, expressed in mass_unit. Example: 1000.'),
+    mass: z.number().positive().describe('Actual gross shipment mass, in mass_unit.'),
     mass_unit: z.enum(['kg', 'tonnes']).optional().describe('Unit for mass. Default: kg.'),
-    distance_km: z.number().positive().describe('Transport distance in kilometres — you provide it; the tool does not route.'),
+    distance_km: z.number().positive().describe('Transport distance, km (you provide it).'),
     mode: z.enum(['road', 'rail', 'sea', 'air', 'inland_waterway']).describe('Transport mode.'),
-    sub_mode: z.string().optional().describe('Optional sub-mode / vehicle class (e.g. "articulated", "container ship", "long-haul"). Omit for the representative default.'),
-    region: z.enum(['uk', 'us', 'fr']).optional().describe('Factor source/region: uk = DEFRA, us = EPA, fr = ADEME. Default is per-mode.'),
-    basis: z.enum(['wtw', 'ttw']).optional().describe('Emissions basis: wtw = well-to-wheel incl. upstream (default), ttw = tank-to-wheel / operation only. When the factor publishes only the other basis the answer uses it and says so (basis_note, BASIS_SUBSTITUTED).'),
+    sub_mode: z.string().optional().describe('Sub-mode / vehicle class (e.g. "articulated"); omit for the representative default.'),
+    region: z.enum(['uk', 'us', 'fr']).optional().describe('Factor source: uk = DEFRA, us = EPA, fr = ADEME. Default per mode.'),
+    basis: z.enum(['wtw', 'ttw']).optional().describe('wtw = well-to-wheel (default), ttw = tank-to-wheel.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -1738,23 +1536,13 @@ const VALIDATION_FAILURE = loose({
 
 const identifierValidator: ToolDef = {
   name: 'validate',
-  description: `Validate and parse freight identifiers by their public check-digit algorithms: shipping container numbers (ISO 6346), air waybill (AWB) numbers (IATA modulus-7) and IMO ship identification numbers.
-
-Two modes: pass text=<arbitrary string> to find and validate every identifier in it (e.g. a booking-email line), OR pass value=<identifier> + type=<container|awb|imo> to validate one.
-
-Behavior: deterministic check-digit arithmetic; per identifier found it reports type, the normalised form, valid (pass/fail), expected vs actual check digit, and details (container: owner prefix + equipment category; AWB: airline prefix + the airline from the AWB-prefix dataset when ONE record holds the prefix — when several do (e.g. 020: Lufthansa and Lufthansa Cargo), airline is null and airline_candidates[] lists every holder with airline_note saying why, never a guessed carrier; IMO: the 7-digit number); text mode with no identifiers found returns an empty found[] with a note. ${RATE}
-
-Returns: found[] (each entry with its own _source naming the standard applied) and disclaimer under result, ${ENV}
-
-Limitations: STRUCTURAL ONLY — a valid check digit means well-formed, NOT that the container, shipment or vessel exists or is active; not a registry or tracking lookup.
-
-Related: container_lookup (container TYPE specs, not numbers), airline_lookup (the AWB-prefix dataset the airline resolution uses).`,
+  description: `Validate freight identifiers by their public check-digit algorithms: shipping container numbers (ISO 6346), air waybill numbers (IATA modulus-7) and IMO ship numbers. text finds and validates every identifier in a string; value + type validates one (value without type is refused); type "consignment" with consignment validates a consignment object. An AWB names its airline only when one record holds the prefix; otherwise airline_candidates[] lists every holder, never a guessed carrier. For container TYPE specs use container_lookup; for the AWB-prefix dataset airline_lookup. Structural only — a valid check digit means well-formed, NOT that the container, shipment or vessel exists.`,
 
   schema: z.object({
-    text: z.string().optional().describe('Arbitrary string to scan for container / AWB / IMO identifiers (parse mode). Provide this OR value+type. Example: "2 cntrs MSKU3068808 / TGHU7654325 on AWB 176-12345675".'),
-    value: z.string().optional().describe('A single identifier to validate (typed mode). Requires type — value without type is refused. Example: "MSKU3068808".'),
-    type: z.enum(['container', 'awb', 'imo', 'consignment']).optional().describe('Identifier type for value: container = ISO 6346, awb = IATA air waybill, imo = IMO ship number; or "consignment" with the consignment argument.'),
-    consignment: z.record(z.string(), z.unknown()).optional().describe('With type "consignment": the consignment object to validate. The answer says whether it is valid and which checks it carries the inputs for.'),
+    text: z.string().optional().describe('Free text to scan for container / AWB / IMO identifiers. Provide this OR value + type.'),
+    value: z.string().optional().describe('One identifier to validate; requires type.'),
+    type: z.enum(['container', 'awb', 'imo', 'consignment']).optional().describe('Type of value: container (ISO 6346), awb, imo; or consignment with the consignment argument.'),
+    consignment: z.record(z.string(), z.unknown()).optional().describe('With type "consignment": the consignment object to validate.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -1799,18 +1587,10 @@ Related: container_lookup (container TYPE specs, not numbers), airline_lookup (t
 
 const ics2Check: ToolDef = {
   name: 'ics2_check',
-  description: `Check a goods description against the official EU ICS2 stop-words list — terms the European Commission deems too vague or generic for an entry summary declaration (ENS) goods-description field (data element 18 05 000 000).
-
-Pass description=<goods description>. Behavior: deterministic term matching against the in-force EU list; each flagged term carries a note (a standalone stop-word means automatic rejection, an embedded one means make the description more specific); clean=true means no listed term matched — it does NOT guarantee acceptance, and no binary accepted/rejected verdict is given. ${RATE}
-
-Returns: the description echo, flagged[] (term + note), clean, caveat and disclaimer under result, plus a _source citing the EU list and legal basis, ${ENV}
-
-Limitations: STRICTLY a reference check — not an ENS filing, not a customs-compliance determination, not legal advice; the EU list is non-exhaustive and updated periodically.
-
-Related: hs_code_lookup (commodity codes — a different field of the ENS), uk_duty_calculator (duty/VAT, unrelated to ENS screening). Intended for checking a goods description before an ENS is filed.`,
+  description: `Check a goods description against the official EU ICS2 stop-words list — terms too vague or generic for an entry summary declaration (ENS) goods description. A standalone stop-word means automatic rejection, an embedded one means make the description more specific; clean=true means no listed term matched, not that it will be accepted. For commodity codes use hs_code_lookup; for duty/VAT uk_duty_calculator. Strictly a reference check — not an ENS filing, not a customs-compliance determination, not legal advice.`,
 
   schema: z.object({
-    description: z.string().min(1, 'description must not be empty').describe('The goods description to check. Example: "gifts" (flagged) vs "wooden toys for retail" (specific).'),
+    description: z.string().min(1, 'description must not be empty').describe('The goods description to check.'),
   }).strict(),
 
   resultSchema: resultShape({
@@ -1867,21 +1647,13 @@ const airportCitation = (result: unknown) => {
 
 const airportLookup: ToolDef = {
   name: 'airport_lookup',
-  description: `Look up an airport by IATA code (3 letters, e.g. "LHR"), ICAO code (4 chars, e.g. "EGLL"), or free-text name/city search (e.g. "heathrow"). Covers 86,248 airports worldwide (OurAirports, public domain, cross-checked vs OpenFlights + Wikidata).
-
-Provide ONE of iata, icao, or query; the optional type filter narrows results. Behavior: read-only; exact code hits return one record; ambiguous name searches return ranked candidates (exact codes first, then larger airports) with match quality reported via the envelope's confidence (basis match_quality); an unknown code errors with a not-found message. ${RATE}
-
-Returns: count and results[] — per airport: IATA + ICAO/ident, name, type (large/medium/small/heliport/closed/seaplane), municipality, region, country, latitude/longitude and elevation_ft — under result, ${ENV}
-
-Limitations: reference data only — not for navigation; verify operationally critical codes with IATA / ICAO.
-
-Related: nearest_airport (find airports FROM a coordinate), airline_lookup (searches CARRIERS / AWB prefixes, not airports), unlocode_lookup (general transport locations, of which airports are one function).`,
+  description: `Look up an airport by IATA code ("LHR"), ICAO code ("EGLL") or free-text name/city search (OurAirports, public domain). Provide ONE of iata, icao or query; ambiguous name searches return ranked candidates; an unknown code errors. For airports near a coordinate use nearest_airport; for carriers and AWB prefixes airline_lookup; for general transport locations unlocode_lookup. Reference data only — not for navigation.`,
   schema: z.object({
-    iata: z.string().regex(/^[A-Za-z]{3}$/, 'IATA code must be 3 letters (e.g. "LHR")').optional().describe('Exact 3-letter IATA code. Example: "LHR".'),
-    icao: z.string().regex(/^[A-Za-z0-9]{4}$/, 'ICAO code must be 4 characters (e.g. "EGLL")').optional().describe('Exact 4-character ICAO / ident. Example: "EGLL".'),
-    query: z.string().min(2, 'Query must be at least 2 characters').optional().describe('Name / city / municipality search (min 2 chars). Example: "heathrow".'),
+    iata: z.string().regex(/^[A-Za-z]{3}$/, 'IATA code must be 3 letters (e.g. "LHR")').optional().describe('Exact 3-letter IATA code.'),
+    icao: z.string().regex(/^[A-Za-z0-9]{4}$/, 'ICAO code must be 4 characters (e.g. "EGLL")').optional().describe('Exact 4-character ICAO code / ident.'),
+    query: z.string().min(2, 'Query must be at least 2 characters').optional().describe('Name or city search.'),
     type: airportTypeEnum.optional().describe('Optional filter by airport type.'),
-    codes: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 airport codes — 3 letters IATA, 4 characters ICAO. Send alone; answered as results[] in input order, each with its own status. One call against the daily limit, N against the Pro monthly allowance.'),
+    codes: z.array(z.string().max(14)).min(1).max(50).optional().describe('Batch: up to 50 airport codes (IATA or ICAO). Send alone.'),
   }).strict(),
   resultSchema: resultShape({
     count: z.number(),
@@ -1897,24 +1669,14 @@ Related: nearest_airport (find airports FROM a coordinate), airline_lookup (sear
 
 const nearestAirport: ToolDef = {
   name: 'nearest_airport',
-  description: `Find the airports nearest to a caller-provided latitude/longitude, sorted by great-circle (haversine) distance with distance_km on each result. Searches 86,248 airports (OurAirports, public domain).
-
-Provide latitude and longitude (decimal degrees); optional radius_km, max_results (1-50, default 10), type filter (e.g. large_airport only) and include_all. By default only airports with scheduled airline service and an IATA code are ranked — never a heliport or a closed field; include_all: true ranks every type except closed fields, and type filters on that type. Coordinates are INPUT only — nothing is stored or logged.
-
-Behavior: deterministic distance sort; confidence reflects proximity and airport size (a large airport within 25 km scores high; closed/heliport/seaplane results cap lower). This tool does NOT geocode place names and does NOT compute routes — pass coordinates you already hold. ${RATE}
-
-Returns: count, results[] (the airport record plus distance_km), distance_basis ("great_circle"), filter (scheduled_iata / all / type) and filter_description under result, ${ENV}
-
-Limitations: reference data only — not for navigation; verify codes with IATA / ICAO.
-
-Related: airport_lookup (exact code or name lookup, no distance), unlocode_lookup (named transport-location search).`,
+  description: `The airports nearest a latitude/longitude you provide, sorted by great-circle distance (distance_km on each). By default only airports with scheduled airline service and an IATA code; include_all: true ranks every type except closed fields. Does NOT geocode place names — pass coordinates you already hold; nothing is stored. For an exact code or name lookup use airport_lookup; for named transport locations unlocode_lookup. Reference data only — not for navigation.`,
   schema: z.object({
-    latitude: z.number().min(-90).max(90).describe('Latitude in decimal degrees (-90 to 90). Example: 51.47.'),
-    longitude: z.number().min(-180).max(180).describe('Longitude in decimal degrees (-180 to 180). Example: -0.4543.'),
+    latitude: z.number().min(-90).max(90).describe('Latitude, decimal degrees.'),
+    longitude: z.number().min(-180).max(180).describe('Longitude, decimal degrees.'),
     radius_km: z.number().positive().optional().describe('Maximum distance in kilometres — omit for no radius cap.'),
     max_results: z.number().int().min(1).max(50).optional().describe('Maximum results (1-50). Default: 10.'),
     type: airportTypeEnum.optional().describe('Optional filter by airport type. Example: "large_airport".'),
-    include_all: z.boolean().optional().describe('Default false: only airports with scheduled airline service and an IATA code (no heliports). true: every airport type except closed fields.'),
+    include_all: z.boolean().optional().describe('true: every airport type except closed fields. Default false (scheduled service with an IATA code).'),
   }).strict(),
   resultSchema: resultShape({
     count: z.number(),
@@ -1941,23 +1703,13 @@ Related: airport_lookup (exact code or name lookup, no distance), unlocode_looku
 
 const resolveReference: ToolDef = {
   name: 'resolve_reference',
-  description: `Resolve an arbitrary freight identifier — one opaque string in, typed and cited candidates out. Use when you hold one identifier-ish token ("176", "UN1845", "NLRTM", "FOB", "22G1", "MSKU1100810", "D/E") and do not know what kind of identifier it is: each candidate names its entity type and carries the api_url and canonical_url of its full record.
-
-Provide q: ONE identifier (single token, max 32 chars) — or an fu: identifier, the fu_id or fu_version_id of any record in an answer (up to 200 chars), which resolves to exactly its one record or to none. Fourteen grammars all run — UN numbers, AWB prefixes, airline IATA/ICAO, airport IATA/ICAO, UN/LOCODE, ISO 6346 container numbers (check digit computed), HS codes (6-10 digits; national lines resolve at their 6-digit international parent), Incoterms, ADR tunnel codes, ADR Table A codes (special provisions, packing instructions and their PP/B/L provisions, MP, T/BK/TP, tank codes, TU/TC/TE/TA/TT/TM, V/VC/AP/CV/S, vehicle designations, labels, hazard identification numbers — e.g. "TU9" → its meaning, section and review status; a well-formed code no Table A row carries, e.g. "P999", is pattern_only), ULD serials, ISO container size/type codes. Ambiguity is the product: colliding grammars return MULTIPLE ranked candidates ("LHR" is Heathrow AND an Egyptian carrier's ICAO; "336" is an ADR special provision AND a hazard identification number), never a silent guess.
-
-Behavior: deterministic — normalize (trim, uppercase, collapse spaces/dashes, strip a UN prefix), match ALL grammars, rank by record-hit > verification status > static dataset prior (airlines/adr/unlocode first) > stable tiebreak; every candidate carries rank_basis so the ordering is inspectable. Zero candidates is a VALID result (count 0 + note), never an error. A failed container check digit returns a candidate with valid:false rather than dropping it. ${RATE}
-
-Returns: query, normalized, count and candidates[] — each with entity_type, identifier_type, value_normalized, summary, record (the core fields the matching dataset holds), verification_status + verification_basis, rank_basis, canonical_url, api_url and a per-candidate dataset citation — under result, ${ENV}
-
-Limitations: v1 is SINGLE-TOKEN resolution, not free-text extraction — pass one identifier, not a manifest line; SCAC/BIC codes are not yet covered; a match asserts the identifier is known/well-formed, not that a shipment exists.
-
-Related: every lookup tool this resolves into — adr_lookup, airline_lookup, airport_lookup, unlocode_lookup, hs_code_lookup, incoterms_lookup, container_lookup, uld_lookup, validate.`,
+  description: `Resolve an arbitrary freight identifier — one opaque string in, typed and cited candidates out. Use when you hold one identifier-ish token ("176", "UN1845", "NLRTM", "FOB", "22G1", "MSKU1100810", "D/E", "TU9") and do not know what kind of identifier it is: each candidate names its entity type and carries the api_url and canonical_url of its full record. q is ONE identifier (max 32 chars), or an fu: identifier (fu_id or fu_version_id, up to 200 chars), which resolves to exactly its one record or to none. Colliding grammars return several ranked candidates, never a silent guess; zero candidates is a valid result. Single-token resolution, not free-text extraction — pass one identifier, not a manifest line. The lookups it resolves into: adr_lookup, airline_lookup, airport_lookup, unlocode_lookup, hs_code_lookup, incoterms_lookup, container_lookup, uld_lookup, validate.`,
   schema: z.object({
     // 2.33.0 (as the hosted tool since freightutils.com run 0.1b): an fu: identifier may be up to 200 characters;
     // every other identifier keeps the 32-character limit.
     q: z.string().min(1).max(RESOLVE_MAX_FU_ID_LENGTH).refine((s) => s.trim().length > 0, 'q must not be blank')
       .refine((s) => s.trim().startsWith('fu:') || s.length <= RESOLVE_MAX_QUERY_LENGTH, { message: `Too big: expected string to have <=${RESOLVE_MAX_QUERY_LENGTH} characters (an fu: identifier may have up to ${RESOLVE_MAX_FU_ID_LENGTH})` })
-      .describe('One freight identifier — e.g. "176", "UN1845", "NLRTM", "FOB", "LHR", "22G1", "MSKU1100810", "090111", "AKE12345AB", "D/E", "TU9" — or an fu: identifier from any answer\'s fu_id / fu_version_id (e.g. "fu:adr:un:1203:II:F1@2025"), which resolves to exactly its one record or to none.'),
+      .describe('One freight identifier, or an fu: identifier from an answer (e.g. "fu:adr:un:1203:II:F1@2025").'),
   }).strict(),
   resultSchema: resultShape({
     query: z.string(),
@@ -2033,6 +1785,21 @@ export const ID_RECORD_TOOLS: ReadonlySet<string> = new Set([
   'nearest_airport', 'airline_lookup', 'uld_lookup', 'container_lookup', 'vehicle_lookup', 'incoterms_lookup',
   'resolve_reference', 'ics2_check', 'emissions_calculator',
 ]);
-for (const t of ALL_TOOLS) if (ID_RECORD_TOOLS.has(t.name)) t.description = `${t.description}
+// 2.34.3 (run TW1): the clause is no longer appended to fifteen descriptions — INSTRUCTIONS says it once.
 
-Identifiers: ${IDS}`;
+/**
+ * 2.34.3 (run TW1, the tool-list diet): the rules every tool shared, said once — the server's `instructions`
+ * (initialize) instead of repeated in each description. Each sentence is the 2.34.2 description text it replaces.
+ */
+export const INSTRUCTIONS = [
+  'Rules every FreightUtils tool shares:',
+  `- structuredContent is the FreightUtils response envelope: the answer under result, ${ENV.replace(' (the FreightUtils v1 response envelope).', '.')}`,
+  `- ${CASING}`,
+  `- ${RATE}`,
+  `- ${UNKNOWN_FIELDS_REFUSED}`,
+  `- ADR editions: ${EDITIONS}`,
+  `- Identifiers: ${IDS}`,
+  `- Lists: ${LIST_TEXT}`,
+  '- Batch arguments (codes, un_numbers, lines): send alone; answered as results[] in input order, each with its own status. One call against the daily limit, N against the Pro monthly allowance.',
+  '- consignment: the consignment object (https://www.freightutils.com/schema/consignment-object.v1.json) may replace a tool\'s other arguments; send it alone; an input the tool needs and the object lacks comes back in missing_inputs.',
+].join('\n');

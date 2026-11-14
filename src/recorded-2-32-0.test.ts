@@ -9,7 +9,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import type { z } from 'zod';
+import { toJSONSchema, type z } from 'zod';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createServer } from './server.js';
@@ -61,29 +61,19 @@ const missingNames = (sc: { result: Record<string, unknown> }) => (sc.result.mis
 
 test('2.32.0: the description names the packaging check, its readings and what it does not do', () => {
   const t = ALL_TOOLS.find((x) => x.name === NAME)!;
-  assert.match(t.description, /packaging_code_validity \{verdict, basis, lines\[\] \{line_index, un_number, verdict, mark, field/);
-  assert.match(t.description, /\(a\) the symbol, \(b\) the code of the 6\.1\.2\.7 table/);
-  assert.match(t.description, /X: I, II, III; Y: II, III; Z: III/);
-  // the readings, as the engine answers them
-  assert.match(t.description, /a Class 7 package or a Class 2 gas in pressure receptacles \(column \(8\) P200 \/ P203\) → not_applicable/);
-  assert.match(t.description, /any other Class 2 line → not_assessed/);
-  assert.match(t.description, /a row without a packing group → conditional/);
+  assert.match(t.description, /the UN packaging mark of each line \(6\.1\.3\.1\)/);
+  assert.match(JSON.stringify(toJSONSchema(t.resultSchema)), /packaging_code_validity/);
   assert.doesNotMatch(t.description, /Class 2 \/ Class 7 → not_assessed/);
-  // the four build 2d answer changes
-  assert.match(t.description, /1\.1\.3\.6\.5; exemption_1_1_3_6\.engine\.excluded_lines names it/);
-  assert.match(t.description, /special provision 274 or 318 is conditional on the document until its technical name is added/);
-  assert.match(t.description, /a CARRIAGE PROHIBITED line and an ID line get no entry \(entry null, the reason given\)/);
-  // Limitations: what the mark check does not do; no "not checked" line about packaging codes
-  assert.match(t.description, /Limitations: the packaging check reads the mark, not the packaging kind/);
-  assert.match(t.description, /IBC \/ large-packaging marks are named, not read/);
-  assert.match(t.description, /on a row without a packing group \(articles, most of Class 1\) the letter is not held against anything/);
+  // 2.34.3 (run TW1, the tool-list diet): how each line is read, and the answer's fields, left the description — the
+  // answers themselves are unchanged and pinned by the recorded cases below; the description keeps what is NOT checked.
+  assert.match(t.description, /Not checked: whether the packaging kind is one the packing instruction allows, IBC \/ large-packaging marks/);
   assert.doesNotMatch(t.description, /does not yet check packaging codes/);
   assert.doesNotMatch(t.description, /not_in_this_version until it ships/);
-  // the input, in the rule's words
+  // the input: the mark as printed, under the rule it is read by
   const line = (t.schema.shape.lines as unknown as { element: z.ZodObject }).element;
   const pk = (line.shape.packages as unknown as { unwrap(): z.ZodObject }).unwrap();
   const um = pk.shape.un_mark as unknown as { description?: string };
-  assert.match(um.description ?? '', /\(a\) the symbol, \(b\) the 6\.1\.2\.7 code, \(c\) the packing-group letter X \/ Y \/ Z .*\(d\) S or the test pressure .*\(e\) the year, \(f\) the State, \(g\) the maker/);
+  assert.match(um.description ?? '', /UN packaging mark as printed \(ADR 6\.1\.3\.1\)/);
 });
 
 test('2.32.0: packages.un_mark is accepted and sent through; refused when empty, too long or not a string', async () => {

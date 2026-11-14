@@ -6,7 +6,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { createRequire } from 'node:module';
 import { z } from 'zod';
-import { ALL_TOOLS, type ToolDef } from './tools.js';
+import { ALL_TOOLS, INSTRUCTIONS, type ToolDef } from './tools.js';
 import { inScope, type Scope } from './scopes.js';
 import { envelopeShape } from './envelope.js';
 import { isHttpError } from './errors.js';
@@ -78,7 +78,8 @@ export function createServer(opts: { scope?: Scope } = {}): McpServer {
     // setRequestHandler calls below are accepted (the SDK asserts a capability
     // is declared before its handler can be registered — see the historical
     // note that follows the tool loop).
-    { capabilities: { prompts: {}, resources: {} } },
+    // 2.34.3 (run TW1): the rules every tool shares, said once here instead of in each description.
+    { capabilities: { prompts: {}, resources: {} }, instructions: INSTRUCTIONS },
   );
 
   // Register every tool with the envelope output schema. Dual-channel result
