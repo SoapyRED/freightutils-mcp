@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.34.3 — 2026-11-14
+
+The tool definitions are lighter. Measured over stdio with the cl100k tokenizer, the whole `tools/list` (26 tools: names,
+titles, annotations, descriptions, input and output schemas) is down from 79,445 to 57,444 tokens, and the part an agent
+reads to choose and call a tool (names, titles, descriptions, input schemas, annotations) from 31,636 to 14,746. The
+heaviest tool, `adr_consignment_check`, is down from 14,451 to 10,675; `adr_exemption_calculator` from 6,745 to 3,563.
+
+Each description now says what the tool is for, when to use it and which sibling to use instead, the behaviour that
+changes a call, and its limitation sentence; lists of returned fields left the descriptions, because the typed output
+schema already states them. Input field texts are one line each. The output schemas keep every type and lose their
+per-field prose.
+
+The rules every tool shared are now said once, in the server's `instructions` (sent on `initialize`, 398 tokens), and in
+the README's "Rules every tool shares": the response envelope, the field casing of the hosted endpoint, the rate-limit
+sentence, the unknown-field refusal, the ADR edition rule, the `fu_id` identifiers, list paging, batch arguments and the
+consignment object. Each ADR-reading tool keeps one sentence on the edition default.
+
+No input, output or behaviour change: every input key, type, enum, default, bound and required-ness is identical (the
+input schemas are byte-identical once their descriptions are removed), every answer is the same, and the names, titles
+and annotations are unchanged. Still 26 tools.
+
 ## 2.34.2 — 2026-11-13
 
 A description-and-README patch. `hs_code_lookup` said it searched 6,940 HS 2022 codes; the dataset behind it

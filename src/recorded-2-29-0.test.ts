@@ -7,7 +7,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import type { z } from 'zod';
+import { toJSONSchema, type z } from 'zod';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createServer } from './server.js';
@@ -63,7 +63,8 @@ test('2.29.0: adr_consignment_check is registered, strict, in scope dg and the d
   // Since 2.32.0 (build 2d) no check is not_in_this_version: the description names the packaging mark instead.
   assert.match(t.description, /the UN packaging mark of each line \(6\.1\.3\.1\)/);
   // Since 2.30.0 (build 2b) mixed loading is checked; recorded-2-30-0.test.ts asserts its Limitations.
-  assert.match(t.description, /packaging_code_validity/); // since 2.32.0 the packaging mark is checked (build 2d)
+  // 2.34.3 (run TW1): the answer's field names are the output schema's, not description prose.
+  assert.match(JSON.stringify(toJSONSchema(t.resultSchema)), /packaging_code_validity/); // since 2.32.0 the packaging mark is checked (build 2d)
 });
 
 test('recorded: the exempt petrol load — pass, 900 points, the document entries, the POST and its body', async () => {
@@ -187,6 +188,7 @@ test('typed branch: entry_deleted must be a boolean and edition_basis one of the
 });
 
 test('description: adr_exemption_calculator names entry_deleted, deleted_un_numbers and edition_basis (no long-form 2027 date for them)', () => {
-  const d = ALL_TOOLS.find((x) => x.name === 'adr_exemption_calculator')!.description;
-  for (const w of ['entry_deleted', 'deleted_un_numbers', 'edition_basis', 'UN 2941', '2027-01-01 to 2027-06-30']) assert.ok(d.includes(w), w);
+  // 2.34.3 (run TW1): these are answer fields — the typed output schema documents them, not the description.
+  const out = JSON.stringify(toJSONSchema(ALL_TOOLS.find((x) => x.name === 'adr_exemption_calculator')!.resultSchema));
+  for (const w of ['entry_deleted', 'deleted_un_numbers', 'edition_basis']) assert.ok(out.includes(w), w);
 });

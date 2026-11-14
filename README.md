@@ -34,6 +34,20 @@ Since **2.25.0**:
 **Website:** https://www.freightutils.com
 **API Docs:** https://www.freightutils.com/api-docs
 
+### Rules every tool shares
+
+Since **2.34.3** these are said once — here and in the server's `instructions` (sent on `initialize`) — instead of in each tool's description, so the tool list is lighter (about 57,400 tokens for all 26 tools, 14,700 of them to choose and call, against 79,400 and 31,600 in 2.34.2):
+
+- `structuredContent` is the FreightUtils response envelope: the answer under `result`, plus `confidence`, `_source` and `citation`.
+- Field names as this package serves them (snake_case); the hosted `/api/mcp` endpoint serves the same fields in camelCase (e.g. `total_cbm` → `totalCbm`).
+- Rate-limited: a limit error carries `reset_at`, the UTC time the allowance resets.
+- Fields are checked by name: a field the tool does not read is refused with a tool error naming it and listing the accepted ones, never ignored.
+- ADR editions: `edition` (`"2025"` | `"2027"`) and `as_of` (YYYY-MM-DD) choose the ADR edition — `edition` wins, else the date picks it (ADR 2025 before 2027-01-01, ADR 2027 from then; ADR 2025 may still be applied until 2027-06-30). An answer on a named edition carries `adr_edition`; neither sent, the answer is ADR 2025 until 2027-01-01.
+- Identifiers: each record carries `fu_id`, a stable FreightUtils identifier (and `fu_version_id` where the dataset has editions); `resolve_reference` resolves one to exactly its record.
+- Lists: a list (no single record asked for) returns summary rows with `total`, `truncated`, `next_offset` and `detail_hint`; `full: true` returns full records five per page, with `offset` / `limit` to page.
+- Batch arguments (`codes`, `un_numbers`, `lines`): send alone; answered as `results[]` in input order, each with its own `status`. One call against the daily limit, N against the Pro monthly allowance.
+- `consignment`: the [consignment object](https://www.freightutils.com/schema/consignment-object.v1.json) may replace a tool's other arguments; send it alone; an input the tool needs and the object lacks comes back in `missing_inputs`.
+
 ---
 
 ## Tools (26)

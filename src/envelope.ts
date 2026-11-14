@@ -19,16 +19,16 @@ import { z } from 'zod';
 const UPSTREAM_STATE = z.enum(['in_step', 'changed_upstream', 'schema_drift', 'unreachable', 'window_missed', 'unknown']);
 /** _meta.upstream (2.34.0). Open objects throughout, so a later field never refuses an answer. */
 export const UPSTREAM_META = z.object({
-  state: UPSTREAM_STATE.describe('The worst state of the datasets below.'),
-  stale: z.boolean().describe('True only when a dataset below missed its upstream check window (window_missed).'),
-  state_read_at: z.string().nullable().describe('When the site upstream check recorded the state (ISO 8601); null when it could not be read.'),
+  state: UPSTREAM_STATE,
+  stale: z.boolean(),
+  state_read_at: z.string().nullable(),
   datasets: z.record(z.string(), z.object({
     state: UPSTREAM_STATE,
-    kind: z.string().nullable().describe('watched (its upstream is fetched daily) or checksum-only (no upstream of its own).'),
-    last_success: z.string().nullable().describe('The last day (YYYY-MM-DD) the upstream check succeeded; null when none is recorded.'),
+    kind: z.string().nullable(),
+    last_success: z.string().nullable(),
     window_days: z.number().nullable(),
     stale: z.boolean(),
-    reason: z.string().optional().describe('Why the state is unknown.'),
+    reason: z.string().optional(),
   }).passthrough()),
 }).passthrough();
 
@@ -144,8 +144,8 @@ export function resultShape(fields: z.ZodRawShape): z.ZodTypeAny {
  * the API keys no record of, still validates. fu_version_id only where the dataset has editions.
  */
 export const FU_ID_FIELDS = {
-  fu_id: z.string().describe('Stable FreightUtils identifier of this record, fu:<namespace>:<key> — the same across editions; resolve_reference resolves it to exactly this record.'),
-  fu_version_id: z.string().describe('This record in one dataset edition, fu_id@<edition>. Present only where the dataset has editions (absent on airlines, ULDs, containers, vehicles).'),
+  fu_id: z.string(),
+  fu_version_id: z.string(),
 } satisfies z.ZodRawShape;
 
 /** Same tolerance rule for nested record objects (array items, sub-objects). */

@@ -85,14 +85,14 @@ test('tools/list: the three tools publish additionalProperties false on every ob
   } finally { await close(); }
 });
 
-test('the three tools describe the rule', async () => {
+// 2.34.3 (run TW1, the tool-list diet): the rule is said once, in the server's instructions (every tool refuses an
+// unknown key since 2.22.2), instead of on three descriptions; initialize carries it.
+test('the server states the rule once, in its instructions', async () => {
   const { client, close } = await connect();
   try {
-    const { tools } = await client.listTools();
-    for (const name of STRICT) {
-      const d = tools.find((x) => x.name === name)!.description ?? '';
-      assert.ok(d.includes('a field the tool does not read is refused with a tool error naming it and listing the accepted ones, never ignored'), `${name}: description does not state the rule`);
-    }
+    const instructions = client.getInstructions() ?? '';
+    assert.ok(instructions.includes('a field the tool does not read is refused with a tool error naming it and listing the accepted ones, never ignored'), 'the instructions do not state the rule');
+    void STRICT;
   } finally { await close(); }
 });
 

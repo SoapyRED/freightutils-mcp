@@ -10,11 +10,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import type { z } from 'zod';
+import { toJSONSchema, type z } from 'zod';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createServer } from './server.js';
-import { ALL_TOOLS, ID_RECORD_TOOLS } from './tools.js';
+import { ALL_TOOLS, ID_RECORD_TOOLS, INSTRUCTIONS } from './tools.js';
 
 type Recorded = { tool: string; args: Record<string, unknown>; request: string; status: number; body: Record<string, unknown> };
 const load = (v: string) => JSON.parse(readFileSync(new URL(`../test-fixtures/recorded-${v}.json`, import.meta.url), 'utf8')) as Record<string, Recorded>;
@@ -171,19 +171,22 @@ test('2.33.0: tools/list declares fu_id / fu_version_id on the record tools and 
   }
 });
 
-test('2.33.0: the identifier clause is on exactly the fifteen record tools, in one wording', () => {
+// 2.34.3 (run TW1, the tool-list diet): the clause is said once, in the server's instructions, instead of at the end
+// of fifteen descriptions; the fifteen record tools' output schemas still type fu_id on every record.
+test('2.33.0: the identifier clause is said once, in the instructions, in one wording', () => {
   const CLAUSE = 'Identifiers: Each record carries fu_id, a stable FreightUtils identifier (and fu_version_id where the dataset has editions); resolve_reference resolves one to exactly its record.';
   assert.equal(ID_RECORD_TOOLS.size, 15);
+  assert.equal(INSTRUCTIONS.split(CLAUSE).length - 1, 1);
   for (const t of ALL_TOOLS) {
-    const n = t.description.split(CLAUSE).length - 1;
-    assert.equal(n, ID_RECORD_TOOLS.has(t.name) ? 1 : 0, t.name);
-    if (ID_RECORD_TOOLS.has(t.name)) assert.ok(t.description.endsWith(CLAUSE), t.name);
+    assert.equal(t.description.includes(CLAUSE), false, t.name);
+    if (ID_RECORD_TOOLS.has(t.name)) assert.match(JSON.stringify(toJSONSchema(t.resultSchema)), /fu_id/, t.name);
   }
 });
 
 test('2.33.0: resolve_reference takes an fu: identifier up to 200 characters, keeps 32 for the rest', async () => {
   const t = ALL_TOOLS.find((x) => x.name === 'resolve_reference')!;
-  assert.match(t.description, /an fu: identifier, the fu_id or fu_version_id of any record in an answer \(up to 200 chars\), which resolves to exactly its one record or to none/);
+  // 2.34.3 (run TW1): the same rule in the lean description's words.
+  assert.match(t.description, /an fu: identifier \(fu_id or fu_version_id, up to 200 chars\), which resolves to exactly its one record or to none/);
   const ok = (q: string) => (t.schema as z.ZodTypeAny).safeParse({ q }).success;
   const fu200 = `fu:adr:un:1203:${'x'.repeat(200 - 'fu:adr:un:1203:'.length)}`;
   assert.equal(fu200.length, 200);

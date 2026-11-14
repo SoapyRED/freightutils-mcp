@@ -192,10 +192,11 @@ test('validate and airline_lookup descriptions: a shared AWB prefix names no air
   try {
     const tools = (await client.listTools()).tools;
     const desc = (name: string) => tools.find((t) => t.name === name)?.description ?? '';
+    // 2.34.3 (run TW1): validate keeps the rule in one sentence; airline_lookup no longer repeats validate's behaviour.
     assert.match(desc('validate'), /airline_candidates\[\]/);
-    assert.match(desc('validate'), /airline_note/);
+    assert.match(desc('validate'), /only when one record holds the prefix/);
     assert.doesNotMatch(desc('validate'), /the operating airline resolved from the AWB-prefix dataset/);
-    assert.match(desc('airline_lookup'), /when one record holds the prefix, otherwise lists the candidates/);
+    assert.match(desc('airline_lookup'), /check digit use validate/);
   } finally {
     await close();
   }
@@ -215,8 +216,9 @@ test('tools/list: descriptions say what the tools now do (2.22.1)', async () => 
     assert.doesNotMatch(d('hs_code_lookup'), /find nothing/);
     assert.match(d('hs_code_lookup'), /HMRC/);
     assert.match(d('hs_code_lookup'), /medium confidence/);
-    assert.match(d('ldm_calculator'), /floor_positions_basis/);
-    assert.match(d('ldm_calculator'), /PAYLOAD/);
+    // 2.34.3 (run TW1): ldm_calculator says the fit rule in words; floor_positions_basis is its output schema's.
+    assert.match(d('ldm_calculator'), /pallet floor positions/);
+    assert.match(d('ldm_calculator'), /max payload/);
     assert.match(d('shipment_summary'), /floor positions/);
   } finally {
     await close();

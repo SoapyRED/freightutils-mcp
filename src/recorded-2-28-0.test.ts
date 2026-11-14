@@ -8,7 +8,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import type { z } from 'zod';
+import { toJSONSchema, type z } from 'zod';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createServer } from './server.js';
@@ -163,9 +163,13 @@ test('additive: the 2.26.0 recorded exemption answer still parses typed', () => 
 });
 
 test('the description names the 2.28.0 fields in the API\'s words', () => {
-  const d = ALL_TOOLS.find((t) => t.name === 'adr_exemption_calculator')!.description;
-  for (const w of ['EXCLUDED_NIL', 'icao_limited_quantity', 'entry_required', 'upper_bound_gross', 'figure_basis', 'strict_adr_2027', 'basis_until', 'transitional_1_6_1_1', '1 January 2027']) assert.ok(d.includes(w), w);
-  assert.doesNotMatch(d, /in force/i);
-  const a = ALL_TOOLS.find((t) => t.name === 'adr_lookup')!.description;
+  // 2.34.3 (run TW1): the answer's field names are the typed output schema's, not description prose; the
+  // description keeps the input the call needs (icao_limited_quantity) and never says "in force".
+  const t = ALL_TOOLS.find((x) => x.name === 'adr_exemption_calculator')!;
+  const out = JSON.stringify(toJSONSchema(t.resultSchema));
+  for (const w of ['EXCLUDED_NIL', 'entry_required', 'upper_bound_gross', 'figure_basis', 'strict_adr_2027', 'basis_until', 'transitional_1_6_1_1']) assert.ok(out.includes(w), w);
+  assert.ok(t.description.includes('icao_limited_quantity'));
+  assert.doesNotMatch(t.description, /in force/i);
+  const a = JSON.stringify(toJSONSchema(ALL_TOOLS.find((x) => x.name === 'adr_lookup')!.resultSchema));
   for (const w of ['paraphrase_unreviewed', 'machine_reviewed', 'contested', 'owner_reviewed', 'dg_reviewed', 'needs_fix', 'verified']) assert.ok(a.includes(w), w);
 });

@@ -15,6 +15,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { toJSONSchema } from 'zod';
 import { ALL_TOOLS } from './tools.js';
 
 const tool = ALL_TOOLS.find((t) => t.name === 'adr_exemption_calculator');
@@ -30,9 +31,15 @@ test('description states the 1.1.3.6.2 rule with the column (3) maximum, never t
 
 test('description documents the routing states, the AIR_ONLY_ID basis and the beside-items refusal', () => {
   const d = tool.description;
-  for (const must of ['COUNTED', 'AIR_ONLY_ID', 'NOT_SUBJECT_TO_ADR', 'BLOCKED', '3.4.9', '3.4.10', '1.1.3.6.5', 'limited quantities to the ICAO Technical Instructions', 'sent beside items[] is refused', 'never both', 'blocking_errors is in the text content']) {
+  // 2.34.3 (run TW1, the tool-list diet): the description keeps what changes a call — the beside-items refusal,
+  // the ID line and its statement; the routing states are the output schema's state enum, and the ICAO limited-
+  // quantity basis (3.4.8 / 3.4.10) is the icao_limited_quantity field's own text.
+  for (const must of ['BLOCKED', 'icao_limited_quantity', 'sent beside items[] is refused', 'never both', 'AMBIGUOUS_UN_VARIANT']) {
     assert.ok(d.includes(must), `description no longer says "${must}"`);
   }
+  const out = JSON.stringify(toJSONSchema(tool.resultSchema));
+  for (const state of ['COUNTED', 'AIR_ONLY_ID', 'NOT_SUBJECT_TO_ADR', 'BLOCKED', 'EXCLUDED_NIL']) assert.ok(out.includes(`"${state}"`), `output schema has no state ${state}`);
+  assert.match(JSON.stringify(toJSONSchema(tool.schema)), /3\.4\.8 mark, or 3\.4\.10/);
   // 1.1.4.2.1 relieves only packing, mixed packing, marking, labelling and placarding; it is not
   // the basis of the 0 (review finding).
   assert.equal(d.includes('1.1.4.2.1'), false, 'the AIR_ONLY_ID basis must not be 1.1.4.2.1');

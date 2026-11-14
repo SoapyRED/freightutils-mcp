@@ -16,7 +16,7 @@
  */
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { ALL_TOOLS } from './tools.js';
+import { ALL_TOOLS, INSTRUCTIONS } from './tools.js';
 
 test('every tool declares a title, readOnlyHint true and destructiveHint false; every name is ≤ 64 characters', () => {
   assert.ok(ALL_TOOLS.length >= 25, `expected the full tool set, got ${ALL_TOOLS.length}`);
@@ -47,15 +47,12 @@ test('no description carries upsell wording or a call-first instruction', () => 
   }
 });
 
+// 2.34.3 (run TW1, the tool-list diet): the limit sentence is said once, in the server's instructions, instead of on
+// each of the 25 REST-backed tools; it is still a fact with no instruction to call anything.
 test('the shared limit sentence is a fact: reset_at, no instruction', () => {
-  const restBacked = ALL_TOOLS.filter((t) => !t.localEnvelope);
-  assert.ok(restBacked.length >= 24, `expected the REST-backed tools, got ${restBacked.length}`);
-  for (const t of restBacked) {
-    assert.ok(
-      t.description.includes('Rate-limited: a limit error carries reset_at, the UTC time the allowance resets.'),
-      `${t.name}: the shared limit sentence is missing or changed`,
-    );
-  }
+  assert.ok(INSTRUCTIONS.includes('Rate-limited: a limit error carries reset_at, the UTC time the allowance resets.'), 'the shared limit sentence is missing or changed');
+  assert.equal(INSTRUCTIONS.includes('get_subscribe_link'), false, 'the instructions send Claude to get_subscribe_link');
+  for (const t of ALL_TOOLS) assert.equal(t.description.includes('Rate-limited'), false, `${t.name}: the limit sentence is repeated`);
 });
 
 test('get_subscribe_link is a neutral pricing lookup the user asks for', () => {

@@ -7,7 +7,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import type { z } from 'zod';
+import { toJSONSchema, type z } from 'zod';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createServer } from './server.js';
@@ -58,10 +58,11 @@ const mixOf = (sc: { result: Record<string, unknown> }) => sc.result.mixed_loadi
 test('2.30.0: the description says mixed loading is checked and names the later builds and the foodstuffs input', () => {
   const t = ALL_TOOLS.find((x) => x.name === NAME)!;
   assert.match(t.description, /mixed loading \(7\.5\.2, with the foodstuffs precautions of 7\.5\.4\)/);
-  assert.match(t.description, /mixed_loading_7_5_2 \{verdict, basis, lines\[\]/);
+  // 2.34.3 (run TW1): answer fields are the output schema's, inputs the input schema's, not description prose.
+  assert.match(JSON.stringify(toJSONSchema(t.resultSchema)), /mixed_loading_7_5_2/);
   // Since 2.31.0 (build 2c) plates, equipment and training are checked; recorded-2-31-0.test.ts asserts the 2c Limitations.
-  assert.match(t.description, /the packaging check reads the mark, not the packaging kind/); // since 2.32.0 (build 2d)
-  assert.match(t.description, /vehicle\.foodstuffs_carried/);
+  assert.match(t.description, /whether the packaging kind is one the packing instruction allows/); // since 2.32.0 (build 2d)
+  assert.match(JSON.stringify(toJSONSchema(t.schema)), /foodstuffs_carried/);
   assert.doesNotMatch(t.description, /does not yet check mixed loading/);
 });
 

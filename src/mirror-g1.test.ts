@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { createServer } from './server.js';
+import { toJSONSchema } from 'zod';
 import { ALL_TOOLS } from './tools.js';
 
 async function connect() {
@@ -79,11 +80,13 @@ test('adr_lookup include_statements: true sends include=statements; false or abs
 });
 
 test('descriptions: adr_lookup names all 20 columns and resolved_codes; resolve_reference names the ADR code families', () => {
-  const adr = ALL_TOOLS.find((t) => t.name === 'adr_lookup')!.description;
-  assert.match(adr.split('\n')[0], /all 20 columns/);
-  assert.match(adr.split('\n')[0], /resolved_codes/);
-  assert.match(adr, /paraphrase_unreviewed/);
+  const adr = ALL_TOOLS.find((t) => t.name === 'adr_lookup')!;
+  assert.match(adr.description.split('\n')[0], /all 20 columns/);
+  assert.match(adr.description.split('\n')[0], /resolved_codes/);
+  // 2.34.3 (run TW1): the review states are the output schema's verification_status enum, not description prose;
+  // resolve_reference names its examples ("TU9", "D/E") rather than its fourteen grammars.
+  assert.match(JSON.stringify(toJSONSchema(adr.resultSchema)), /paraphrase_unreviewed/);
   const res = ALL_TOOLS.find((t) => t.name === 'resolve_reference')!.description;
-  assert.match(res, /ADR Table A codes/);
-  assert.match(res, /pattern_only/);
+  assert.match(res, /"TU9"/);
+  assert.match(res, /do not know what kind of identifier it is/);
 });
