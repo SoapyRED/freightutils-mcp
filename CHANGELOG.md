@@ -1,5 +1,28 @@
 # Changelog
 
+## 2.34.4 — 2026-11-14
+
+Some facts that 2.34.3 moved out of the tool definitions are back in them, in their 2.34.2 words. An agent needs to read
+each one before it calls the tool, and the hosted server's `tools/list` is checked for each one. `adr_lookup` opens with its
+2.34.2 first sentence again (all 20 Table A columns, tank codes, carriage provisions, resolved_codes) and carries the
+editions paragraph again (edition and as_of, and adr_edition on the answer). `adr_exemption_calculator` says again that an
+ID-prefixed line without the ICAO limited-quantity statement is BLOCKED (items[].entry_required true), and what basis_until
+is. `hs_code_lookup` names again the HS 2022 descriptions it searches (UN Comtrade H6) and HMRC's everyday-goods fallback
+("laptop" finds 847130). `validate` names again the shared AWB prefix example (020: Lufthansa and Lufthansa Cargo). In
+`nearest_airport`, the scheduled-service default reads "are ranked — never a heliport or a closed field" again. The
+unknown-field sentence is back on `adr_exemption_calculator`, `adr_lq_eq_check` and `shipment_summary`, and the rate-limit
+sentence (reset_at) is back on the 25 tools that carried it. The server's `instructions` still state both sentences once.
+
+The airports count is back in `nearest_airport` and `airport_lookup`, and in the README's tool table, as 86,281. That is the
+number of airports in the OurAirports refresh of 6 November 2026. 2.34.2 said 86,248, the figure from the 30 October
+refresh.
+
+The list is now 58,408 tokens (cl100k), up from 57,444 in 2.34.3. The part an agent reads to choose and call a tool is
+15,710 tokens, up from 14,746. The output schemas are unchanged at 42,438. The 2.34.3 entry gave `adr_consignment_check`
+as 10,675 tokens, which is 10 tokens low: the released 2.34.3 measures 10,685 (2.34.4: 10,703).
+
+No input, output or behaviour change. Still 26 tools.
+
 ## 2.34.3 — 2026-11-14
 
 The tool definitions are lighter. Measured over stdio with the cl100k tokenizer, the whole `tools/list` (26 tools: names,

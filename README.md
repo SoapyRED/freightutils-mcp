@@ -114,7 +114,7 @@ Some UN numbers have more than one ADR Table A row (packing groups, concentratio
 | `resolve_reference` | Resolve any freight identifier ("176", "UN1845", "NLRTM", "FOB") to typed, ranked, cited candidates when its type is unknown |
 | `airline_lookup` | 6,356 airlines with IATA/ICAO codes and AWB prefixes |
 | `unlocode_lookup` | 116,086 UN/LOCODE transport locations |
-| `airport_lookup` | 86,248 airports by IATA/ICAO code, name or city (OurAirports) |
+| `airport_lookup` | 86,281 airports by IATA/ICAO code, name or city (OurAirports) |
 | `nearest_airport` | Nearest airports to a latitude/longitude, by great-circle distance — by default airports with scheduled airline service and an IATA code (`include_all: true` lists every type) |
 | `uld_lookup` | 16 air cargo ULD types (LD3, PMC, etc.) |
 | `vehicle_lookup` | 17 road freight vehicles and trailers |

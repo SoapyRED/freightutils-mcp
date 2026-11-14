@@ -52,7 +52,13 @@ test('no description carries upsell wording or a call-first instruction', () => 
 test('the shared limit sentence is a fact: reset_at, no instruction', () => {
   assert.ok(INSTRUCTIONS.includes('Rate-limited: a limit error carries reset_at, the UTC time the allowance resets.'), 'the shared limit sentence is missing or changed');
   assert.equal(INSTRUCTIONS.includes('get_subscribe_link'), false, 'the instructions send Claude to get_subscribe_link');
-  for (const t of ALL_TOOLS) assert.equal(t.description.includes('Rate-limited'), false, `${t.name}: the limit sentence is repeated`);
+  // 2.34.4 (run TW1b): the sentence is back on each of the 25 tools that carried it in 2.34.2 — the website's locked
+  // scenario mcp-tools-list-no-tool-sends-claude-to-get-subscribe-link reads it on every tool but get_subscribe_link.
+  for (const t of ALL_TOOLS) {
+    if (t.name === 'get_subscribe_link') continue;
+    assert.ok(t.description.includes('Rate-limited: a limit error carries reset_at, the UTC time the allowance resets.'), `${t.name}: the limit sentence is missing`);
+    assert.equal(t.description.includes('get_subscribe_link'), false, `${t.name}: sends Claude to get_subscribe_link`);
+  }
 });
 
 test('get_subscribe_link is a neutral pricing lookup the user asks for', () => {
