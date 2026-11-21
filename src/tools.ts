@@ -1587,7 +1587,7 @@ const identifierValidator: ToolDef = {
 
 const ics2Check: ToolDef = {
   name: 'ics2_check',
-  description: `Check a goods description against the official EU ICS2 stop-words list — terms too vague or generic for an entry summary declaration (ENS) goods description. A standalone stop-word means automatic rejection, an embedded one means make the description more specific; clean=true means no listed term matched, not that it will be accepted. For commodity codes use hs_code_lookup; for duty/VAT uk_duty_calculator. ${RATE} Strictly a reference check — not an ENS filing, not a customs-compliance determination, not legal advice.`,
+  description: `Check a goods description against the official EU ICS2 stop-words list — terms too vague or generic for an entry summary declaration (ENS) goods description. A standalone stop-word means automatic rejection, an embedded one means make the description more specific; clean=true means no listed term matched, not that it will be accepted. The Commission's whitelist of accepted goods descriptions (ICS2 Common Repository, from 17 November 2026) is applied first: a whole description that is a whitelist entry is not flagged, even when it contains a stop-word, and the answer carries whitelist_match naming the entry and the stop words it contains. For commodity codes use hs_code_lookup; for duty/VAT uk_duty_calculator. ${RATE} Strictly a reference check — not an ENS filing, not a customs-compliance determination, not legal advice.`,
 
   schema: z.object({
     description: z.string().min(1, 'description must not be empty').describe('The goods description to check.'),
