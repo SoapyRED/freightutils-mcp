@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.34.5 — 2026-11-21
+
+The `ics2_check` description now says that the European Commission's whitelist of accepted goods descriptions (ICS2
+Common Repository, from 17 November 2026) is applied first: a whole description that is a whitelist entry is not flagged,
+even when it contains a stop-word, and the answer carries `whitelist_match` naming the entry and the stop words it
+contains. The hosted answer has done so since 20 November 2026; this package passes that answer through, so only the
+description was behind.
+
+No input, output or behaviour change. Still 26 tools.
+
 ## 2.34.4 — 2026-11-14
 
 Some facts that 2.34.3 moved out of the tool definitions are back in them, in their 2.34.2 words. An agent needs to read
