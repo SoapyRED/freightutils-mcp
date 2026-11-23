@@ -10,7 +10,7 @@
 
 FreightUtils is the neutral freight reference layer for AI agents — source-backed dangerous-goods, customs, location and freight-calculation data an agent can call and cite, from primary sources (ADR 2025 / UNECE, HS 2022 / WCO, IATA-regulated airline prefixes). Neutral by design: no freight to sell and no carrier to push — a lookup returns what the named source says, with the citation attached so an agent can inspect it rather than take our word for it, regardless of who carries the load.
 
-This [Model Context Protocol](https://modelcontextprotocol.io/) server gives AI agents access to 26 freight calculation and reference tools, covering road, air, and sea freight. Built by a UK ADR-certified freight transport planner.
+This [Model Context Protocol](https://modelcontextprotocol.io/) server gives AI agents access to 28 freight calculation and reference tools, covering road, air, and sea freight. Built by a UK ADR-certified freight transport planner.
 
 Every response cites its source — a `_source` block with the authority, edition, licence where held, and a verification status an agent can read — and the tools are deterministic, not generated answers. Reference only: never filing, booking, or legal advice, and results state when human review is required (`validate` is structural check-digit validation only; a clean `ics2_check` is not ENS acceptance; emissions figures are estimates, not audited reports).
 
@@ -50,7 +50,7 @@ Since **2.34.3** these are said once — here and in the server's `instructions`
 
 ---
 
-## Tools (26)
+## Tools (28)
 
 ### Calculators
 | Tool | Description |
@@ -107,6 +107,11 @@ Some UN numbers have more than one ADR Table A row (packing groups, concentratio
 | `uk_duty_calculator` | UK import duty and VAT (live GOV.UK Trade Tariff data) |
 | `incoterms_lookup` | Incoterms 2020 — all 11 rules with risk/cost transfer points |
 | `ics2_check` | Flag EU ICS2 unacceptable goods-description terms (stop-words) before filing an ENS — reference only |
+| `eu_tariff_lookup` | EU tariff code (CN 8-digit or TARIC 10-digit) on a date: whether it exists and is declarable, and every measure that applies by TARIC's cascade from its parent lines — codes, measures and rates only, from one monthly TARIC extraction |
+| `eu_duty_calculator` | EU import duty from TARIC for a declarable 10-digit code, origin and customs value in EUR: each measure computed, insufficient_data or not_applicable, third-country duty first, no total — EUR only, no VAT or excise |
+| `code_list_lookup` | A code in a published code list — HMRC CDS procedure codes (DE 1/10) and additional procedure codes (DE 1/11): the code's name as published, its heading, status and the list's edition |
+
+**In 2.34.6:** `eu_tariff_lookup`, `eu_duty_calculator` and `code_list_lookup` join the package with the hosted server's definitions; `get_subscribe_link` is no longer listed (the pricing link still travels in every rate-limit answer, as `upgrade_url`).
 
 ### Reference Data
 | Tool | Description |
@@ -135,11 +140,6 @@ Some UN numbers have more than one ADR Table A row (packing groups, concentratio
 | Tool | Description |
 |------|-------------|
 | `shipment_summary` | Chains CBM + weight + LDM + ADR + duty in one call |
-
-### Plans
-| Tool | Description |
-|------|-------------|
-| `get_subscribe_link` | The pricing page URL with the Pro plan's limit and price (50,000/month at £19/mo) |
 
 ---
 
@@ -293,7 +293,7 @@ All tools call the free FreightUtils API:
 
 - **Read-only.** Every tool is a lookup or a calculation, declared `readOnlyHint: true` and `destructiveHint: false`. The server changes nothing, anywhere.
 - **No file system, no shell.** The server reads no file except its own `package.json`, starts no process and opens no port — it talks over stdio only.
-- **One destination.** Tool inputs go only to `https://www.freightutils.com/api` (or the base you set in `FREIGHTUTILS_API_URL`), over HTTPS. `get_subscribe_link` answers locally and sends nothing.
+- **One destination.** Tool inputs go only to `https://www.freightutils.com/api` (or the base you set in `FREIGHTUTILS_API_URL`), over HTTPS.
 - **The key stays in the environment.** `FREIGHTUTILS_API_KEY` is read from the environment and sent only as an `Authorization: Bearer` header to that host — never logged, never written to disk, never put in an error message.
 - **stdout is the protocol.** Nothing but MCP JSON-RPC goes to stdout; the one start-up notice goes to stderr.
 - **Two validation layers.** Each tool's Zod schema checks types, formats and the API's own limits before any call is made (the three ADR tools — `adr_exemption_calculator`, `adr_lq_eq_check`, `shipment_summary` — also refuse, by name, a field they do not read). The API then validates every request again on the server and refuses what it cannot answer with a 400 naming the field.

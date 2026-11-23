@@ -98,6 +98,7 @@ export function createServer(opts: { scope?: Scope } = {}): McpServer {
     server.registerTool(
       tool.name,
       {
+        ...(tool.title !== undefined ? { title: tool.title } : {}),
         description: tool.description,
         // The schema ITSELF for a strictKeys tool, so an unknown key is refused with a tool
         // error naming it (2.21.0). `.shape` makes the SDK rebuild a plain z.object, which

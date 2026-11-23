@@ -17,6 +17,9 @@ export interface ToolAnnotationShape {
 
 export interface ToolDef {
   name: string;
+  /** The tool's top-level title (2.34.6): set on the tools that came from the hosted server with one, so the
+   *  definition is the hosted one. Tools without it are listed as before (no title key). */
+  title?: string;
   description: string;
   // Allow any ZodObject (including .strict() variants) so individual tools
   // can opt into strict-key enforcement without breaking the shared type.
@@ -1396,57 +1399,9 @@ Send lines[] (un_number, quantity {value, unit, basis} and, where they apply, pa
     apiPost('adr/consignment-check', { lines: args.lines, journey: args.journey, vehicle: args.vehicle, crew: args.crew, options: args.options, edition: args.edition, as_of: args.as_of }, opts),
 };
 
-// ─────────────────────────────────────────────────────────────
-//  19. Get Subscribe Link
-// ─────────────────────────────────────────────────────────────
-
-const getSubscribeLink: ToolDef = {
-  name: 'get_subscribe_link',
-  description: `Return the FreightUtils pricing page URL with the Pro plan's request limit (50,000 per month) and price. Use when the user asks about FreightUtils plans, pricing or API limits. A static local response — no API call, never rate-limited, no account or payment action; the user opens the URL in a browser.`,
-
-  schema: z.object({
-    tier: z.enum(['pro']).optional().describe('Tier to surface. Only "pro" is supported today.'),
-  }).strict(),
-
-  resultSchema: resultShape({
-    url: z.string(),
-    tier: z.string(),
-    monthly_limit: z.number(),
-    monthly_price: z.string(),
-    currency: z.string(),
-    note: z.string(),
-  }),
-
-  annotations: readOnlyAnnotations('FreightUtils Plans & Pricing'),
-
-  // Pure static response — no upstream API call. The pricing page is the
-  // canonical surface for subscription; this tool just hands the URL back.
-  handler: async () => ({
-    url: 'https://www.freightutils.com/pricing',
-    tier: 'pro',
-    monthly_limit: 50000,
-    monthly_price: '£19',
-    currency: 'GBP',
-    note: 'Open the URL in a browser to subscribe. Agents must not attempt to complete checkout themselves.',
-  }),
-
-  // Static envelope — replicates the hosted /api/mcp get_subscribe_link
-  // envelope verbatim (confidence deterministic/high, methodology source,
-  // same citation line). The only locally built envelope in the package.
-  localEnvelope: (flat) => ({
-    envelope_version: '1',
-    ok: true,
-    result: flat as Record<string, unknown>,
-    confidence: { level: 'high', basis: 'deterministic' },
-    _source: {
-      name: 'FreightUtils published methodology',
-      checked: 'request-time',
-      provenance_status: 'computed',
-      source_url: 'https://www.freightutils.com/methodology',
-    },
-    citation: { text: 'FreightUtils Pro — subscribe at https://www.freightutils.com/pricing (£19/mo, 50,000 requests/mo). Open in a browser; agents must not complete checkout.' },
-  }),
-};
+// get_subscribe_link (19) left the tool list in 2.34.6, as on the hosted server (freightutils.com #430): the
+// pricing link still travels in every rate-limit answer (the REST 429 body's upgrade_url, passed through whole —
+// errors.ts), so a call to it is now an unknown tool.
 
 // ─────────────────────────────────────────────────────────────
 //  Emissions Calculator (ISO 14083 / GLEC v3.2)
@@ -1743,6 +1698,142 @@ const resolveReference: ToolDef = {
 };
 
 // ─────────────────────────────────────────────────────────────
+//  EU Tariff Lookup + EU Duty Calculator (TARIC) — 2.34.6
+// ─────────────────────────────────────────────────────────────
+// Hosted first (freightutils.com run CU2, customs 1.2): name, title, annotations, description and input schema are
+// the hosted definitions' own (lib/mcp/hosted-only.ts, app/api/mcp/[transport]/route.ts). Every argument is
+// optional in the schema, as hosted, so REST's shared answer names what is missing (as_of above all) by its own
+// refusal. The answers are REST's: GET /api/eu-tariff and POST /api/eu-duty, envelope 1.2 only.
+
+const TARIC_RESULT = {
+  code: z.string(),
+  code_given: z.string(),
+  as_of: z.string(),
+  origin: z.unknown(),
+  exists: z.boolean(),
+  declarable: z.boolean(),
+  declarable_codes_below: z.array(z.string()),
+  consultation_url: z.string(),
+};
+// POST /api/eu-duty takes envelope alone in its query string (any other parameter is refused by name), so this tool
+// never sends the legacy_source bridge: its envelope is the whole REST answer.
+const envelopeOnly = (opts?: ApiOpts): ApiOpts => ({ envelope: opts?.envelope });
+
+const euTariffLookup: ToolDef = {
+  name: 'eu_tariff_lookup',
+  title: 'EU Tariff Lookup (TARIC)',
+  description: `Look up an EU tariff code: give a CN (8-digit) or TARIC (10-digit) code and as_of (YYYY-MM-DD, mandatory), optionally origin (ISO country or TARIC country-group code) and direction (import, default, or export). It returns whether the code exists and is declarable on that date (with the declarable codes below it when it is not), and every measure that applies by TARIC's cascade from its parent lines: measure type and name, the duty as published and parsed, origin or destination with its name, exclusions, additional codes (codes only), quota order numbers, legal base, start and end. For the duty on a value use eu_duty_calculator; for the UK tariff use uk_duty_calculator. Codes, measures and rates only: no goods description is served; every answer links the Commission's TARIC consultation for the code's wording. Answers come from one monthly TARIC extraction and as_of must be its reference date (every answer and refusal names it). No VAT, excise or national measures; reference, not advice. ${RATE}`,
+
+  schema: strictInput({
+    code: z.string().optional().describe('CN code (8 digits) or TARIC code (10 digits); spaces and dots allowed. Required.'),
+    as_of: z.string().optional().describe('Date the measures are read for, YYYY-MM-DD. Required; must be the reference date of the TARIC extraction the answers come from (a refusal names it).'),
+    origin: z.string().optional().describe('Optional: ISO 3166 country code (e.g. CN) or a 4-digit TARIC country-group code (e.g. 1011). Without it every measure on the code is listed.'),
+    direction: z.string().optional().describe('Optional: import (default) or export.'),
+  }, { acceptedLabel: 'Accepted' }),
+
+  resultSchema: resultShape({
+    ...TARIC_RESULT,
+    direction: z.string(),
+    nomenclature: z.array(z.record(z.string(), z.unknown())),
+    parents_searched: z.array(z.string()),
+    measure_count: z.number(),
+    measures: z.array(z.record(z.string(), z.unknown())),
+  }),
+
+  annotations: readOnlyAnnotations('EU Tariff Lookup (TARIC)'),
+
+  handler: async (args, opts) =>
+    apiGet('eu-tariff', { code: args.code, as_of: args.as_of, origin: args.origin, direction: args.direction }, opts),
+};
+
+const euDutyCalculator: ToolDef = {
+  name: 'eu_duty_calculator',
+  title: 'EU Duty Calculator (TARIC)',
+  description: `Compute EU import duty from TARIC for a declarable 10-digit code, as_of (YYYY-MM-DD, mandatory), origin (ISO country) and customs_value in EUR, with quantities by TARIC unit code (e.g. {"DTN": 12.5}) where a specific duty needs them. Every measure on the code for that origin gets a state: computed, insufficient_data (condition, quota balance, additional code, Meursing, entry price, MIN / MAX, or a quantity named in missing_inputs) or not_applicable. Third-country duty first; each other rate is its own line saying what it requires; no total. Trade-defence duties are listed, never computed. For the measures alone use eu_tariff_lookup; for the UK use uk_duty_calculator. No VAT, excise or currency conversion (EUR only); one monthly TARIC extraction, as_of must be its reference date. Reference, not advice. ${RATE}`,
+
+  schema: strictInput({
+    code: z.string().optional().describe('Declarable TARIC code, 10 digits (an 8-digit CN code is read as its 10-digit form). Required.'),
+    as_of: z.string().optional().describe('Date the duty is computed for, YYYY-MM-DD. Required; must be the reference date of the TARIC extraction (a refusal names it).'),
+    origin: z.string().optional().describe('Country of origin, ISO 3166 alpha-2 (e.g. CN, US, TR). Required.'),
+    customs_value: z.union([z.number(), z.string()]).optional().describe('Customs value in EUR, a positive number. Required.'),
+    currency: z.string().optional().describe('EUR (the default and the only one accepted: no currency is converted).'),
+    quantities: z.record(z.string(), z.union([z.number(), z.string()])).optional().describe('Quantities by TARIC unit code for specific or compound duties, e.g. {"DTN": 12.5} (12.5 × 100 kg), {"HLT": 4}, {"NAR": 100}, {"DTN/E": 3}. A specific duty without its quantity is listed as insufficient_data and named in missing_inputs.'),
+  }, { acceptedLabel: 'Accepted' }),
+
+  resultSchema: resultShape({
+    ...TARIC_RESULT,
+    customs_value: z.number(),
+    currency: z.string(),
+    quantities: z.record(z.string(), z.unknown()),
+    third_country_duty: loose({ state: z.string(), duty_source: z.string(), amount_eur: z.number(), reason: z.string() }),
+    lines: z.array(z.record(z.string(), z.unknown())),
+    states: z.record(z.string(), z.unknown()),
+    no_total: z.string(),
+    additional_measures_may_apply: z.boolean(),
+    rounding: z.unknown(),
+  }),
+
+  annotations: readOnlyAnnotations('EU Duty Calculator (TARIC)'),
+
+  // The inputs travel as the JSON body, as sent (REST reads the same fields the hosted tool does).
+  handler: async (args, opts) =>
+    apiPost('eu-duty', { code: args.code, as_of: args.as_of, origin: args.origin, customs_value: args.customs_value, currency: args.currency, quantities: args.quantities }, envelopeOnly(opts)),
+};
+
+// ─────────────────────────────────────────────────────────────
+//  Code List Lookup (the code-lists family) — 2.34.6
+// ─────────────────────────────────────────────────────────────
+// Hosted first (freightutils.com run CL1, customs 1.5); the definition is the hosted one. The answer is REST's:
+// GET /api/codes/<list>. Without list there is no list to put in the path: the call reads REST's index of the
+// lists (GET /api/codes), which names every list with its edition — nothing about a list is typed here. (Hosted,
+// a call without list is a MISSING_INPUT refusal carrying the same lists.)
+
+const CODE_ROW = loose({ code: z.string(), name: z.string(), status: z.string(), group: z.string(), list: z.string(), edition: z.unknown() });
+
+const codeListLookup: ToolDef = {
+  name: 'code_list_lookup',
+  title: 'Code List Lookup',
+  description: `Look up a code in a published code list. list (required) is one of: cds-procedure-codes-imports and cds-procedure-codes-exports (HMRC CDS requested and previous procedure codes, DE 1/10, e.g. 4000, 1040); cds-additional-procedure-codes-imports and cds-additional-procedure-codes-exports (HMRC CDS additional procedure codes, DE 1/11, e.g. C07, 1RV). With code it returns the code's name as published, the heading it is listed under, its status and the list's edition; with q it searches that one list (exact code, code prefix, then name); with neither, the list itself, paged. Use it to read what a UK customs procedure or additional procedure code means; for a commodity code use hs_code_lookup, for UK duty uk_duty_calculator. Codes and names as HMRC publishes them on GOV.UK (Open Government Licence v3.0, attribution in every answer). No completion rules and no declaration check; reference, not advice. ${RATE}`,
+
+  schema: strictInput({
+    list: z.string().optional().describe('The code list, e.g. cds-procedure-codes-imports (the lists are named in the description). Required: a lookup or a search runs within one list.'),
+    code: z.string().optional().describe('One code, as published (e.g. 4000, C07). Leave out to search or to list.'),
+    q: z.string().optional().describe('Search within the list: exact code first, then codes starting with q, then names containing it.'),
+    full: z.boolean().optional().describe('Full rows (heading and edition on each) instead of summary rows, five per page by default.'),
+    offset: z.number().int().optional().describe('Page start for a list or a search (default 0).'),
+    limit: z.number().int().optional().describe('Page size: summary rows 1-200 (default 50), full rows 1-25 (default 5).'),
+    include_deprecated: z.boolean().optional().describe('Also list and search codes the publisher marks as no longer to be used (a direct lookup always returns them, with the status). No list served today marks one.'),
+  }, { acceptedLabel: 'Accepted' }),
+
+  resultSchema: resultShape({
+    list: z.record(z.string(), z.unknown()),
+    lists: z.array(z.record(z.string(), z.unknown())),
+    record: CODE_ROW,
+    deprecated: z.boolean(),
+    query: z.string(),
+    count: z.number(),
+    total: z.number(),
+    offset: z.number(),
+    limit: z.number(),
+    truncated: z.boolean(),
+    next_offset: z.number(),
+    view: z.string(),
+    detail_hint: z.string(),
+    results: z.array(CODE_ROW),
+  }),
+
+  annotations: readOnlyAnnotations('Code List Lookup'),
+
+  handler: async (args, opts) => {
+    const list = typeof args.list === 'string' && args.list !== '' ? args.list : undefined;
+    const query = { code: args.code, q: args.q, full: args.full, offset: args.offset, limit: args.limit, include_deprecated: args.include_deprecated };
+    // Without list, the other fields still go: the index takes none and refuses each by name ("ask one list"),
+    // so nothing sent is ever ignored.
+    return apiGet(list === undefined ? 'codes' : `codes/${encodeURIComponent(list)}`, query, opts);
+  },
+};
+
+// ─────────────────────────────────────────────────────────────
 //  Export all tools
 // ─────────────────────────────────────────────────────────────
 
@@ -1772,7 +1863,10 @@ export const ALL_TOOLS: ToolDef[] = [
   nearestAirport,
   resolveReference,
   adrConsignmentCheck,
-  getSubscribeLink,
+  // 2.34.6: after adr_consignment_check, as on the hosted list (booking_check, hosted only, sits between them there).
+  euTariffLookup,
+  euDutyCalculator,
+  codeListLookup,
 ];
 
 /**
