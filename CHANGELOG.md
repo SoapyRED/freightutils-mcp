@@ -1,5 +1,32 @@
 # Changelog
 
+## 2.34.6 — 2026-11-23
+
+Three tools added, one removed from the list: a patch number, but not a text-only release. The package now lists 28
+tools.
+
+`eu_tariff_lookup`, `eu_duty_calculator` and `code_list_lookup` join the package. The hosted server has served them since
+21 and 23 November 2026, and their names, titles, annotations, descriptions and input schemas here are the hosted
+definitions, unchanged. Each answer is the REST API's own (`GET /api/eu-tariff`, `POST /api/eu-duty`,
+`GET /api/codes/<list>`), passed through as the hosted tools pass it.
+
+- `eu_tariff_lookup` looks up an EU tariff code: give a CN (8-digit) or TARIC (10-digit) code and `as_of`. It returns
+  whether the code exists and is declarable on that date, and every measure that applies by TARIC's cascade from its
+  parent lines. Codes, measures and rates only: no goods description is served, and every answer links the Commission's
+  TARIC consultation for the code's wording. Answers come from one monthly TARIC extraction, and `as_of` must be its
+  reference date.
+- `eu_duty_calculator` computes EU import duty from TARIC for a declarable 10-digit code, `as_of`, `origin` and
+  `customs_value` in EUR. Every measure on the code for that origin gets a state: `computed`, `insufficient_data` or
+  `not_applicable`. Third-country duty comes first; each other rate is its own line saying what it requires; there is no
+  total. No VAT, excise or currency conversion.
+- `code_list_lookup` looks up a code in a published code list: HMRC CDS requested and previous procedure codes (DE 1/10)
+  and additional procedure codes (DE 1/11), for imports and exports. With `code` it returns the code's name as
+  published, its heading, its status and the list's edition; with `q` it searches one list; with neither, it returns the
+  list itself, paged. Called without `list`, the package reads the API's index of the lists.
+
+`get_subscribe_link` is no longer listed, as on the hosted server; a call to it is now an unknown tool. The pricing link
+still travels in every rate-limit answer (`upgrade_url`). No other tool's definition, input or answer changed.
+
 ## 2.34.5 — 2026-11-21
 
 The `ics2_check` description now says that the European Commission's whitelist of accepted goods descriptions (ICS2

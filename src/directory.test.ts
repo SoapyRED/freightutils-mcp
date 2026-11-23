@@ -61,13 +61,12 @@ test('the shared limit sentence is a fact: reset_at, no instruction', () => {
   }
 });
 
-test('get_subscribe_link is a neutral pricing lookup the user asks for', () => {
-  const t = ALL_TOOLS.find((x) => x.name === 'get_subscribe_link');
-  assert.ok(t, 'get_subscribe_link is not registered');
-  assert.ok(t.description.startsWith('Return the FreightUtils pricing page URL'), 'description should open with what it returns');
-  assert.ok(t.description.includes('Use when the user asks about FreightUtils plans, pricing or API limits'), 'invocation must be tied to the user asking');
-  assert.equal(/429/.test(t.description), false, 'no trigger on another tool’s error');
-  assert.equal(t.annotations.title, 'FreightUtils Plans & Pricing');
+// 2.34.6: get_subscribe_link is no longer listed (as on the hosted server, freightutils.com #430) — the pricing link
+// travels in every rate-limit answer instead. Its 2.34.5 pin (a neutral pricing lookup the user asks for) is
+// re-pointed here: no tool is a plans or pricing tool, so none can be sent to.
+test('no tool is a plans or pricing tool (get_subscribe_link left the list in 2.34.6)', () => {
+  assert.equal(ALL_TOOLS.some((x) => x.name === 'get_subscribe_link'), false, 'get_subscribe_link is registered');
+  for (const t of ALL_TOOLS) assert.notEqual(t.annotations.title, 'FreightUtils Plans & Pricing', `${t.name}: a pricing tool`);
 });
 
 test('resolve_reference says what it returns, not which tool to call next', () => {

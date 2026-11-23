@@ -1,0 +1,3004 @@
+{
+  "eu_tariff_lookup_6305331000": {
+    "tool": "eu_tariff_lookup",
+    "args": {
+      "code": "6305331000",
+      "as_of": "2026-11-01"
+    },
+    "request": "GET /api/eu-tariff?code=6305331000&as_of=2026-11-01&envelope=1.2&legacy_source=1",
+    "recorded_at": "2026-11-23T14:30:22.444Z",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "TARIC extraction of 2026-11-01",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-11-01",
+      "result": {
+        "code": "6305331000",
+        "as_of": "2026-11-01",
+        "direction": "import",
+        "origin": null,
+        "exists": true,
+        "declarable": true,
+        "nomenclature": [
+          {
+            "suffix": "80",
+            "level": 8,
+            "indent": 3,
+            "declarable": true,
+            "start": "1996-01-01",
+            "end": null
+          }
+        ],
+        "parents_searched": [
+          "6300000000",
+          "6305000000",
+          "6305330000",
+          "6305331000"
+        ],
+        "measure_count": 71,
+        "measures": [
+          {
+            "measure_type": {
+              "code": "103",
+              "name": "Third country duty",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "1011",
+              "name": "ERGA OMNES"
+            },
+            "duty": {
+              "source": "12.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 12
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 2448/95",
+            "start": "1996-01-01",
+            "end": null,
+            "attached_to": "6305331000",
+            "inherited": false
+          },
+          {
+            "measure_type": {
+              "code": "106",
+              "name": "Customs Union Duty",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "AD",
+              "name": "Andorra"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0680/90",
+            "start": "2006-01-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "106",
+              "name": "Customs Union Duty",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "SM",
+              "name": "San Marino"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0245/02",
+            "start": "2006-01-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "106",
+              "name": "Customs Union Duty",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "TR",
+              "name": "Türkiye"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0142/96",
+            "start": "2006-01-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "107",
+              "name": "Low-value consignment customs duty",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "1011",
+              "name": "ERGA OMNES"
+            },
+            "duty": {
+              "source": "3.000 EUR",
+              "kind": "specific",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "specific",
+                  "amount": 3,
+                  "money": "EUR",
+                  "unit": null,
+                  "qualifier": null,
+                  "unit_label": null,
+                  "unit_key": null
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 0382/26",
+            "start": "2026-11-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "119",
+              "name": "Airworthiness tariff suspension",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "1011",
+              "name": "ERGA OMNES"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 1517/18",
+            "start": "2018-11-01",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "1006",
+              "name": "EU-Canada agreement: re-imported goods"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0037/17",
+            "start": "2017-09-21",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "1007",
+              "name": "EU-Switzerland agreement: re-imported goods"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 2840/72",
+            "start": "2007-01-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "1033",
+              "name": "CARIFORUM"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0805/08",
+            "start": "2008-12-29",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true,
+            "excluded_areas": [
+              "HT"
+            ]
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "1034",
+              "name": "Eastern and Southern Africa States"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0196/12",
+            "start": "2012-05-14",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "1035",
+              "name": "SADC EPA"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 1623/16",
+            "start": "2016-10-10",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "2000",
+              "name": "Preferential origin in accordance with the Agreement in the form of an Exchange of Letters between the European Union and the Kingdom of Morocco on the amendment of Protocols 1 and 4 to the Euro-Mediterranean Agreement establishing an association between the European Communities and their Member States, of the one part, and the Kingdom of Morocco, of the other part."
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 2022/25",
+            "start": "2025-10-03",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "2005",
+              "name": "GSP-EBA (Special arrangement for the least-developed countries - Everything But Arms)"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 0978/12",
+            "start": "2014-01-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "2012",
+              "name": "EEA - European Economic Area"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0001/94",
+            "start": "2007-07-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "2020",
+              "name": "GSP - General arrangements"
+            },
+            "duty": {
+              "source": "9.600 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 9.6
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 0978/12",
+            "start": "2015-01-01",
+            "end": null,
+            "attached_to": "6305331000",
+            "inherited": false
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "2027",
+              "name": "GSP+ (incentive arrangement for sustainable development and good governance)"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 0978/12",
+            "start": "2014-01-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "2080",
+              "name": "OCTs (Overseas Countries and Territories)"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 1764/21",
+            "start": "2021-01-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "2200",
+              "name": "Central America"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0734/12",
+            "start": "2013-08-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "5500",
+              "name": "Mercosur"
+            },
+            "duty": {
+              "source": "9.600 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 9.6
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0183/26",
+            "start": "2026-05-01",
+            "end": "2026-12-31",
+            "attached_to": "6305331000",
+            "inherited": false
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "AL",
+              "name": "Albania"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0332/09",
+            "start": "2009-04-01",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "AM",
+              "name": "Armenia"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 2269/26",
+            "start": "2026-10-10",
+            "end": "2028-10-11",
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "BA",
+              "name": "Bosnia and Herzegovina"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0474/08",
+            "start": "2009-01-01",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "CA",
+              "name": "Canada"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0037/17",
+            "start": "2017-09-21",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "CH",
+              "name": "Switzerland"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 2840/72",
+            "start": "1972-12-20",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "CI",
+              "name": "Ivory Coast"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0156/09",
+            "start": "2019-12-02",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "CL",
+              "name": "Chile"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 3016/24",
+            "start": "2025-02-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "CM",
+              "name": "Cameroon"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0152/09",
+            "start": "2014-08-04",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "CO",
+              "name": "Colombia"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0735/12",
+            "start": "2013-08-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "DZ",
+              "name": "Algeria"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0690/05",
+            "start": "2005-09-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "EC",
+              "name": "Ecuador"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 2369/16",
+            "start": "2017-01-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "EG",
+              "name": "Egypt"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0635/04",
+            "start": "2004-06-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "FJ",
+              "name": "Fiji"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0729/09",
+            "start": "2014-07-28",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "FO",
+              "name": "Faroe Islands"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0126/97",
+            "start": "1997-01-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "GB",
+              "name": "United Kingdom"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 2253/20",
+            "start": "2021-01-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "GE",
+              "name": "Georgia"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0494/14",
+            "start": "2014-09-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "GH",
+              "name": "Ghana"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 1850/16",
+            "start": "2016-12-15",
+            "end": "2026-12-31",
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "IL",
+              "name": "Israel"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0855/09",
+            "start": "2023-05-16",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "JO",
+              "name": "Jordan"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0357/02",
+            "start": "2002-05-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "JP",
+              "name": "Japan"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 1907/18",
+            "start": "2020-02-01",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "KE",
+              "name": "Kenya"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 1647/24",
+            "start": "2024-07-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "KR",
+              "name": "Korea, Republic of (South Korea)"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0265/11",
+            "start": "2011-07-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "LB",
+              "name": "Lebanon"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0356/06",
+            "start": "2006-04-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "MA",
+              "name": "Morocco"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0204/00",
+            "start": "2000-03-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "MD",
+              "name": "Moldova, Republic of"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0492/14",
+            "start": "2016-01-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "ME",
+              "name": "Montenegro"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0224/10",
+            "start": "2010-05-01",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "MK",
+              "name": "North Macedonia"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0239/04",
+            "start": "2009-01-01",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "MX",
+              "name": "Mexico"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0415/00",
+            "start": "2016-07-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "NZ",
+              "name": "New Zealand"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0244/24",
+            "start": "2024-05-01",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "PE",
+              "name": "Peru"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0735/12",
+            "start": "2013-03-01",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "PG",
+              "name": "Papua New Guinea"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0729/09",
+            "start": "2009-12-20",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "PS",
+              "name": "Occupied palestinian Territory"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0430/97",
+            "start": "2001-01-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "SB",
+              "name": "Solomon Islands"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0729/09",
+            "start": "2020-05-17",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "SG",
+              "name": "Singapore"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 1875/19",
+            "start": "2024-11-21",
+            "end": "2026-12-31",
+            "attached_to": "6305331000",
+            "inherited": false
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "SY",
+              "name": "Syria"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 2216/78",
+            "start": "1994-08-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "TN",
+              "name": "Tunisia"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0238/98",
+            "start": "1998-03-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "UA",
+              "name": "Ukraine"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0295/14",
+            "start": "2016-01-01",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "US",
+              "name": "United States"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 1455/26",
+            "start": "2026-07-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "VN",
+              "name": "Viet Nam"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0753/20",
+            "start": "2020-08-01",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "WS",
+              "name": "Samoa"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0729/09",
+            "start": "2018-12-31",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "XC",
+              "name": "Ceuta"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Accession act 0001/85",
+            "start": "1991-07-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "XK",
+              "name": "Kosovo"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0342/16",
+            "start": "2016-04-01",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "XL",
+              "name": "Melilla"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Accession act 0001/85",
+            "start": "1999-01-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "XS",
+              "name": "Serbia"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 0036/10",
+            "start": "2010-02-01",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "ZA",
+              "name": "South Africa"
+            },
+            "duty": {
+              "source": "0.000 %",
+              "kind": "ad_valorem",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "percent",
+                  "amount": 0
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Decision 1623/16",
+            "start": "2016-10-10",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "277",
+              "name": "Import prohibition",
+              "series": {
+                "code": "A",
+                "name": "Importation and/or exportation prohibited"
+              }
+            },
+            "origin": {
+              "code": "KP",
+              "name": "North Korea (Democratic People’s Republic of Korea)"
+            },
+            "duty": {
+              "source": "",
+              "kind": "none"
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 0936/15",
+            "start": "2015-07-15",
+            "end": null,
+            "attached_to": "6305330000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "475",
+              "name": "Restriction on entry into free circulation",
+              "series": {
+                "code": "B",
+                "name": "Entry into free circulation or exportation subject to conditions"
+              }
+            },
+            "origin": {
+              "code": "KP",
+              "name": "North Korea (Democratic People’s Republic of Korea)"
+            },
+            "duty": {
+              "source": "Cond: Y cert: Y-084 (29):; Y (09):",
+              "kind": "conditions",
+              "conditions": [
+                {
+                  "type": "Y",
+                  "certificate": "Y-084",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "29",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "Y",
+                  "certificate": null,
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "09",
+                  "duty": null,
+                  "components": null
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 1836/17",
+            "start": "2017-10-12",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "760",
+              "name": "Import control",
+              "series": {
+                "code": "B",
+                "name": "Entry into free circulation or exportation subject to conditions"
+              }
+            },
+            "origin": {
+              "code": "BY",
+              "name": "Belarus"
+            },
+            "duty": {
+              "source": "Cond: Y cert: Y-727 (29):; Y cert: Y-728 (29):; Y cert: L-152 (29):; Y cert: Y-870 (29):; Y (09):",
+              "kind": "conditions",
+              "conditions": [
+                {
+                  "type": "Y",
+                  "certificate": "Y-727",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "29",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "Y",
+                  "certificate": "Y-728",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "29",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "Y",
+                  "certificate": "L-152",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "29",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "Y",
+                  "certificate": "Y-870",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "29",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "Y",
+                  "certificate": null,
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "09",
+                  "duty": null,
+                  "components": null
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 0765/06",
+            "start": "2025-02-25",
+            "end": null,
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "760",
+              "name": "Import control",
+              "series": {
+                "code": "B",
+                "name": "Entry into free circulation or exportation subject to conditions"
+              }
+            },
+            "origin": {
+              "code": "UA",
+              "name": "Ukraine"
+            },
+            "duty": {
+              "source": "Cond: Y cert: Y-997 (26):; Y cert: N-864 (26):; Y cert: N-954 (26):; Y (06):",
+              "kind": "conditions",
+              "conditions": [
+                {
+                  "type": "Y",
+                  "certificate": "Y-997",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "26",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "Y",
+                  "certificate": "N-864",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "26",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "Y",
+                  "certificate": "N-954",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "26",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "Y",
+                  "certificate": null,
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "06",
+                  "duty": null,
+                  "components": null
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 0692/14",
+            "start": "2026-06-24",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "762",
+              "name": "Import control",
+              "series": {
+                "code": "B",
+                "name": "Entry into free circulation or exportation subject to conditions"
+              }
+            },
+            "origin": {
+              "code": "RU",
+              "name": "Russian Federation"
+            },
+            "duty": {
+              "source": "Cond: B cert: L-142 (26):; B cert: Y-874 (26):; B cert: L-143 (26):; B cert: Y-859 (26):; B (06):",
+              "kind": "conditions",
+              "conditions": [
+                {
+                  "type": "B",
+                  "certificate": "L-142",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "26",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "B",
+                  "certificate": "Y-874",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "26",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "B",
+                  "certificate": "L-143",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "26",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "B",
+                  "certificate": "Y-859",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "26",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "B",
+                  "certificate": null,
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "06",
+                  "duty": null,
+                  "components": null
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 0833/14",
+            "start": "2023-12-19",
+            "end": "2027-12-31",
+            "attached_to": "6305000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "762",
+              "name": "Import control",
+              "series": {
+                "code": "B",
+                "name": "Entry into free circulation or exportation subject to conditions"
+              }
+            },
+            "origin": {
+              "code": "UA",
+              "name": "Ukraine"
+            },
+            "duty": {
+              "source": "Cond: Y cert: Y-984 (29):; Y cert: N-954 (29):; Y cert: N-864 (29):; Y (09):",
+              "kind": "conditions",
+              "conditions": [
+                {
+                  "type": "Y",
+                  "certificate": "Y-984",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "29",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "Y",
+                  "certificate": "N-954",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "29",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "Y",
+                  "certificate": "N-864",
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "29",
+                  "duty": null,
+                  "components": null
+                },
+                {
+                  "type": "Y",
+                  "certificate": null,
+                  "amount": null,
+                  "amount_unit": null,
+                  "action": "09",
+                  "duty": null,
+                  "components": null
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 0263/22",
+            "start": "2026-06-24",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          },
+          {
+            "measure_type": {
+              "code": "800",
+              "name": "Union handling fee",
+              "series": {
+                "code": "T",
+                "name": "Fees and similar charges"
+              }
+            },
+            "origin": {
+              "code": "1011",
+              "name": "ERGA OMNES"
+            },
+            "duty": {
+              "source": "2.000 EUR",
+              "kind": "specific",
+              "components": [
+                {
+                  "op": null,
+                  "kind": "specific",
+                  "amount": 2,
+                  "money": "EUR",
+                  "unit": null,
+                  "qualifier": null,
+                  "unit_label": null,
+                  "unit_key": null
+                }
+              ]
+            },
+            "additional_code": null,
+            "order_number": null,
+            "reduction_indicator": null,
+            "legal_base": "Regulation 2108/26",
+            "start": "2026-11-01",
+            "end": null,
+            "attached_to": "6300000000",
+            "inherited": true
+          }
+        ],
+        "wording": {
+          "served": false,
+          "note": "No goods description is served: read the code's wording on the Commission's TARIC consultation.",
+          "consultation_url": "https://ec.europa.eu/taxation_customs/dds2/taric/measures.jsp?Lang=en&SimDate=20261101&Taric=6305331000&LangDescr=en"
+        },
+        "extraction": {
+          "reference_date": "2026-11-01",
+          "window": {
+            "from": "2026-11-01",
+            "to": "2026-11-01"
+          }
+        },
+        "attribution": "Source: European Commission, DG TAXUD — TARIC, data extraction of 1 November 2026, reused under Commission Decision 2011/833/EU. Changes made by FreightUtils: goods descriptions and other descriptive texts removed; fields renamed and reformatted (dates as YYYY-MM-DD, one row per measure); codes, rates and legal references are reproduced as published, without altering their meaning. For the wording of a code, see the TARIC consultation. The European Commission accepts no liability for any consequence stemming from this reuse. Not an official publication: only the Official Journal of the European Union is authentic.",
+        "not_done": [
+          "No VAT and no excise: TARIC holds neither (\"TARIC does not contain information relating to national levies such as rates of VAT and rates of excise\", DG TAXUD).",
+          "No national measures of a Member State.",
+          "No binding tariff information (BTI) and no classification: the code is yours to give.",
+          "No quota balances: a tariff quota is listed with its order number, never applied.",
+          "No goods descriptions: the code's wording is on the Commission's TARIC consultation, linked from every answer.",
+          "No currency conversion: customs values are taken in euro only.",
+          "Only the TARIC extraction of 1 November 2026: an answer is given for that date alone, and the live tariff may have changed since."
+        ],
+        "liability": "Reference, not advice: not a customs decision, not legal or customs advice. Check the code and the measures on the TARIC consultation, and with your customs authority, before you declare."
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "European Commission, DG TAXUD — TARIC (data extraction of 1 November 2026)",
+        "checked": "2026-11-01",
+        "provenance_status": "verified",
+        "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+        "dataset_edition": "TARIC extraction of 2026-11-01",
+        "authority_current_edition": "TARIC extraction of 2026-11-01",
+        "checked_at": "2026-11-01"
+      },
+      "citation": {
+        "text": "EU TARIC import measures for 6305331000 on 2026-11-01: 71 measures; third-country duty 12.000 %. Extraction of 1 November 2026; the code's wording: https://ec.europa.eu/taxation_customs/dds2/taric/measures.jsp?Lang=en&SimDate=20261101&Taric=6305331000&LangDescr=en",
+        "qualifier": "Source: European Commission, DG TAXUD — TARIC, data extraction of 1 November 2026, reused under Commission Decision 2011/833/EU. Changes made by FreightUtils: goods descriptions and other descriptive texts removed; fields renamed and reformatted (dates as YYYY-MM-DD, one row per measure); codes, rates and legal references are reproduced as published, without altering their meaning. For the wording of a code, see the TARIC consultation. The European Commission accepts no liability for any consequence stemming from this reuse. Not an official publication: only the Official Journal of the European Union is authentic."
+      },
+      "normalized_input": {
+        "code": "6305331000",
+        "as_of": "2026-11-01",
+        "origin": null,
+        "direction": "import",
+        "defaults_applied": [
+          "direction=import"
+        ]
+      },
+      "_meta": {
+        "identify": "Anonymous call (25/day per address). A free key raises the limit to 100/day and lets us tell you about changes: POST /api/keys/register. Add ?client=<your-app> if you want to be recognisable in our logs."
+      }
+    }
+  },
+  "eu_duty_calculator_6305331000_us": {
+    "tool": "eu_duty_calculator",
+    "args": {
+      "code": "6305331000",
+      "as_of": "2026-11-01",
+      "origin": "US",
+      "customs_value": 1000
+    },
+    "request": "POST /api/eu-duty?envelope=1.2 {\"code\":\"6305331000\",\"as_of\":\"2026-11-01\",\"origin\":\"US\",\"customs_value\":1000}",
+    "recorded_at": "2026-11-23T14:30:22.574Z",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "partial",
+      "missing_inputs": [],
+      "edition": {
+        "name": "TARIC extraction of 2026-11-01",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-11-01",
+      "result": {
+        "code": "6305331000",
+        "as_of": "2026-11-01",
+        "origin": {
+          "code": "US",
+          "name": "United States"
+        },
+        "customs_value": 1000,
+        "currency": "EUR",
+        "quantities": {},
+        "third_country_duty": {
+          "state": "computed",
+          "duty_source": "12.000 %",
+          "amount_eur": 120,
+          "reason": "The third-country duty (erga omnes), computed from the customs value and the published rate."
+        },
+        "lines": [
+          {
+            "state": "computed",
+            "reason_code": "computed",
+            "reason": "The third-country duty (erga omnes), computed from the customs value and the published rate.",
+            "requires": null,
+            "amount_eur": 120,
+            "computation": {
+              "inputs": {
+                "customs_value_eur": 1000
+              },
+              "steps": [
+                "12.000 % × 1000 EUR = 120 EUR"
+              ],
+              "formula": "12.000 % × 1000 EUR = 120 EUR → 120.00 EUR (rounded to the cent)"
+            },
+            "label": "Third country duty",
+            "measure_type": {
+              "code": "103",
+              "name": "Third country duty",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "1011",
+              "name": "ERGA OMNES"
+            },
+            "duty_source": "12.000 %",
+            "duty_kind": "ad_valorem",
+            "additional_code": null,
+            "order_number": null,
+            "legal_base": "Regulation 2448/95",
+            "start": "1996-01-01",
+            "end": null,
+            "attached_to": "6305331000"
+          },
+          {
+            "state": "insufficient_data",
+            "reason_code": "no_measurement_unit",
+            "reason": "The specific part names no measurement unit: not computed.",
+            "requires": null,
+            "amount_eur": null,
+            "computation": null,
+            "label": "Low-value consignment customs duty",
+            "measure_type": {
+              "code": "107",
+              "name": "Low-value consignment customs duty",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "1011",
+              "name": "ERGA OMNES"
+            },
+            "duty_source": "3.000 EUR",
+            "duty_kind": "specific",
+            "additional_code": null,
+            "order_number": null,
+            "legal_base": "Regulation 0382/26",
+            "start": "2026-11-01",
+            "end": null,
+            "attached_to": "6300000000"
+          },
+          {
+            "state": "computed",
+            "reason_code": "computed",
+            "reason": "Computed from the published rate as its own line; it applies only on the requirement named, which this tool cannot check.",
+            "requires": "the conditions of measure type 119 \"Airworthiness tariff suspension\" set by its legal base (not checked by this tool)",
+            "amount_eur": 0,
+            "computation": {
+              "inputs": {
+                "customs_value_eur": 1000
+              },
+              "steps": [
+                "0.000 % × 1000 EUR = 0 EUR"
+              ],
+              "formula": "0.000 % × 1000 EUR = 0 EUR → 0.00 EUR (rounded to the cent)"
+            },
+            "label": "Airworthiness tariff suspension",
+            "measure_type": {
+              "code": "119",
+              "name": "Airworthiness tariff suspension",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "1011",
+              "name": "ERGA OMNES"
+            },
+            "duty_source": "0.000 %",
+            "duty_kind": "ad_valorem",
+            "additional_code": null,
+            "order_number": null,
+            "legal_base": "Regulation 1517/18",
+            "start": "2018-11-01",
+            "end": null,
+            "attached_to": "6305000000"
+          },
+          {
+            "state": "computed",
+            "reason_code": "computed",
+            "reason": "Computed from the published rate as its own line; it applies only on the requirement named, which this tool cannot check.",
+            "requires": "proof of preferential origin for US under the legal base (not visible to this tool)",
+            "amount_eur": 0,
+            "computation": {
+              "inputs": {
+                "customs_value_eur": 1000
+              },
+              "steps": [
+                "0.000 % × 1000 EUR = 0 EUR"
+              ],
+              "formula": "0.000 % × 1000 EUR = 0 EUR → 0.00 EUR (rounded to the cent)"
+            },
+            "label": "Tariff preference",
+            "measure_type": {
+              "code": "142",
+              "name": "Tariff preference",
+              "series": {
+                "code": "C",
+                "name": "Applicable duty"
+              }
+            },
+            "origin": {
+              "code": "US",
+              "name": "United States"
+            },
+            "duty_source": "0.000 %",
+            "duty_kind": "ad_valorem",
+            "additional_code": null,
+            "order_number": null,
+            "legal_base": "Regulation 1455/26",
+            "start": "2026-07-01",
+            "end": null,
+            "attached_to": "6300000000"
+          },
+          {
+            "state": "insufficient_data",
+            "reason_code": "series_not_computed",
+            "reason": "A series T measure (\"Fees and similar charges\"), not an applicable customs duty (series C): listed with its source string and not computed.",
+            "requires": null,
+            "amount_eur": null,
+            "computation": null,
+            "label": "Union handling fee",
+            "measure_type": {
+              "code": "800",
+              "name": "Union handling fee",
+              "series": {
+                "code": "T",
+                "name": "Fees and similar charges"
+              }
+            },
+            "origin": {
+              "code": "1011",
+              "name": "ERGA OMNES"
+            },
+            "duty_source": "2.000 EUR",
+            "duty_kind": "specific",
+            "additional_code": null,
+            "order_number": null,
+            "legal_base": "Regulation 2108/26",
+            "start": "2026-11-01",
+            "end": null,
+            "attached_to": "6300000000"
+          }
+        ],
+        "states": {
+          "computed": 3,
+          "insufficient_data": 2,
+          "not_applicable": 0
+        },
+        "no_total": "No single \"duty payable\" is given: each applicable rate is its own line, labelled with what it requires (proof of preferential origin, a quota balance, an end-use authorisation …), which this tool cannot see. Which one applies to a declaration is decided by the declarant and customs.",
+        "additional_measures_may_apply": false,
+        "rounding": "Each computed line is rounded once, to the euro cent, half up (Math.round on the amount × 100), as the UK duty calculator rounds; the inputs and rates are shown unrounded.",
+        "wording": {
+          "served": false,
+          "note": "No goods description is served: read the code's wording on the Commission's TARIC consultation.",
+          "consultation_url": "https://ec.europa.eu/taxation_customs/dds2/taric/measures.jsp?Lang=en&SimDate=20261101&Taric=6305331000&LangDescr=en"
+        },
+        "extraction": {
+          "reference_date": "2026-11-01",
+          "window": {
+            "from": "2026-11-01",
+            "to": "2026-11-01"
+          }
+        },
+        "attribution": "Source: European Commission, DG TAXUD — TARIC, data extraction of 1 November 2026, reused under Commission Decision 2011/833/EU. Changes made by FreightUtils: goods descriptions and other descriptive texts removed; fields renamed and reformatted (dates as YYYY-MM-DD, one row per measure); codes, rates and legal references are reproduced as published, without altering their meaning. For the wording of a code, see the TARIC consultation. The European Commission accepts no liability for any consequence stemming from this reuse. Not an official publication: only the Official Journal of the European Union is authentic.",
+        "not_done": [
+          "No VAT and no excise: TARIC holds neither (\"TARIC does not contain information relating to national levies such as rates of VAT and rates of excise\", DG TAXUD).",
+          "No national measures of a Member State.",
+          "No binding tariff information (BTI) and no classification: the code is yours to give.",
+          "No quota balances: a tariff quota is listed with its order number, never applied.",
+          "No goods descriptions: the code's wording is on the Commission's TARIC consultation, linked from every answer.",
+          "No currency conversion: customs values are taken in euro only.",
+          "Only the TARIC extraction of 1 November 2026: an answer is given for that date alone, and the live tariff may have changed since."
+        ],
+        "liability": "Reference, not advice: not a customs decision, not legal or customs advice. Check the code and the measures on the TARIC consultation, and with your customs authority, before you declare."
+      },
+      "confidence": {
+        "level": "medium",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "European Commission, DG TAXUD — TARIC (data extraction of 1 November 2026)",
+        "checked": "2026-11-01",
+        "provenance_status": "verified",
+        "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+        "dataset_edition": "TARIC extraction of 2026-11-01",
+        "authority_current_edition": "TARIC extraction of 2026-11-01",
+        "checked_at": "2026-11-01"
+      },
+      "citation": {
+        "text": "EU import duty for 6305331000 from US on 2026-11-01, customs value 1000 EUR: third-country duty 12.000 % = 120.00 EUR; 3 lines computed, 2 not computed (insufficient_data), 0 not a duty. No total is given. Extraction of 1 November 2026; the code's wording: https://ec.europa.eu/taxation_customs/dds2/taric/measures.jsp?Lang=en&SimDate=20261101&Taric=6305331000&LangDescr=en",
+        "qualifier": "Source: European Commission, DG TAXUD — TARIC, data extraction of 1 November 2026, reused under Commission Decision 2011/833/EU. Changes made by FreightUtils: goods descriptions and other descriptive texts removed; fields renamed and reformatted (dates as YYYY-MM-DD, one row per measure); codes, rates and legal references are reproduced as published, without altering their meaning. For the wording of a code, see the TARIC consultation. The European Commission accepts no liability for any consequence stemming from this reuse. Not an official publication: only the Official Journal of the European Union is authentic."
+      },
+      "normalized_input": {
+        "code": "6305331000",
+        "as_of": "2026-11-01",
+        "origin": "US",
+        "customs_value": 1000,
+        "currency": "EUR",
+        "quantities": {},
+        "defaults_applied": [
+          "currency=EUR"
+        ]
+      },
+      "_meta": {
+        "identify": "Anonymous call (25/day per address). A free key raises the limit to 100/day and lets us tell you about changes: POST /api/keys/register. Add ?client=<your-app> if you want to be recognisable in our logs."
+      }
+    }
+  },
+  "code_list_lookup_imports_4000": {
+    "tool": "code_list_lookup",
+    "args": {
+      "list": "cds-procedure-codes-imports",
+      "code": "4000"
+    },
+    "request": "GET /api/codes/cds-procedure-codes-imports?code=4000&envelope=1.2&legacy_source=1",
+    "recorded_at": "2026-11-23T14:30:22.694Z",
+    "status": 200,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": true,
+      "status": "ok",
+      "missing_inputs": [],
+      "edition": {
+        "name": "CDS requested and previous procedure codes (DE 1/10), imports, Updated 5 November 2026",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-11-23",
+      "result": {
+        "list": {
+          "id": "cds-procedure-codes-imports",
+          "title": "Appendix 1: DE 1/10: Requested and Previous Procedure Codes: Introduction and index list",
+          "short_title": "CDS requested and previous procedure codes (DE 1/10), imports",
+          "publisher": "HM Revenue & Customs",
+          "data_element": "DE 1/10",
+          "appendix": "Appendix 1",
+          "declarations": "imports",
+          "edition": {
+            "date": "2026-11-05",
+            "label": "Updated 5 November 2026"
+          },
+          "url": "https://www.gov.uk/government/publications/appendix-1-de-110-requested-and-previous-procedure-codes-of-the-customs-declaration-service-cds/appendix-1-de-110-requested-and-previous-procedure-codes-introduction-and-index-list"
+        },
+        "record": {
+          "code": "4000",
+          "name": "Release to free circulation",
+          "status": "listed",
+          "group": "Requested procedure 40: Release to free circulation",
+          "list": "cds-procedure-codes-imports",
+          "edition": "2026-11-05"
+        }
+      },
+      "confidence": {
+        "level": "high",
+        "basis": "provenance"
+      },
+      "_source": {
+        "name": "HM Revenue & Customs — Appendix 1: DE 1/10: Requested and Previous Procedure Codes: Introduction and index list (Updated 5 November 2026)",
+        "checked": "2026-11-23",
+        "provenance_status": "verified",
+        "source_url": "https://www.gov.uk/government/publications/appendix-1-de-110-requested-and-previous-procedure-codes-of-the-customs-declaration-service-cds/appendix-1-de-110-requested-and-previous-procedure-codes-introduction-and-index-list",
+        "dataset_edition": "CDS requested and previous procedure codes (DE 1/10), imports, Updated 5 November 2026",
+        "authority_current_edition": "CDS requested and previous procedure codes (DE 1/10), imports, Updated 5 November 2026",
+        "checked_at": "2026-11-23"
+      },
+      "citation": {
+        "text": "CDS requested and previous procedure codes (DE 1/10), imports: 4000 — Release to free circulation (listed; under \"Requested procedure 40: Release to free circulation\"). HM Revenue & Customs, Updated 5 November 2026.",
+        "qualifier": "Source: HM Revenue & Customs, \"Appendix 1: DE 1/10: Requested and Previous Procedure Codes: Introduction and index list\" (GOV.UK, Updated 5 November 2026). Contains public sector information licensed under the Open Government Licence v3.0. Licence: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+      },
+      "_meta": {
+        "identify": "Anonymous call (25/day per address). A free key raises the limit to 100/day and lets us tell you about changes: POST /api/keys/register. Add ?client=<your-app> if you want to be recognisable in our logs."
+      }
+    }
+  },
+  "eu_tariff_lookup_missing_as_of": {
+    "tool": "eu_tariff_lookup",
+    "args": {
+      "code": "6305331000"
+    },
+    "request": "GET /api/eu-tariff?code=6305331000&envelope=1.2&legacy_source=1",
+    "recorded_at": "2026-11-23T14:30:22.783Z",
+    "status": 400,
+    "body": {
+      "envelope_version": "1.2",
+      "ok": false,
+      "status": "partial",
+      "missing_inputs": [
+        "as_of"
+      ],
+      "edition": {
+        "name": "TARIC extraction of 2026-11-01",
+        "applies_from": null,
+        "may_apply_until": null
+      },
+      "as_of": "2026-11-01",
+      "result": {},
+      "confidence": {
+        "level": "high",
+        "basis": "deterministic"
+      },
+      "_source": {
+        "name": "European Commission, DG TAXUD — TARIC (data extraction of 1 November 2026)",
+        "checked": "2026-11-01",
+        "provenance_status": "verified",
+        "source_url": "https://ec.europa.eu/taxation_customs/dds2/taric/taric_consultation.jsp?Lang=en",
+        "dataset_edition": "TARIC extraction of 2026-11-01",
+        "authority_current_edition": "TARIC extraction of 2026-11-01",
+        "checked_at": "2026-11-01"
+      },
+      "citation": {
+        "text": "No tariff lookup — as_of is required: as_of is mandatory — the date the measures are read for (YYYY-MM-DD; this extraction answers for 2026-11-01).",
+        "qualifier": "Source: European Commission, DG TAXUD — TARIC, data extraction of 1 November 2026, reused under Commission Decision 2011/833/EU. Changes made by FreightUtils: goods descriptions and other descriptive texts removed; fields renamed and reformatted (dates as YYYY-MM-DD, one row per measure); codes, rates and legal references are reproduced as published, without altering their meaning. For the wording of a code, see the TARIC consultation. The European Commission accepts no liability for any consequence stemming from this reuse. Not an official publication: only the Official Journal of the European Union is authentic."
+      },
+      "blocking_errors": [
+        {
+          "code": "MISSING_INPUT",
+          "message": "as_of is required: as_of is mandatory — the date the measures are read for (YYYY-MM-DD; this extraction answers for 2026-11-01).",
+          "recovery": {
+            "action": "Send code (8 or 10 digits) and as_of, with origin and direction if wanted.",
+            "tool": "eu_tariff_lookup",
+            "params": {
+              "as_of": "2026-11-01"
+            }
+          }
+        }
+      ],
+      "_meta": {
+        "identify": "Anonymous call (25/day per address). A free key raises the limit to 100/day and lets us tell you about changes: POST /api/keys/register. Add ?client=<your-app> if you want to be recognisable in our logs."
+      }
+    }
+  }
+}
